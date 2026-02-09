@@ -15,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
     title: "Drippy Banks",
-    description: "",
+    description:
+        "Drippy Banks is a clothing brand serving fresh drip, bold fits, and standout streetwear essentials.",
 };
 
 export default function RootLayout({
