@@ -1,5 +1,6 @@
+import UserDropdown from "@/app/(public)/_components/Userdropdown";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, Search, ShoppingBag, User, X } from 'lucide-react';
+import { Menu, Search, ShoppingBag, X } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -47,9 +48,7 @@ export function Navbar() {
                         <button className="p-2 text-gray-600 hover:text-gray-900 transition-colors">
                             <Search size={20} />
                         </button>
-                        <button className="hidden sm:block p-2 text-gray-600 hover:text-gray-900 transition-colors">
-                            <User size={20} />
-                        </button>
+                        <UserDropdown />
                         <button className="p-2 text-gray-600 hover:text-gray-900 transition-colors relative">
                             <ShoppingBag size={20} />
                             <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
