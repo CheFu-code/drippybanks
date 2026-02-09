@@ -1,0 +1,43 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+
+export default function AuthLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    return (
+        <div className="relative flex min-h-svh flex-col items-center justify-center">
+            <div className="flex w-full max-w-sm flex-col gap-6">
+                <Link
+                    className="flex items-center gap-2 self-center font-bold"
+                    href={"/"}
+                >
+                    <Image src="/drippybanks.png" alt="Drippy Banks" width={60} height={60} />
+                    Drippy Banks
+                </Link>
+                {children}
+
+                <div className="text-balance text-center text-xs text-muted-foreground">
+                    By using our app, you agree to our{" "}
+                    <Link
+                        href={"/terms-service"}
+                        className="text-primary hover:underline font-medium"
+                    >
+                        Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link
+                        href={"/privacy-policy"}
+                        className="text-primary hover:underline font-medium"
+                    >
+                        Privacy Policy
+                    </Link>
+                    .
+                </div>
+            </div>
+        </div>
+    );
+}
