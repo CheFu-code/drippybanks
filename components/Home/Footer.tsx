@@ -8,7 +8,7 @@ export function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                     {/* Brand */}
                     <div className="space-y-4">
-                        <h3 className="text-2xl font-bold tracking-tighter">MODA</h3>
+                        <h3 className="text-2xl font-bold tracking-tighter">Drippy Banks</h3>
                         <p className="text-gray-400 text-sm leading-relaxed">
                             Elevating your everyday style with premium quality and sustainable fashion. Designed for the modern individual.
                         </p>
@@ -68,7 +68,7 @@ export function Footer() {
                 </div>
 
                 <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-                    <p>&copy; {new Date().getFullYear()} MODA Inc. All rights reserved.</p>
+                    <p>&copy; {new Date().getFullYear()} DrippyBanks Inc. All rights reserved.</p>
                     <div className="flex space-x-6 mt-4 md:mt-0">
                         <a href="#" className="hover:text-gray-400">Privacy Policy</a>
                         <a href="#" className="hover:text-gray-400">Terms of Service</a>

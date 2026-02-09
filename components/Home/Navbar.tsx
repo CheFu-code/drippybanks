@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { ShoppingBag, Menu, X, Search, User } from 'lucide-react';
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, Search, ShoppingBag, User, X } from 'lucide-react';
 import Image from 'next/image';
-import { ThemeToggle } from '../ui/themeToggle';
+import { useState } from 'react';
 
 
 export function Navbar() {
@@ -55,7 +54,6 @@ export function Navbar() {
                             <ShoppingBag size={20} />
                             <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
                         </button>
-                        <ThemeToggle />
                     </div>
                 </div>
             </div>
