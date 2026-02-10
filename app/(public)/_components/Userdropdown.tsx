@@ -1,8 +1,9 @@
 import {
-    BookOpen,
-    ChevronDownIcon,
     Home,
     LayoutDashboardIcon,
+    ShoppingCart,
+    Heart,
+    User,
     LogOutIcon,
 } from 'lucide-react';
 
@@ -12,18 +13,18 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuGroup,
-    DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
+    DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
-// import { UserDropdownProps } from '@/types/user';
+import { UserDropdownProps } from '@/types/user';
 import { signOut } from 'firebase/auth';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { auth } from '@/config/firebaseConfig'
+import { auth } from '@/config/firebaseConfig';
 
-export default function UserDropdown() {
+export default function UserDropdown({ user }: UserDropdownProps) {
     const handleLogout = async () => {
         try {
             await signOut(auth);
@@ -37,76 +38,59 @@ export default function UserDropdown() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button
-                    variant="ghost"
-                    className="h-auto p-0 hover:bg-transparent border border-amber-300"
-                >
+                <Button variant="ghost" className="h-auto p-0 hover:bg-transparent">
                     <Avatar>
                         <AvatarImage
-                        src={'/drippybanks.png'}
-                            // src={user?.profilePicture || '/drippybanks.png'}
+                            src={user?.avatarUrl || '/drippybanks.jpg'}
                             alt="Profile image"
                         />
-                        <AvatarFallback>
-                            DB
-                            {/* {user?.fullname?.[0] || 'CA'} */}
-                        </AvatarFallback>
+                        <AvatarFallback>{user?.fullname?.[0] || 'DB'}</AvatarFallback>
                     </Avatar>
-                    <ChevronDownIcon
-                        size={16}
-                        className="opacity-60"
-                        aria-hidden="true"
-                    />
+                    <LayoutDashboardIcon size={16} className="opacity-60" aria-hidden="true" />
                 </Button>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent align="end" className="max-w-64">
-                <DropdownMenuLabel className="flex min-w-0 flex-col">
-                    <span className="text-foreground truncate text-sm font-medium">
-                        {/* {user?.fullname} */}
-                        username
-                    </span>
-                    <span className="text-muted-foreground truncate text-xs font-normal">
-                        {/* {user?.email} */}
-                        example@email.com
-                    </span>
+                <DropdownMenuLabel className="flex flex-col min-w-0">
+                    <span className="text-foreground truncate text-sm font-medium">{user?.fullname}</span>
+                    <span className="text-muted-foreground truncate text-xs font-normal">{user?.email}</span>
                 </DropdownMenuLabel>
+
                 <DropdownMenuSeparator />
+
                 <DropdownMenuGroup>
                     <DropdownMenuItem asChild>
-                        <Link href={'/'} className="flex items-center gap-2">
-                            <Home
-                                size={16}
-                                className="opacity-60"
-                                aria-hidden="true"
-                            />
+                        <Link href="/" className="flex items-center gap-2">
+                            <Home size={16} className="opacity-60" aria-hidden="true" />
                             <span>Home</span>
-                        </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                        <Link
-                            href={'/videos/all-videos'}
-                            className="flex items-center gap-2"
-                        >
-                            <LayoutDashboardIcon
-                                size={16}
-                                className="opacity-60"
-                                aria-hidden="true"
-                            />
-                            <span>Videos</span>
                         </Link>
                     </DropdownMenuItem>
 
                     <DropdownMenuItem asChild>
-                        <Link
-                            href={'/courses'}
-                            className="flex items-center gap-2"
-                        >
-                            <BookOpen
-                                size={16}
-                                className="opacity-60"
-                                aria-hidden="true"
-                            />
-                            <span>Courses</span>
+                        <Link href="/shop" className="flex items-center gap-2">
+                            <LayoutDashboardIcon size={16} className="opacity-60" aria-hidden="true" />
+                            <span>Shop</span>
+                        </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem asChild>
+                        <Link href="/cart" className="flex items-center gap-2">
+                            <ShoppingCart size={16} className="opacity-60" aria-hidden="true" />
+                            <span>Cart</span>
+                        </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem asChild>
+                        <Link href="/wishlist" className="flex items-center gap-2">
+                            <Heart size={16} className="opacity-60" aria-hidden="true" />
+                            <span>Wishlist</span>
+                        </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem asChild>
+                        <Link href="/profile" className="flex items-center gap-2">
+                            <User size={16} className="opacity-60" aria-hidden="true" />
+                            <span>Profile</span>
                         </Link>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
@@ -114,16 +98,8 @@ export default function UserDropdown() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem asChild>
-                    <Button
-                        variant="ghost"
-                        onClick={handleLogout}
-                        className="flex items-center gap-2"
-                    >
-                        <LogOutIcon
-                            size={16}
-                            className="opacity-60"
-                            aria-hidden="true"
-                        />
+                    <Button variant="destructive" onClick={handleLogout} className="flex items-center gap-2">
+                        <LogOutIcon size={16} className="opacity-60" aria-hidden="true" />
                         <span>Logout</span>
                     </Button>
                 </DropdownMenuItem>

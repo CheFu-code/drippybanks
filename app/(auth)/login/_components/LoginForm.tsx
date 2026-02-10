@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FcGoogle } from "react-icons/fc";
+import Link from "next/link";
 
 export default function LoginForm() {
     return (
@@ -16,12 +16,12 @@ export default function LoginForm() {
             <CardHeader>
                 <CardTitle>Welcome back!</CardTitle>
                 <CardDescription>
-                    Login to access your courses and continue learning.
+                    Log in to access your account, track orders, and continue shopping.
                 </CardDescription>
             </CardHeader>
             <form>
                 <CardContent className="flex flex-col gap-4">
-                    <div className="flex flex-row justify-center gap-4">
+                    {/* <div className="flex flex-row justify-center gap-4">
                         <Button variant="outline" className="cursor-pointer">
                             <FcGoogle className="size-4" />
                             <span>Sign in with Google</span>
@@ -32,7 +32,7 @@ export default function LoginForm() {
                         <span className="relative z-10 bg-card px-2 text-muted-foreground">
                             Or continue with
                         </span>
-                    </div>
+                    </div> */}
 
                     <div className="grid gap-3">
                         <div className="grid gap-2">
@@ -43,6 +43,13 @@ export default function LoginForm() {
                             <Label htmlFor="password">Password</Label>
                             <Input id="password" type="password" placeholder="********" />
                         </div>
+                        <div className="flex items-center justify-end text-sm">
+                            <span>Don&apos;t have an account?</span>
+                            <Link className="ml-1 text-primary hover:underline" href="/register">
+                                Sign up
+                            </Link>
+                        </div>
+
                         <Button className="cursor-pointer">Continue</Button>
                     </div>
                 </CardContent>

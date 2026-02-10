@@ -1,11 +1,15 @@
 import UserDropdown from "@/app/(public)/_components/Userdropdown";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, Search, ShoppingBag, X } from 'lucide-react';
+import { Loader, Menu, Search, ShoppingBag, X } from 'lucide-react';
 import Image from 'next/image';
+import Link from "next/link";
 import { useState } from 'react';
+import { buttonVariants } from "../ui/button";
 
 
 export function Navbar() {
+    const { user, loading } = useAuthUser()
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
@@ -48,7 +52,23 @@ export function Navbar() {
                         <button className="p-2 text-gray-600 hover:text-gray-900 transition-colors">
                             <Search size={20} />
                         </button>
-                        <UserDropdown />
+                        {loading ? (
+                            <Loader className="size-4 animate-spin" />
+                        ) : user ? (
+                            <Link
+                                href="/"
+                                className="text-sm font-medium transition-colors hover:text-primary"
+                            >
+                                <UserDropdown user={user} />
+                            </Link>
+                        ) : (
+                            <Link
+                                href="/login"
+                                className={buttonVariants({ size: 'sm' })}
+                            >
+                                Login
+                            </Link>
+                        )}
                         <button className="p-2 text-gray-600 hover:text-gray-900 transition-colors relative">
                             <ShoppingBag size={20} />
                             <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
