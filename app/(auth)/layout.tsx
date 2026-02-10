@@ -20,7 +20,7 @@ export default function AuthLayout({
                 </Link>
                 {children}
 
-                <div className="text-balance text-center text-xs text-muted-foreground">
+                {/* <div className="text-balance text-center text-xs text-muted-foreground">
                     By using our app, you agree to our{" "}
                     <Link
                         href={"/terms-service"}
@@ -36,7 +36,7 @@ export default function AuthLayout({
                         Privacy Policy
                     </Link>
                     .
-                </div>
+                </div> */}
             </div>
         </div>
     );
