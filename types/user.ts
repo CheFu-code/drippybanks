@@ -60,3 +60,14 @@ export type AppUser = {
 export interface UserDropdownProps {
     user: AppUser | null;
 }
+
+export type FormState = {
+  phone: string;
+  countryCode: string;      // ISO code (e.g., "ZA")
+  countryName: string;      // Human readable (e.g., "South Africa")
+  provinceCode: string;     // ISO code for province/state when available
+  provinceName: string;
+  addressStreet: string;
+  addressCity: string;
+  addressPostalCode: string;
+};

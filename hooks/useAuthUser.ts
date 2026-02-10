@@ -11,7 +11,7 @@ export function useAuthUser() {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             if (firebaseUser && firebaseUser.email) {
-                const docRef = doc(db, "drippy-bank-users", firebaseUser.uid);
+                const docRef = doc(db, "drippy-banks-users", firebaseUser.uid);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {

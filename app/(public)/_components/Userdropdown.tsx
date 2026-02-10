@@ -1,10 +1,9 @@
 import {
-    Home,
-    LayoutDashboardIcon,
-    ShoppingCart,
     Heart,
-    User,
+    LayoutDashboardIcon,
     LogOutIcon,
+    ShoppingCart,
+    User
 } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,16 +12,16 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuGroup,
+    DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-    DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
+import { auth } from '@/config/firebaseConfig';
 import { UserDropdownProps } from '@/types/user';
 import { signOut } from 'firebase/auth';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { auth } from '@/config/firebaseConfig';
 
 export default function UserDropdown({ user }: UserDropdownProps) {
     const handleLogout = async () => {
@@ -59,13 +58,6 @@ export default function UserDropdown({ user }: UserDropdownProps) {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuGroup>
-                    <DropdownMenuItem asChild>
-                        <Link href="/" className="flex items-center gap-2">
-                            <Home size={16} className="opacity-60" aria-hidden="true" />
-                            <span>Home</span>
-                        </Link>
-                    </DropdownMenuItem>
-
                     <DropdownMenuItem asChild>
                         <Link href="/shop" className="flex items-center gap-2">
                             <LayoutDashboardIcon size={16} className="opacity-60" aria-hidden="true" />

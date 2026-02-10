@@ -1,80 +1,164 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import { useState } from "react";
+import { doc, setDoc } from "firebase/firestore";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { db } from "@/config/firebaseConfig";
+import { FormState } from "@/types/user";
+import { Country, ICountry, IState, State } from "country-state-city";
+import FinishUpForm from "../../_components/FinishUpForm";
+
+const DEFAULT_COUNTRY_CODE = "ZA"; // Preselect South Africa (optional)
 
 const FinishSetupAccount = () => {
-    const params = useParams();
+    const params = useParams<{ id?: string | string[] }>();
+    const userId = Array.isArray(params.id) ? params.id[0] : params.id;
+    const router = useRouter()
 
-    const [form, setForm] = useState({
+    const [loading, setLoading] = useState(false);
+    const [countries, setCountries] = useState<ICountry[]>([]);
+    const [states, setStates] = useState<IState[]>([]);
+
+    const [form, setForm] = useState<FormState>({
         phone: "",
-        bio: "",
-        website: "",
+        countryCode: "",
+        countryName: "",
+        provinceCode: "",
+        provinceName: "",
+        addressStreet: "",
+        addressCity: "",
+        addressPostalCode: "",
     });
 
-    const handleChange = (e: any) => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value,
-        });
+    // Load countries on mount
+    useEffect(() => {
+        const all = Country.getAllCountries(); // [{ name, isoCode, phonecode, flag, ... }]
+        setCountries(all);
+
+        // Optionally default to South Africa
+        const za = all.find((c) => c.isoCode === DEFAULT_COUNTRY_CODE);
+        if (za) {
+            setForm((prev) => ({
+                ...prev,
+                countryCode: za.isoCode,
+                countryName: za.name,
+            }));
+            const zaStates = State.getStatesOfCountry(za.isoCode);
+            setStates(zaStates);
+        }
+    }, []);
+
+    // When country changes, refresh states (provinces)
+    const handleCountrySelect = (isoCode: string) => {
+        const selected = countries.find((c) => c.isoCode === isoCode);
+        setForm((prev) => ({
+            ...prev,
+            countryCode: isoCode,
+            countryName: selected?.name ?? "",
+            provinceCode: "",
+            provinceName: "",
+        }));
+        setStates(State.getStatesOfCountry(isoCode) || []);
     };
 
-    const handleSubmit = () => {
-        console.log("Submitting:", form);
-        // TODO: call API endpoint
+    const handleProvinceSelect = (stateCode: string) => {
+        const selected = states.find((s) => s.isoCode === stateCode);
+        setForm((prev) => ({
+            ...prev,
+            provinceCode: selected?.isoCode ?? "",
+            provinceName: selected?.name ?? "",
+        }));
     };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async () => {
+        if (!userId) {
+            toast.error("Missing user id. Please reload the page.");
+            return;
+        }
+
+        if (!form.countryCode) {
+            toast.error("Please select a country.");
+            return;
+        }
+
+        if (!form.addressStreet || !form.addressCity || !form.addressPostalCode) {
+            toast.error("Please complete your address (street, city, postal code).");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            await setDoc(
+                doc(db, "drippy-banks-users", userId),
+                {
+                    phone: form.phone,
+                    country: {
+                        code: form.countryCode,
+                        name: form.countryName,
+                    },
+                    province: form.provinceName
+                        ? { code: form.provinceCode, name: form.provinceName }
+                        : null,
+                    addressStreet: form.addressStreet,
+                    addressCity: form.addressCity,
+                    addressPostalCode: form.addressPostalCode,
+                    finishedSetup: true,
+                    updatedAt: new Date(),
+                },
+                { merge: true },
+            );
+
+            toast.success("Account details saved!");
+            router.replace("/")
+        } catch (error: unknown) {
+            const err = error as Error;
+            toast.error("Failed to save account details.", {
+                description: err.message ?? "Unknown error",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Derived memoized lists (optional, for performance with large lists)
+    const countryOptions = useMemo(
+        () =>
+            countries.map((c) => ({
+                value: c.isoCode,
+                label: c.name,
+            })),
+        [countries],
+    );
+
+    const stateOptions = useMemo(
+        () =>
+            states.map((s) => ({
+                value: s.isoCode,
+                label: s.name,
+            })),
+        [states],
+    );
 
     return (
-        <Card className="w-full max-w-lg">
-            <CardHeader>
-                <CardTitle className="text-xl font-semibold">
-                    Finish Setting Up Your Account
-                </CardTitle>
-            </CardHeader>
-
-            <CardContent className="space-y-4">
-                <div className="space-y-2">
-                    <Label>Phone Number</Label>
-                    <Input
-                        name="phone"
-                        placeholder="+1 555 123 4567"
-                        value={form.phone}
-                        onChange={handleChange}
-                        type="tel"
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <Label>Website (optional)</Label>
-                    <Input
-                        name="website"
-                        placeholder="https://your-website.com"
-                        value={form.website}
-                        onChange={handleChange}
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <Label>Bio</Label>
-                    <Textarea
-                        name="bio"
-                        placeholder="Tell us a little about yourself..."
-                        value={form.bio}
-                        onChange={handleChange}
-                    />
-                </div>
-
-                <Button className="w-full mt-4" onClick={handleSubmit}>
-                    Complete Setup
-                </Button>
-            </CardContent>
-        </Card>
+        <FinishUpForm
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+            loading={loading}
+            form={form}
+            countryOptions={countryOptions}
+            stateOptions={stateOptions}
+            handleCountrySelect={handleCountrySelect}
+            handleProvinceSelect={handleProvinceSelect}
+            states={states}
+        />
     );
 };
 
