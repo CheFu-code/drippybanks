@@ -28,17 +28,26 @@ const Register = () => {
         try {
             // Create user
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-            // Update display name
             await updateProfile(userCredential.user, { displayName: fullname });
             await setDoc(doc(db, "drippy-banks-users", userCredential.user.uid), {
                 fullname,
                 email,
                 createdAt: new Date(),
+                role: 'customer',
+                isEmailVerified: false,
+                isPhoneVerified: false,
             });
 
-            toast.success("Account created successfully!");
-            router.replace(`/register/${userCredential.user.uid}/finish-up`)
+            toast.success("Account created successfully!", {
+                description: "You’ll be redirected to complete your profile setup.",
+                style: {
+                    background: "#000",
+                    color: "#fff",
+                    border: "1px solid #333",
+                },
+            });
+
+            router.replace(`/register/${userCredential.user.uid}/finish-up`);
         } catch (error: unknown) {
             let message = "Something went wrong!";
 

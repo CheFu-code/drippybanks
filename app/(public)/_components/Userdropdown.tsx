@@ -17,22 +17,12 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { auth } from '@/config/firebaseConfig';
+import { useLogout } from '@/hooks/useLogout';
 import { UserDropdownProps } from '@/types/user';
-import { signOut } from 'firebase/auth';
 import Link from 'next/link';
-import { toast } from 'sonner';
 
 export default function UserDropdown({ user }: UserDropdownProps) {
-    const handleLogout = async () => {
-        try {
-            await signOut(auth);
-            toast.success('Logged out successfully!');
-        } catch (error) {
-            console.error('Logout failed:', error);
-            toast.error('Logout failed. Please try again.');
-        }
-    };
+    const { handleLogout } = useLogout();
 
     return (
         <DropdownMenu>
@@ -80,7 +70,7 @@ export default function UserDropdown({ user }: UserDropdownProps) {
                     </DropdownMenuItem>
 
                     <DropdownMenuItem asChild>
-                        <Link href="/profile" className="flex items-center gap-2">
+                        <Link href={`/${user?.id}/profile`} className="flex items-center gap-2">
                             <User size={16} className="opacity-60" aria-hidden="true" />
                             <span>Profile</span>
                         </Link>
@@ -90,7 +80,7 @@ export default function UserDropdown({ user }: UserDropdownProps) {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem asChild>
-                    <Button variant="destructive" onClick={handleLogout} className="flex items-center gap-2">
+                    <Button variant="destructive" onClick={() => handleLogout()} className="flex items-center gap-2">
                         <LogOutIcon size={16} className="opacity-60" aria-hidden="true" />
                         <span>Logout</span>
                     </Button>
