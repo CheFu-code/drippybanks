@@ -31,7 +31,7 @@ export const ProfilePageUI = ({
                     <div className="h-24 w-24 rounded-full overflow-hidden border-4 border-white shadow-md">
                         <Avatar className="h-full w-full object-cover rounded-full">
                             <AvatarImage
-                                src={user?.avatarUrl || "/drippybanks.png"}
+                                src={user?.avatarUrl}
                                 alt="Profile image"
                             />
                             <AvatarFallback>{user?.fullname?.[0] || "DB"}</AvatarFallback>
@@ -51,12 +51,12 @@ export const ProfilePageUI = ({
                     </div>
                     <p className="text-gray-500">{user.email}</p>
                     <p className="text-sm text-gray-400 mt-1">
-                        Member since:{" "}
-                        {user?.createdAt?.toLocaleString("en-ZA", {
+                        Member since{" "}
+                        {user?.createdAt ? new Date(user.createdAt).toLocaleDateString("en-ZA", {
                             year: "numeric",
                             month: "long",
                             day: "numeric",
-                        })}
+                        }) : "Unknown"}
                     </p>
                 </div>
 
