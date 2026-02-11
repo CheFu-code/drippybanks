@@ -35,6 +35,10 @@ export async function connectDB(): Promise<typeof mongoose> {
             .then((m) => {
                 console.log("MongoDB connected");
                 return m;
+            })
+            .catch((err) => {
+                cached.promise = null;
+                throw err;
             });
     }
 
