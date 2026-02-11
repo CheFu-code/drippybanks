@@ -52,7 +52,7 @@ export function useAuthUser() {
 
                         // Optional fields with safe mapping
                         avatarUrl: data.avatarUrl ?? undefined,
-                        phoneNumber: data.phoneNumber ?? data.phone ?? undefined, // ✅ map phone → phoneNumber if needed
+                        phone: data.phoneNumber ?? data.phone ?? undefined, // ✅ map phone → phoneNumber if needed
                         isEmailVerified:
                             data.isEmailVerified ?? firebaseUser.emailVerified ?? false,
                         isPhoneVerified: data.isPhoneVerified ?? false,
