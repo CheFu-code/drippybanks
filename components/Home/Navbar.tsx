@@ -43,7 +43,7 @@ export function Navbar() {
                     {/* Desktop Navigation */}
                     <div className="hidden md:block">
                         <div className="ml-10 flex items-baseline space-x-8">
-                            {["New Arrivals", "Women", "Men", "Accessories", "Sale"].map(
+                            {["New Arrivals", "Women", "Men", "Caps", "Sale"].map(
                                 (item) => (
                                     <a
                                         key={item}
@@ -97,7 +97,7 @@ export function Navbar() {
                         className="md:hidden bg-white border-b border-gray-100 overflow-hidden"
                     >
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                            {["New Arrivals", "Women", "Men", "Accessories", "Sale"].map(
+                            {["New Arrivals", "Women", "Men", "Caps", "Sale"].map(
                                 (item) => (
                                     <a
                                         key={item}

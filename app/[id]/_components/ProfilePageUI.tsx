@@ -31,7 +31,7 @@ export const ProfilePageUI = ({
                     <div className="h-24 w-24 rounded-full overflow-hidden border-4 border-white shadow-md">
                         <Avatar className="h-full w-full object-cover rounded-full">
                             <AvatarImage
-                                src={user?.avatarUrl || "/drippybanks.jpg"}
+                                src={user?.avatarUrl || "/drippybanks.png"}
                                 alt="Profile image"
                             />
                             <AvatarFallback>{user?.fullname?.[0] || "DB"}</AvatarFallback>
