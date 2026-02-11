@@ -93,6 +93,22 @@ const FinishSetupAccount = () => {
             return;
         }
 
+        if (!form.phone) {
+            toast.error("Please enter your phone number.");
+            return;
+        }
+
+        if (!form.provinceCode) {
+            toast.error("Please select a province.");
+            return;
+        }
+
+        if (!form.countryName) {
+            toast.error("Please select a country.");
+            return;
+        }
+
+
         setLoading(true);
 
         try {

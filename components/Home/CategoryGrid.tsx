@@ -15,12 +15,12 @@ const categories = [
         image:'/customerTwo.jpeg',
         colSpan: 'md:col-span-1',
     },
-    // {
-    //     id: 'accessories',
-    //     name: 'Accessories',
-    //     image: 'https://images.unsplash.com/photo-1746796623821-299efba84557?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwYWNjZXNzb3JpZXMlMjBzaG9lcyUyMGJhZyUyMGZsYXRsYXl8ZW58MXx8fHwxNzcwNjM4ODg0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    //     colSpan: 'md:col-span-2',
-    // },
+    {
+        id: 'caps',
+        name: 'Caps',
+        image:'/cap.jpeg',
+        colSpan: 'md:col-span-2',
+    },
 ];
 
 export function CategoryGrid() {
