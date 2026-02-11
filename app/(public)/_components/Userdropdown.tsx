@@ -20,6 +20,7 @@ import {
 import { useLogout } from '@/hooks/useLogout';
 import { UserDropdownProps } from '@/types/user';
 import Link from 'next/link';
+import { GiClothes } from 'react-icons/gi';
 
 export default function UserDropdown({ user }: UserDropdownProps) {
     const { handleLogout } = useLogout();
@@ -30,7 +31,7 @@ export default function UserDropdown({ user }: UserDropdownProps) {
                 <Button variant="ghost" className="h-auto p-0 hover:bg-transparent">
                     <Avatar>
                         <AvatarImage
-                            src={user?.avatarUrl || '/drippybanks.jpg'}
+                            src={user?.avatarUrl}
                             alt="Profile image"
                         />
                         <AvatarFallback>{user?.fullname?.[0] || 'DB'}</AvatarFallback>
@@ -75,6 +76,13 @@ export default function UserDropdown({ user }: UserDropdownProps) {
                             <span>Profile</span>
                         </Link>
                     </DropdownMenuItem>
+
+                    {user?.role === 'admin' && (<DropdownMenuItem asChild>
+                        <Link href='/admin/products/new' className="flex items-center gap-2">
+                            <GiClothes size={16} className="opacity-60" aria-hidden="true" />
+                            <span>Add Product</span>
+                        </Link>
+                    </DropdownMenuItem>)}
                 </DropdownMenuGroup>
 
                 <DropdownMenuSeparator />

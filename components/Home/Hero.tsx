@@ -1,9 +1,13 @@
+
+'use client'
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { motion } from "framer-motion";
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export function Hero() {
+    const router = useRouter()
     return (
         <div className="relative h-[80vh] w-full overflow-hidden">
             {/* Background Image */}
@@ -42,7 +46,7 @@ export function Hero() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
                     >
-                        <button className="bg-white text-gray-900 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-colors flex items-center space-x-2 group">
+                        <button onClick={() => router.push('/shop')} className="bg-white cursor-pointer text-gray-900 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-colors flex items-center space-x-2 group">
                             <span>Shop Now</span>
                             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                         </button>

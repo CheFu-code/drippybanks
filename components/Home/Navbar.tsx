@@ -6,8 +6,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { buttonVariants } from "../ui/button";
+import { useRouter } from "next/navigation";
 
 export function Navbar() {
+    const router = useRouter();
     const { user, loading } = useAuthUser();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -26,19 +28,22 @@ export function Navbar() {
                     </div>
 
                     {/* Logo */}
-                    <div className="shrink-0 flex items-center justify-center md:justify-start flex-1 md:flex-none">
+                    <button
+                        onClick={() => router.push("/")}
+                        className="shrink-0 cursor-pointer flex items-center justify-center md:justify-start flex-1 md:flex-none"
+                    >
                         <Image
                             src={"/drippybanks.png"}
                             alt="Logo"
                             width={100}
                             height={100}
                         />
-                    </div>
+                    </button>
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:block">
                         <div className="ml-10 flex items-baseline space-x-8">
-                            {["New Arrivals", "Women", "Men", "Accessories", "Sale"].map(
+                            {["New Arrivals", "Women", "Men", "Caps", "Sale"].map(
                                 (item) => (
                                     <a
                                         key={item}
@@ -67,7 +72,10 @@ export function Navbar() {
                                 <UserDropdown user={user} />
                             </Link>
                         ) : (
-                            <Link href="/login" className={buttonVariants({ size: "sm" })}>
+                            <Link
+                                href="/login"
+                                className={buttonVariants({ size: "sm", variant: "outline" })}
+                            >
                                 Login
                             </Link>
                         )}
@@ -89,7 +97,7 @@ export function Navbar() {
                         className="md:hidden bg-white border-b border-gray-100 overflow-hidden"
                     >
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                            {["New Arrivals", "Women", "Men", "Accessories", "Sale"].map(
+                            {["New Arrivals", "Women", "Men", "Caps", "Sale"].map(
                                 (item) => (
                                     <a
                                         key={item}
