@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/config/firebaseConfig";
@@ -18,13 +18,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { getLoginErrorMessage } from "@/helpers/getErrorMsg";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 export default function LoginForm() {
     const router = useRouter();
+    const { user, loading: authLoading } = useAuthUser();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (!authLoading && user) {
+            router.replace("/");
+        }
+    }, [authLoading, user, router]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -50,6 +58,23 @@ export default function LoginForm() {
             setLoading(false);
         }
     };
+
+    if (authLoading) {
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle>Checking session...</CardTitle>
+                    <CardDescription>
+                        Please wait while we verify your account state.
+                    </CardDescription>
+                </CardHeader>
+            </Card>
+        );
+    }
+
+    if (user) {
+        return null;
+    }
 
     return (
         <Card>
