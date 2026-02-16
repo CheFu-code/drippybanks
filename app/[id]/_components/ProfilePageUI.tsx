@@ -4,6 +4,7 @@ import { db } from "@/config/firebaseConfig";
 import { AppUser, FormState } from "@/types/user";
 import { Country, ICountry, IState, State } from "country-state-city";
 import { doc, setDoc } from "firebase/firestore";
+import Link from "next/link";
 import {
     CreditCard,
     LogOut,
@@ -448,9 +449,11 @@ export const ProfilePageUI = ({
                     </p>
                 </div>
 
-                <Button className="flex items-center gap-2 px-4 py-2  text-sm font-medium">
-                    <Settings className="h-4 w-4" />
-                    Edit Profile
+                <Button asChild className="flex items-center gap-2 px-4 py-2 text-sm font-medium">
+                    <Link href={`/${user.id}/profile/edit`}>
+                        <Settings className="h-4 w-4" />
+                        Edit Profile
+                    </Link>
                 </Button>
             </div>
 

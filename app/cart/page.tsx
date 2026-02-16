@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/context/CartContext';
 
 export default function CartPage() {
-    const { cart, cartTotal, removeFromCart, clearCart } = useCart();
+    const { cart, cartTotal, addToCart, decreaseQuantity, removeFromCart, clearCart } = useCart();
 
     return (
         <div className="min-h-screen p-5 bg-gray-100 font-sans text-gray-900 selection:bg-gray-900 selection:text-white">
@@ -47,7 +47,23 @@ export default function CartPage() {
                                         <div className="flex-1 min-w-0">
                                             <p className="font-medium truncate">{item.name}</p>
                                             <p className="text-sm text-muted-foreground">{item.category}</p>
-                                            <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                                            <div className="flex items-center gap-2">
+                                                <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() => decreaseQuantity(item.id)}
+                                                >
+                                                    -
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() => addToCart(item)}
+                                                >
+                                                    +
+                                                </Button>
+                                            </div>
                                         </div>
                                         <div className="text-right space-y-2">
                                             <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>

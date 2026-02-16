@@ -9,6 +9,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { buttonVariants } from "../ui/button";
 
+const NAV_ITEMS = [
+    { label: "New Arrivals", href: "/shop" },
+    { label: "Women", href: "/shop?q=women" },
+    { label: "Men", href: "/shop?q=men" },
+    { label: "Caps", href: "/shop?category=Caps" },
+    { label: "Sale", href: "/shop?q=sale" },
+];
+
 export function Navbar() {
     const router = useRouter();
     const { user, loading } = useAuthUser();
@@ -45,17 +53,15 @@ export function Navbar() {
                     {/* Desktop Navigation */}
                     <div className="hidden md:block">
                         <div className="ml-10 flex items-baseline space-x-8">
-                            {["New Arrivals", "Women", "Men", "Caps", "Sale"].map(
-                                (item) => (
-                                    <a
-                                        key={item}
-                                        href="#"
-                                        className="text-sm font-medium text-white hover:text-gray-300 transition-colors"
-                                    >
-                                        {item}
-                                    </a>
-                                ),
-                            )}
+                            {NAV_ITEMS.map((item) => (
+                                <Link
+                                    key={item.label}
+                                    href={item.href}
+                                    className="text-sm font-medium text-white hover:text-gray-300 transition-colors"
+                                >
+                                    {item.label}
+                                </Link>
+                            ))}
                         </div>
                     </div>
 
@@ -104,17 +110,16 @@ export function Navbar() {
                         className="md:hidden bg-white border-b border-gray-100 overflow-hidden"
                     >
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                            {["New Arrivals", "Women", "Men", "Caps", "Sale"].map(
-                                (item) => (
-                                    <a
-                                        key={item}
-                                        href="#"
-                                        className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-                                    >
-                                        {item}
-                                    </a>
-                                ),
-                            )}
+                            {NAV_ITEMS.map((item) => (
+                                <Link
+                                    key={item.label}
+                                    href={item.href}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                                >
+                                    {item.label}
+                                </Link>
+                            ))}
                         </div>
                     </motion.div>
                 )}

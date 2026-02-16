@@ -1,7 +1,76 @@
-import React from 'react';
+'use client'
+
+import React, { useState } from 'react';
 import { Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { db } from '@/config/firebaseConfig';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import Link from 'next/link';
+import { useAuthUser } from '@/hooks/useAuthUser';
+
+const SHOP_LINKS = [
+    { label: 'New Arrivals', href: '/shop' },
+    { label: 'Women', href: '/shop?q=women' },
+    { label: 'Men', href: '/shop?q=men' },
+    { label: 'Caps', href: '/shop?category=Caps' },
+    { label: 'Sale', href: '/shop?q=sale' },
+];
+
+const HELP_LINKS = [
+    { label: 'Customer Service', href: 'mailto:support@drippybanks.com' },
+    { label: 'My Account', href: '__MY_ACCOUNT__' },
+    { label: 'Find a Store', href: '/shop' },
+    { label: 'Legal & Privacy', href: 'mailto:legal@drippybanks.com' },
+    { label: 'Contact', href: 'mailto:hello@drippybanks.com' },
+];
 
 export function Footer() {
+    const { user } = useAuthUser();
+    const [email, setEmail] = useState('');
+    const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
+
+        if (!isValidEmail) {
+            setMessage({ type: 'error', text: 'Please enter a valid email address.' });
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            const subscriberRef = doc(db, 'drippybanks-subscribers', normalizedEmail);
+            const existingSubscriber = await getDoc(subscriberRef);
+
+            if (existingSubscriber.exists() && existingSubscriber.data()?.isActive) {
+                setMessage({ type: 'error', text: 'This email is already subscribed.' });
+                return;
+            }
+
+            await setDoc(
+                subscriberRef,
+                {
+                    email: normalizedEmail,
+                    subscribedAt: serverTimestamp(),
+                    source: 'footer',
+                    isActive: true,
+                },
+                { merge: true },
+            );
+
+            setMessage({ type: 'success', text: 'Subscribed successfully. You will hear from us soon.' });
+            setEmail('');
+        } catch {
+            setMessage({ type: 'error', text: 'Could not subscribe right now. Please try again.' });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
         <footer className="bg-gray-900 text-white pt-16 pb-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -24,11 +93,11 @@ export function Footer() {
                     <div>
                         <h4 className="text-lg font-semibold mb-6">Shop</h4>
                         <ul className="space-y-3">
-                            {['New Arrivals', 'Women', 'Men', 'Caps', 'Sale'].map((item) => (
-                                <li key={item}>
-                                    <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
-                                        {item}
-                                    </a>
+                            {SHOP_LINKS.map((item) => (
+                                <li key={item.label}>
+                                    <Link href={item.href} className="text-gray-400 hover:text-white transition-colors text-sm">
+                                        {item.label}
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
@@ -38,11 +107,23 @@ export function Footer() {
                     <div>
                         <h4 className="text-lg font-semibold mb-6">Help</h4>
                         <ul className="space-y-3">
-                            {['Customer Service', 'My Account', 'Find a Store', 'Legal & Privacy', 'Contact'].map((item) => (
-                                <li key={item}>
-                                    <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
-                                        {item}
-                                    </a>
+                            {HELP_LINKS.map((item) => (
+                                <li key={item.label}>
+                                    {(() => {
+                                        const resolvedHref = item.href === '__MY_ACCOUNT__'
+                                            ? (user?.id ? `/${user.id}/profile` : '/login')
+                                            : item.href;
+
+                                        return resolvedHref.startsWith('/') ? (
+                                            <Link href={resolvedHref} className="text-gray-400 hover:text-white transition-colors text-sm">
+                                                {item.label}
+                                            </Link>
+                                        ) : (
+                                            <a href={resolvedHref} className="text-gray-400 hover:text-white transition-colors text-sm">
+                                                {item.label}
+                                            </a>
+                                        );
+                                    })()}
                                 </li>
                             ))}
                         </ul>
@@ -54,15 +135,29 @@ export function Footer() {
                         <p className="text-gray-400 text-sm mb-4">
                             Sign up for our newsletter to get the latest news, announcements, and special offers.
                         </p>
-                        <form className="flex flex-col space-y-3">
+                        <form onSubmit={handleSubscribe} className="flex flex-col space-y-3">
                             <input
                                 type="email"
                                 placeholder="Enter your email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 className="bg-gray-800 border border-gray-700 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-500 text-sm"
                             />
-                            <button className="bg-white text-gray-900 font-medium px-4 py-2 rounded-md hover:bg-gray-100 transition-colors text-sm">
-                                Subscribe
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="bg-white text-gray-900 font-medium px-4 py-2 rounded-md hover:bg-gray-100 transition-colors text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                                {isSubmitting ? 'Subscribing...' : 'Subscribe'}
                             </button>
+                            {message && (
+                                <p
+                                    className={`text-xs ${message.type === 'success' ? 'text-emerald-300' : 'text-red-300'
+                                        }`}
+                                >
+                                    {message.text}
+                                </p>
+                            )}
                         </form>
                     </div>
                 </div>
