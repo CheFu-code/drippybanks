@@ -25,8 +25,8 @@ const categories = [
 ];
 
 const categoryHrefById: Record<string, string> = {
-    women: '/shop?q=women',
-    men: '/shop?q=men',
+    women: '/shop?category=All',
+    men: '/shop?category=All',
     caps: '/shop?category=Caps',
 };
 
@@ -40,13 +40,14 @@ export function CategoryGrid() {
                 </Link>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {categories.map((category) => (
+                {categories.map((category, index) => (
                     <div
                         key={category.id}
                         className={`relative group overflow-hidden rounded-xl h-100 ${category.colSpan}`}
                     >
                         <Image
-                            fill priority
+                            fill
+                            priority={index === 0}
                             src={category.image}
                             alt={category.name}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"

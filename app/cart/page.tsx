@@ -10,6 +10,8 @@ import { useCart } from '@/context/CartContext';
 
 export default function CartPage() {
     const { cart, cartTotal, addToCart, decreaseQuantity, removeFromCart, clearCart } = useCart();
+    // TODO(handleCheckout): Replace with real checkout flow when checkout route/API is implemented.
+    const handleCheckout = () => undefined;
 
     return (
         <div className="min-h-screen p-5 bg-gray-100 font-sans text-gray-900 selection:bg-gray-900 selection:text-white">
@@ -41,6 +43,7 @@ export default function CartPage() {
                                                 fill
                                                 src={item.image}
                                                 alt={item.name}
+                                                sizes="80px"
                                                 className="object-cover"
                                             />
                                         </div>
@@ -82,7 +85,9 @@ export default function CartPage() {
                                     <p className="text-lg font-semibold">Total</p>
                                     <p className="text-lg font-semibold">${cartTotal.toFixed(2)}</p>
                                 </div>
-                                <Button className="w-full">Checkout</Button>
+                                <Button className="w-full" onClick={handleCheckout} disabled>
+                                    Checkout
+                                </Button>
                             </>
                         )}
                     </CardContent>

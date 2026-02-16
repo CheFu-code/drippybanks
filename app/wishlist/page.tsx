@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function WishlistPage() {
+    // TODO(wishlist): Fetch authenticated AppUser.wishlist and render saved items when backend wiring is ready.
     return (
         <div className="min-h-screen p-5 bg-gray-100 font-sans text-gray-900 selection:bg-gray-900 selection:text-white">
             <Navbar />

@@ -17,6 +17,11 @@ export const OrdersTab = ({ orders }: { orders: Order[] }) => {
             className="space-y-4"
         >
             <h2 className="text-xl font-bold text-gray-900 mb-4">Order History</h2>
+            {orders.length === 0 && (
+                <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
+                    <p className="text-gray-600">You have no orders yet.</p>
+                </div>
+            )}
             {orders.map((order) => (
                 <div
                     key={order.id}
@@ -39,9 +44,9 @@ export const OrdersTab = ({ orders }: { orders: Order[] }) => {
                     </div>
                     <div className="flex items-center gap-6">
                         <span className="font-bold text-lg">${order.total.toFixed(2)}</span>
-                        <button className="text-gray-400 hover:text-black">
+                        <span className="text-gray-400" aria-hidden="true">
                             <ChevronRight className="h-5 w-5" />
-                        </button>
+                        </span>
                     </div>
                 </div>
             ))}

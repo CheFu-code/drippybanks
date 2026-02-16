@@ -28,7 +28,7 @@ const ShopPage = () => {
         const params = new URLSearchParams(searchParams.toString());
 
         Object.entries(updates).forEach(([key, value]) => {
-            if (!value) {
+            if (value == null) {
                 params.delete(key);
                 return;
             }
@@ -99,7 +99,7 @@ const ShopPage = () => {
 
             {/* Product Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredProducts.map((product) => (
+                {filteredProducts.map((product, index) => (
                     <motion.div
                         key={product.id}
                         initial={{ opacity: 0, y: 20 }}
@@ -109,7 +109,8 @@ const ShopPage = () => {
                     >
                         <div className="aspect-3/4 w-full overflow-hidden rounded-lg relative">
                             <Image
-                                fill priority
+                                fill
+                                priority={index < 2}
                                 src={product.image}
                                 alt={product.name}
                                 className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"

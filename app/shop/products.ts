@@ -101,7 +101,7 @@ export const PRODUCTS: Product[] = [
     },
     {
         id: '4',
-        name: 'Midnight Mosaic Hoodie',
+        name: 'Midnight Mosaic Hoodie (Front)',
         price: 79.00,
         category: 'Hoodies',
         image: '/hoodieBlackFront.png'
@@ -115,7 +115,7 @@ export const PRODUCTS: Product[] = [
     },
     {
         id: '8',
-        name: 'Crimson Street Art Hoodie',
+        name: 'Crimson Street Art Hoodie (Back)',
         price: 79.00,
         category: 'Hoodies',
         image: '/hoodieRedBack.png'
@@ -136,14 +136,14 @@ export const PRODUCTS: Product[] = [
     },
     {
         id: '22',
-        name: 'Midnight Mosaic Hoodie',
+        name: 'Midnight Mosaic Hoodie (Back)',
         price: 79.00,
         category: 'Hoodies',
         image: '/hoodieBlackBack.png'
     },
     {
         id: '17',
-        name: 'Crimson Street Art Hoodie',
+        name: 'Crimson Street Art Hoodie (Front)',
         price: 79.00,
         category: 'Hoodies',
         image: '/hoodieRedFront.png'

@@ -4,6 +4,7 @@ import { db } from "@/config/firebaseConfig";
 import { AppUser, FormState } from "@/types/user";
 import { Country, ICountry, IState, State } from "country-state-city";
 import { doc, setDoc } from "firebase/firestore";
+import { ORDERS } from "@/lib/mockOrders";
 import Link from "next/link";
 import {
     CreditCard,
@@ -14,7 +15,6 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { ORDERS } from "../profile/page";
 import { detectCardBrand } from "./profile/cardBrand";
 import { OrdersTab } from "./profile/OrdersTab";
 import { AddressTab } from "./profile/AddressTab";
@@ -33,7 +33,9 @@ export const ProfilePageUI = ({
     activeTab: "orders" | "addresses" | "payment"
     setActiveTab: (tab: "orders" | "addresses" | "payment") => void
 }) => {
-    const [loading, setLoading] = useState(false);
+    const [loadingCount, setLoadingCount] = useState(0);
+    const loading = loadingCount > 0;
+    const [skipUserSync, setSkipUserSync] = useState(false);
     const [isAddressFormOpen, setIsAddressFormOpen] = useState(false);
     const [isPaymentFormOpen, setIsPaymentFormOpen] = useState(false);
     const [countries, setCountries] = useState<ICountry[]>([]);
@@ -64,6 +66,10 @@ export const ProfilePageUI = ({
     });
 
     useEffect(() => {
+        if (skipUserSync) {
+            return;
+        }
+
         setSavedAddress({
             addressStreet: user?.addressStreet ?? "",
             addressCity: user?.addressCity ?? "",
@@ -82,7 +88,7 @@ export const ProfilePageUI = ({
         }));
 
         setSavedPaymentMethods(user?.paymentMethods ?? []);
-    }, [user]);
+    }, [user, skipUserSync]);
 
     useEffect(() => {
         const all = Country.getAllCountries();
@@ -126,6 +132,9 @@ export const ProfilePageUI = ({
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
     };
+
+    const startLoading = () => setLoadingCount((prev) => prev + 1);
+    const stopLoading = () => setLoadingCount((prev) => Math.max(0, prev - 1));
 
     const handleOpenAddressForm = () => {
         const countryCode = savedAddress.country?.code || form.countryCode;
@@ -171,7 +180,7 @@ export const ProfilePageUI = ({
             return;
         }
 
-        setLoading(true);
+        startLoading();
         try {
             await setDoc(
                 doc(db, "drippy-banks-users", user.id),
@@ -210,7 +219,7 @@ export const ProfilePageUI = ({
                 description: err.message ?? "Unknown error",
             });
         } finally {
-            setLoading(false);
+            stopLoading();
         }
     };
 
@@ -220,12 +229,12 @@ export const ProfilePageUI = ({
             return;
         }
 
-        if (savedAddress.addressStreet) {
-            toast.error("Default address cannot be removed.");
+        if (!savedAddress.addressStreet) {
+            toast.error("No address to remove.");
             return;
         }
 
-        setLoading(true);
+        startLoading();
         try {
             await setDoc(
                 doc(db, "drippy-banks-users", user.id),
@@ -253,7 +262,7 @@ export const ProfilePageUI = ({
                 description: err.message ?? "Unknown error",
             });
         } finally {
-            setLoading(false);
+            stopLoading();
         }
     };
 
@@ -269,7 +278,7 @@ export const ProfilePageUI = ({
         }
 
         const digits = cardNumber.replace(/\D/g, "");
-        if (digits.length < 12) {
+        if (digits.length < 13 || digits.length > 19) {
             toast.error("Please enter a valid card number.");
             return;
         }
@@ -298,13 +307,13 @@ export const ProfilePageUI = ({
             expiry: cardExpiry,
             billingPostalCode: cardBillingPostalCode.trim(),
             isDefault: savedPaymentMethods.length === 0,
-            cardNumber: digits,
             createdAt: new Date(),
         };
 
         const updatedMethods = [...savedPaymentMethods, newMethod];
 
-        setLoading(true);
+        startLoading();
+        setSkipUserSync(true);
         try {
             await setDoc(
                 doc(db, "drippy-banks-users", user.id),
@@ -329,7 +338,8 @@ export const ProfilePageUI = ({
                 description: err.message ?? "Unknown error",
             });
         } finally {
-            setLoading(false);
+            setSkipUserSync(false);
+            stopLoading();
         }
     };
 
@@ -374,7 +384,7 @@ export const ProfilePageUI = ({
             (method) => method.id !== paymentMethodId,
         );
 
-        setLoading(true);
+        startLoading();
         try {
             await setDoc(
                 doc(db, "drippy-banks-users", user.id),
@@ -393,7 +403,7 @@ export const ProfilePageUI = ({
                 description: err.message ?? "Unknown error",
             });
         } finally {
-            setLoading(false);
+            stopLoading();
         }
     };
 
@@ -527,23 +537,29 @@ export const ProfilePageUI = ({
 
                     {activeTab === "payment" && (
                         <PaymentTab
-                            savedPaymentMethods={savedPaymentMethods}
-                            isPaymentFormOpen={isPaymentFormOpen}
-                            setIsPaymentFormOpen={setIsPaymentFormOpen}
-                            cardHolderName={cardHolderName}
-                            setCardHolderName={setCardHolderName}
-                            cardNumber={cardNumber}
-                            handleCardNumberChange={handleCardNumberChange}
-                            detectedCardBrand={detectedCardBrand}
-                            cardExpiry={cardExpiry}
-                            handleCardExpiryChange={handleCardExpiryChange}
-                            cardCvv={cardCvv}
-                            handleCardCvvChange={handleCardCvvChange}
-                            cardBillingPostalCode={cardBillingPostalCode}
-                            setCardBillingPostalCode={setCardBillingPostalCode}
-                            handleSaveCard={handleSaveCard}
-                            handleRemoveCard={handleRemoveCard}
-                            loading={loading}
+                            cardForm={{
+                                cardHolderName,
+                                setCardHolderName,
+                                cardNumber,
+                                handleCardNumberChange,
+                                detectedCardBrand,
+                                cardExpiry,
+                                handleCardExpiryChange,
+                                cardCvv,
+                                handleCardCvvChange,
+                                cardBillingPostalCode,
+                                setCardBillingPostalCode,
+                            }}
+                            methods={{
+                                savedPaymentMethods,
+                                handleSaveCard,
+                                handleRemoveCard,
+                                loading,
+                            }}
+                            ui={{
+                                isPaymentFormOpen,
+                                setIsPaymentFormOpen,
+                            }}
                         />
                     )}
                 </div>

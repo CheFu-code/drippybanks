@@ -9,7 +9,7 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 import { doc, setDoc } from "firebase/firestore";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 type ProfileEditForm = {
@@ -30,6 +30,7 @@ export default function EditProfilePage() {
     const routeUserId = Array.isArray(params.id) ? params.id[0] : params.id;
     const router = useRouter();
     const { user, loading } = useAuthUser();
+    const previousUserIdRef = useRef<string | null>(null);
     const [saving, setSaving] = useState(false);
     const [form, setForm] = useState<ProfileEditForm>({
         fullname: "",
@@ -46,6 +47,11 @@ export default function EditProfilePage() {
 
     useEffect(() => {
         if (!user) return;
+
+        if (previousUserIdRef.current === user.id) {
+            return;
+        }
+
         setForm({
             fullname: user.fullname ?? "",
             phone: user.phone ?? "",
@@ -58,11 +64,11 @@ export default function EditProfilePage() {
             storeName: user.storeName ?? "",
             storeDescription: user.storeDescription ?? "",
         });
+        previousUserIdRef.current = user.id;
     }, [user]);
 
     const isRouteOwner = useMemo(() => {
-        if (!routeUserId || !user?.id) return true;
-        return routeUserId === user.id;
+        return routeUserId === user?.id;
     }, [routeUserId, user?.id]);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {

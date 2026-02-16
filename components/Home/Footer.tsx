@@ -2,10 +2,9 @@
 
 import React, { useState } from 'react';
 import { Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
-import { db } from '@/config/firebaseConfig';
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import { useAuthUser } from '@/hooks/useAuthUser';
+import { useNewsletterSubscription } from '@/hooks/useNewsletterSubscription';
 
 const SHOP_LINKS = [
     { label: 'New Arrivals', href: '/shop' },
@@ -17,57 +16,47 @@ const SHOP_LINKS = [
 
 const HELP_LINKS = [
     { label: 'Customer Service', href: 'mailto:support@drippybanks.com' },
-    { label: 'My Account', href: '__MY_ACCOUNT__' },
+    { label: 'My Account', type: 'account' as const },
     { label: 'Find a Store', href: '/shop' },
     { label: 'Legal & Privacy', href: 'mailto:legal@drippybanks.com' },
     { label: 'Contact', href: 'mailto:hello@drippybanks.com' },
 ];
 
+type HelpLink = (typeof HELP_LINKS)[number];
+
+const resolveHelpHref = (item: HelpLink, userId?: string) => {
+    if ('type' in item && item.type === 'account') {
+        return userId ? `/${userId}/profile` : '/login';
+    }
+    return item.href;
+};
+
+const renderFooterLink = (href: string, label: string) => {
+    if (href.startsWith('/')) {
+        return (
+            <Link href={href} className="text-gray-400 hover:text-white transition-colors text-sm">
+                {label}
+            </Link>
+        );
+    }
+
+    return (
+        <a href={href} className="text-gray-400 hover:text-white transition-colors text-sm">
+            {label}
+        </a>
+    );
+};
+
 export function Footer() {
     const { user } = useAuthUser();
     const [email, setEmail] = useState('');
-    const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { isSubmitting, message, submit } = useNewsletterSubscription();
 
     const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
-        const normalizedEmail = email.trim().toLowerCase();
-        const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
-
-        if (!isValidEmail) {
-            setMessage({ type: 'error', text: 'Please enter a valid email address.' });
-            return;
-        }
-
-        setIsSubmitting(true);
-        try {
-            const subscriberRef = doc(db, 'drippybanks-subscribers', normalizedEmail);
-            const existingSubscriber = await getDoc(subscriberRef);
-
-            if (existingSubscriber.exists() && existingSubscriber.data()?.isActive) {
-                setMessage({ type: 'error', text: 'This email is already subscribed.' });
-                return;
-            }
-
-            await setDoc(
-                subscriberRef,
-                {
-                    email: normalizedEmail,
-                    subscribedAt: serverTimestamp(),
-                    source: 'footer',
-                    isActive: true,
-                },
-                { merge: true },
-            );
-
-            setMessage({ type: 'success', text: 'Subscribed successfully. You will hear from us soon.' });
+        const subscribed = await submit(email, 'footer');
+        if (subscribed) {
             setEmail('');
-        } catch {
-            setMessage({ type: 'error', text: 'Could not subscribe right now. Please try again.' });
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
@@ -109,21 +98,7 @@ export function Footer() {
                         <ul className="space-y-3">
                             {HELP_LINKS.map((item) => (
                                 <li key={item.label}>
-                                    {(() => {
-                                        const resolvedHref = item.href === '__MY_ACCOUNT__'
-                                            ? (user?.id ? `/${user.id}/profile` : '/login')
-                                            : item.href;
-
-                                        return resolvedHref.startsWith('/') ? (
-                                            <Link href={resolvedHref} className="text-gray-400 hover:text-white transition-colors text-sm">
-                                                {item.label}
-                                            </Link>
-                                        ) : (
-                                            <a href={resolvedHref} className="text-gray-400 hover:text-white transition-colors text-sm">
-                                                {item.label}
-                                            </a>
-                                        );
-                                    })()}
+                                    {renderFooterLink(resolveHelpHref(item, user?.id), item.label)}
                                 </li>
                             ))}
                         </ul>
@@ -163,7 +138,21 @@ export function Footer() {
                 </div>
 
                 <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-                    <p>&copy; {new Date().getFullYear()} DrippyBanks Inc. All rights reserved.</p>
+                    <div className="text-center md:text-left">
+                        <p>&copy; {new Date().getFullYear()} DrippyBanks Inc. All rights reserved.</p>
+                        <p className="mt-1 text-xs text-gray-400">
+                            Crafted with care by the{' '}
+                            <a
+                                href="https://chefuinc.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline-offset-2 hover:underline text-gray-300 hover:text-white transition-colors"
+                            >
+                                CheFu Inc.
+                            </a>
+                            .
+                        </p>
+                    </div>
                     <div className="flex space-x-6 mt-4 md:mt-0">
                         <a href="#" className="hover:text-gray-400">Privacy Policy</a>
                         <a href="#" className="hover:text-gray-400">Terms of Service</a>

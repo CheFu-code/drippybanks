@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { MapPin } from "lucide-react";
 import { IState } from "country-state-city";
 import type React from "react";
-import FinishUpForm from "../../../(auth)/register/_components/FinishUpForm";
+import FinishUpForm from "@/components/forms/FinishUpForm";
 
 type SavedAddress = {
     addressStreet: string;
@@ -83,10 +83,9 @@ export const AddressTab = ({
                             </button>
                             <button
                                 onClick={onRemoveAddress}
-                                disabled
-                                className="text-sm font-medium text-gray-400 cursor-not-allowed"
+                                className="text-sm font-medium text-red-600 hover:underline"
                             >
-                                Default Address
+                                Remove Address
                             </button>
                         </div>
                     </CardContent>

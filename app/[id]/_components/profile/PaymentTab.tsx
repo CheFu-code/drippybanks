@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { AppUser } from "@/types/user";
 import { motion } from "framer-motion";
 import { CreditCard } from "lucide-react";
@@ -10,43 +11,35 @@ import { getCardBrandIcon } from "./cardBrand";
 type PaymentMethod = NonNullable<AppUser["paymentMethods"]>[number];
 
 type PaymentTabProps = {
-    savedPaymentMethods: PaymentMethod[];
-    isPaymentFormOpen: boolean;
-    setIsPaymentFormOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    cardHolderName: string;
-    setCardHolderName: React.Dispatch<React.SetStateAction<string>>;
-    cardNumber: string;
-    handleCardNumberChange: (value: string) => void;
-    detectedCardBrand: string;
-    cardExpiry: string;
-    handleCardExpiryChange: (value: string) => void;
-    cardCvv: string;
-    handleCardCvvChange: (value: string) => void;
-    cardBillingPostalCode: string;
-    setCardBillingPostalCode: React.Dispatch<React.SetStateAction<string>>;
-    handleSaveCard: () => void;
-    handleRemoveCard: (paymentMethodId: string) => void;
-    loading: boolean;
+    cardForm: {
+        cardHolderName: string;
+        setCardHolderName: React.Dispatch<React.SetStateAction<string>>;
+        cardNumber: string;
+        handleCardNumberChange: (value: string) => void;
+        detectedCardBrand: string;
+        cardExpiry: string;
+        handleCardExpiryChange: (value: string) => void;
+        cardCvv: string;
+        handleCardCvvChange: (value: string) => void;
+        cardBillingPostalCode: string;
+        setCardBillingPostalCode: React.Dispatch<React.SetStateAction<string>>;
+    };
+    methods: {
+        savedPaymentMethods: PaymentMethod[];
+        handleSaveCard: () => void;
+        handleRemoveCard: (paymentMethodId: string) => void;
+        loading: boolean;
+    };
+    ui: {
+        isPaymentFormOpen: boolean;
+        setIsPaymentFormOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    };
 };
 
 export const PaymentTab = ({
-    savedPaymentMethods,
-    isPaymentFormOpen,
-    setIsPaymentFormOpen,
-    cardHolderName,
-    setCardHolderName,
-    cardNumber,
-    handleCardNumberChange,
-    detectedCardBrand,
-    cardExpiry,
-    handleCardExpiryChange,
-    cardCvv,
-    handleCardCvvChange,
-    cardBillingPostalCode,
-    setCardBillingPostalCode,
-    handleSaveCard,
-    handleRemoveCard,
-    loading,
+    cardForm,
+    methods,
+    ui,
 }: PaymentTabProps) => {
     return (
         <motion.div
@@ -55,12 +48,12 @@ export const PaymentTab = ({
             className="space-y-4"
         >
             <h2 className="text-xl font-bold text-gray-900 mb-4">Payment Methods</h2>
-            {savedPaymentMethods.length === 0 ? (
+            {methods.savedPaymentMethods.length === 0 ? (
                 <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <p className="text-sm text-gray-500">No payment methods saved yet.</p>
                 </div>
             ) : (
-                savedPaymentMethods.map((method) => {
+                methods.savedPaymentMethods.map((method) => {
                     const CardBrandIcon = getCardBrandIcon(method.brand);
                     return (
                         <div
@@ -84,7 +77,7 @@ export const PaymentTab = ({
                                 </div>
                             </div>
                             <button
-                                onClick={() => handleRemoveCard(method.id)}
+                                onClick={() => methods.handleRemoveCard(method.id)}
                                 disabled={method.isDefault}
                                 className={`text-sm font-medium ${method.isDefault
                                     ? "text-gray-400 cursor-not-allowed"
@@ -99,47 +92,47 @@ export const PaymentTab = ({
             )}
 
             <button
-                onClick={() => setIsPaymentFormOpen((prev) => !prev)}
+                onClick={() => ui.setIsPaymentFormOpen((prev) => !prev)}
                 className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-medium hover:border-gray-400 hover:text-gray-700 transition-colors flex items-center justify-center gap-2"
             >
                 <CreditCard className="h-5 w-5" />
-                {isPaymentFormOpen ? "Close Card Form" : "Add New Card"}
+                {ui.isPaymentFormOpen ? "Close Card Form" : "Add New Card"}
             </button>
 
-            {isPaymentFormOpen && (
+            {ui.isPaymentFormOpen && (
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-xl font-semibold">Add Payment Card</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Cardholder Name</label>
+                            <Label className="text-sm font-medium text-gray-700">Cardholder Name</Label>
                             <Input
-                                value={cardHolderName}
-                                onChange={(e) => setCardHolderName(e.target.value)}
+                                value={cardForm.cardHolderName}
+                                onChange={(e) => cardForm.setCardHolderName(e.target.value)}
                                 placeholder="John Doe"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Card Number</label>
+                            <Label className="text-sm font-medium text-gray-700">Card Number</Label>
                             <Input
-                                value={cardNumber}
-                                onChange={(e) => handleCardNumberChange(e.target.value)}
+                                value={cardForm.cardNumber}
+                                onChange={(e) => cardForm.handleCardNumberChange(e.target.value)}
                                 placeholder="4242 4242 4242 4242"
                                 inputMode="numeric"
                                 maxLength={19}
                             />
                             <p className="text-xs text-gray-500">
-                                Detected card type: {detectedCardBrand}
+                                Detected card type: {cardForm.detectedCardBrand}
                             </p>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Expiry (MM/YY)</label>
+                            <Label className="text-sm font-medium text-gray-700">Expiry (MM/YY)</Label>
                             <Input
-                                value={cardExpiry}
-                                onChange={(e) => handleCardExpiryChange(e.target.value)}
+                                value={cardForm.cardExpiry}
+                                onChange={(e) => cardForm.handleCardExpiryChange(e.target.value)}
                                 placeholder="12/26"
                                 maxLength={5}
                             />
@@ -147,10 +140,10 @@ export const PaymentTab = ({
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">CVV</label>
+                                <Label className="text-sm font-medium text-gray-700">CVV</Label>
                                 <Input
-                                    value={cardCvv}
-                                    onChange={(e) => handleCardCvvChange(e.target.value)}
+                                    value={cardForm.cardCvv}
+                                    onChange={(e) => cardForm.handleCardCvvChange(e.target.value)}
                                     placeholder="123"
                                     inputMode="numeric"
                                     maxLength={4}
@@ -158,19 +151,19 @@ export const PaymentTab = ({
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">
+                                <Label className="text-sm font-medium text-gray-700">
                                     Billing ZIP / Postal Code
-                                </label>
+                                </Label>
                                 <Input
-                                    value={cardBillingPostalCode}
-                                    onChange={(e) => setCardBillingPostalCode(e.target.value)}
+                                    value={cardForm.cardBillingPostalCode}
+                                    onChange={(e) => cardForm.setCardBillingPostalCode(e.target.value)}
                                     placeholder="0002"
                                 />
                             </div>
                         </div>
 
-                        <Button onClick={handleSaveCard} disabled={loading} className="w-full">
-                            {loading ? "Saving..." : "Save Card"}
+                        <Button onClick={methods.handleSaveCard} disabled={methods.loading} className="w-full">
+                            {methods.loading ? "Saving..." : "Save Card"}
                         </Button>
                     </CardContent>
                 </Card>

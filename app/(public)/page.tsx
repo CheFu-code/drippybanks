@@ -7,52 +7,18 @@ import { Hero } from '@/components/Home/Hero';
 import { Navbar } from '@/components/Home/Navbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { db } from '@/config/firebaseConfig';
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { useNewsletterSubscription } from '@/hooks/useNewsletterSubscription';
 import { useState } from 'react';
 
 function App() {
     const [email, setEmail] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+    const { isSubmitting, message, submit } = useNewsletterSubscription();
 
     const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const normalizedEmail = email.trim().toLowerCase();
-        const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
-
-        if (!isValidEmail) {
-            setMessage({ type: 'error', text: 'Please enter a valid email address.' });
-            return;
-        }
-
-        setIsSubmitting(true);
-        try {
-            const subscriberRef = doc(db, 'drippybanks-subscribers', normalizedEmail);
-            const existingSubscriber = await getDoc(subscriberRef);
-
-            if (existingSubscriber.exists() && existingSubscriber.data()?.isActive) {
-                setMessage({ type: 'error', text: 'This email is already subscribed.' });
-                return;
-            }
-
-            await setDoc(
-                subscriberRef,
-                {
-                    email: normalizedEmail,
-                    subscribedAt: serverTimestamp(),
-                    source: 'home-newsletter',
-                    isActive: true,
-                },
-                { merge: true },
-            );
-
-            setMessage({ type: 'success', text: 'Subscribed successfully. Check your inbox for updates.' });
+        const subscribed = await submit(email, 'home-newsletter');
+        if (subscribed) {
             setEmail('');
-        } catch {
-            setMessage({ type: 'error', text: 'Could not subscribe right now. Please try again.' });
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
