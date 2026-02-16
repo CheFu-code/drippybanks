@@ -5,6 +5,7 @@ import { Search } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
 import { Product, useCart } from '@/context/CartContext';
+import { useSearchParams } from 'next/navigation';
 
 // Mock Data
 const PRODUCTS: Product[] = [
@@ -78,34 +79,82 @@ const PRODUCTS: Product[] = [
         category: 'Tops',
         image: '/greenBack.jpeg'
     },
-
     {
-        id: '4',
-        name: 'Summer Floral',
-        price: 79.00,
-        category: 'Hoodies',
-        image: '/hoodieBlack.jpeg'
+        id: '18',
+        name: 'Vintage Denim Jeans',
+        price: 89.00,
+        category: 'Tops',
+        image: '/babiesFront.png'
     },
     {
-        id: '7',
-        name: 'Summer Floral Dress',
+        id: '19',
+        name: 'Vintage Denim Jeans',
+        price: 89.00,
+        category: 'Tops',
+        image: '/babiesBack.png'
+    },
+    {
+        id: '20',
+        name: 'Vintage Denim Jeans',
+        price: 89.00,
+        category: 'Tops',
+        image: '/americanFront.png'
+    },
+    {
+        id: '21',
+        name: 'Vintage Denim Jeans',
+        price: 89.00,
+        category: 'Tops',
+        image: '/americanBack.png'
+    },
+    {
+        id: '4',
+        name: 'Midnight Mosaic Hoodie',
         price: 79.00,
         category: 'Hoodies',
-        image: '/hoodieBlue.jpeg'
+        image: '/hoodieBlackFront.png'
+    },
+    {
+        id: '23',
+        name: 'Azure Drip Hoodie        ',
+        price: 79.00,
+        category: 'Hoodies',
+        image: '/hoodieBlueFront.png'
     },
     {
         id: '8',
-        name: 'Summer Floral Dress',
+        name: 'Crimson Street Art Hoodie',
         price: 79.00,
         category: 'Hoodies',
-        image: '/hoodieRed.jpeg'
+        image: '/hoodieRedBack.png'
     },
     {
         id: '9',
-        name: 'Summer Floral Dress',
+        name: 'Drip Vision Hoodie',
         price: 79.00,
         category: 'Hoodies',
-        image: '/hoodieWhite.jpeg'
+        image: '/mainHoodie.jpeg'
+    },
+    {
+        id: '16',
+        name: 'Drip Vision Hoodie',
+        price: 79.00,
+        category: 'Hoodies',
+        image: '/mainHoodieFront.png'
+    },
+    {
+        id: '22',
+        name: 'Midnight Mosaic Hoodie',
+        price: 79.00,
+        category: 'Hoodies',
+        image: '/hoodieBlackBack.png'
+    },
+    {
+        id: '17',
+        name: 'Crimson Street Art Hoodie',
+        price: 79.00,
+        category: 'Hoodies',
+        image: '/hoodieRedFront.png'
     },
     {
         id: '5',
@@ -114,6 +163,13 @@ const PRODUCTS: Product[] = [
         category: 'Bags',
         image: '/bag.jpeg'
     },
+    {
+        id: '7',
+        name: 'Azure Drip Hoodie        ',
+        price: 79.00,
+        category: 'Hoodies',
+        image: '/hoodieBlueBack.jpg'
+    },
 
 ];
 
@@ -121,12 +177,21 @@ const CATEGORIES = ['All', 'Tops', 'Caps', 'Bags', 'Hoodies'];
 
 const ShopPage = () => {
     const { addToCart } = useCart();
+    const searchParams = useSearchParams();
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
+    const isFromNavSearch = searchParams.get('source') === 'nav-search';
+    const searchPlaceholder = isFromNavSearch
+        ? 'Search for a product from the navbar...'
+        : 'Search products...';
 
     const filteredProducts = PRODUCTS.filter((product) => {
         const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-        const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const normalizedQuery = searchQuery.trim().toLowerCase();
+        const matchesSearch =
+            normalizedQuery.length === 0 ||
+            product.name.toLowerCase().includes(normalizedQuery) ||
+            product.category.toLowerCase().includes(normalizedQuery);
         return matchesCategory && matchesSearch;
     });
 
@@ -139,12 +204,12 @@ const ShopPage = () => {
                     <p className="text-gray-500 mt-1">Check out the latest trends for this season.</p>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <div className="relative">
+                <div className="flex items-center gap-4 w-full md:w-auto">
+                    <div className="relative w-full">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                         <input
                             type="text"
-                            placeholder="Search products..."
+                            placeholder={searchPlaceholder}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent w-full md:w-64"
@@ -188,7 +253,7 @@ const ShopPage = () => {
                             />
                             <button
                                 onClick={() => addToCart(product)}
-                                className="absolute bottom-4 right-4 cursor-pointer bg-white p-3 rounded-full shadow-lg text-black opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:bg-gray-100"
+                                className="absolute bottom-4 right-4 cursor-pointer bg-white p-3 rounded-full shadow-lg text-black opacity-100 md:opacity-0 transform translate-y-0 md:translate-y-4 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-300 hover:bg-gray-100"
                             >
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm font-bold">+ Add</span>
