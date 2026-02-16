@@ -1,17 +1,27 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { motion } from "framer-motion";
+import { db } from "@/config/firebaseConfig";
+import { AppUser, FormState } from "@/types/user";
+import { Country, ICountry, IState, State } from "country-state-city";
+import { doc, setDoc } from "firebase/firestore";
+import { ORDERS } from "@/lib/mockOrders";
+import Link from "next/link";
 import {
-    ChevronRight,
     CreditCard,
     LogOut,
     MapPin,
     Package,
     Settings,
 } from "lucide-react";
-import { ORDERS } from "../profile/page";
-import { AppUser } from "@/types/user";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { detectCardBrand } from "./profile/cardBrand";
+import { OrdersTab } from "./profile/OrdersTab";
+import { AddressTab } from "./profile/AddressTab";
+import { PaymentTab } from "./profile/PaymentTab";
+
+const DEFAULT_COUNTRY_CODE = "ZA";
+
 export const ProfilePageUI = ({
     user,
     handleLogout,
@@ -23,6 +33,395 @@ export const ProfilePageUI = ({
     activeTab: "orders" | "addresses" | "payment"
     setActiveTab: (tab: "orders" | "addresses" | "payment") => void
 }) => {
+    const [loadingCount, setLoadingCount] = useState(0);
+    const loading = loadingCount > 0;
+    const [skipUserSync, setSkipUserSync] = useState(false);
+    const [isAddressFormOpen, setIsAddressFormOpen] = useState(false);
+    const [isPaymentFormOpen, setIsPaymentFormOpen] = useState(false);
+    const [countries, setCountries] = useState<ICountry[]>([]);
+    const [states, setStates] = useState<IState[]>([]);
+    const [cardNumber, setCardNumber] = useState("");
+    const [cardExpiry, setCardExpiry] = useState("");
+    const [cardHolderName, setCardHolderName] = useState("");
+    const [cardCvv, setCardCvv] = useState("");
+    const [cardBillingPostalCode, setCardBillingPostalCode] = useState("");
+    const [savedPaymentMethods, setSavedPaymentMethods] = useState(user?.paymentMethods ?? []);
+
+    const [savedAddress, setSavedAddress] = useState({
+        addressStreet: user?.addressStreet ?? "",
+        addressCity: user?.addressCity ?? "",
+        addressPostalCode: user?.addressPostalCode ?? "",
+        country: user?.country ?? null,
+    });
+
+    const [form, setForm] = useState<FormState>({
+        phone: user?.phone ?? "",
+        countryCode: user?.country?.code ?? "",
+        countryName: user?.country?.name ?? "",
+        provinceCode: "",
+        provinceName: "",
+        addressStreet: user?.addressStreet ?? "",
+        addressCity: user?.addressCity ?? "",
+        addressPostalCode: user?.addressPostalCode ?? "",
+    });
+
+    useEffect(() => {
+        if (skipUserSync) {
+            return;
+        }
+
+        setSavedAddress({
+            addressStreet: user?.addressStreet ?? "",
+            addressCity: user?.addressCity ?? "",
+            addressPostalCode: user?.addressPostalCode ?? "",
+            country: user?.country ?? null,
+        });
+
+        setForm((prev) => ({
+            ...prev,
+            phone: user?.phone ?? prev.phone,
+            countryCode: user?.country?.code ?? prev.countryCode,
+            countryName: user?.country?.name ?? prev.countryName,
+            addressStreet: user?.addressStreet ?? "",
+            addressCity: user?.addressCity ?? "",
+            addressPostalCode: user?.addressPostalCode ?? "",
+        }));
+
+        setSavedPaymentMethods(user?.paymentMethods ?? []);
+    }, [user, skipUserSync]);
+
+    useEffect(() => {
+        const all = Country.getAllCountries();
+        setCountries(all);
+
+        const initialCountryCode = user?.country?.code || DEFAULT_COUNTRY_CODE;
+        const selected = all.find((c) => c.isoCode === initialCountryCode);
+
+        if (selected) {
+            setForm((prev) => ({
+                ...prev,
+                countryCode: prev.countryCode || selected.isoCode,
+                countryName: prev.countryName || selected.name,
+            }));
+            setStates(State.getStatesOfCountry(selected.isoCode));
+        }
+    }, [user?.country?.code]);
+
+    const handleCountrySelect = (isoCode: string) => {
+        const selected = countries.find((c) => c.isoCode === isoCode);
+        setForm((prev) => ({
+            ...prev,
+            countryCode: isoCode,
+            countryName: selected?.name ?? "",
+            provinceCode: "",
+            provinceName: "",
+        }));
+        setStates(State.getStatesOfCountry(isoCode) || []);
+    };
+
+    const handleProvinceSelect = (stateCode: string) => {
+        const selected = states.find((s) => s.isoCode === stateCode);
+        setForm((prev) => ({
+            ...prev,
+            provinceCode: selected?.isoCode ?? "",
+            provinceName: selected?.name ?? "",
+        }));
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const startLoading = () => setLoadingCount((prev) => prev + 1);
+    const stopLoading = () => setLoadingCount((prev) => Math.max(0, prev - 1));
+
+    const handleOpenAddressForm = () => {
+        const countryCode = savedAddress.country?.code || form.countryCode;
+        if (countryCode) {
+            setStates(State.getStatesOfCountry(countryCode) || []);
+        }
+
+        setForm((prev) => ({
+            ...prev,
+            phone: user?.phone ?? prev.phone,
+            countryCode,
+            countryName: savedAddress.country?.name || prev.countryName,
+            addressStreet: savedAddress.addressStreet,
+            addressCity: savedAddress.addressCity,
+            addressPostalCode: savedAddress.addressPostalCode,
+        }));
+        setIsAddressFormOpen(true);
+    };
+
+    const handleSaveAddress = async () => {
+        if (!user?.id) {
+            toast.error("Missing user id. Please reload the page.");
+            return;
+        }
+
+        if (!form.countryCode || !form.countryName) {
+            toast.error("Please select a country.");
+            return;
+        }
+
+        if (!form.provinceCode) {
+            toast.error("Please select a province.");
+            return;
+        }
+
+        if (!form.addressStreet || !form.addressCity || !form.addressPostalCode) {
+            toast.error("Please complete your address (street, city, postal code).");
+            return;
+        }
+
+        if (!form.phone) {
+            toast.error("Please enter your phone number.");
+            return;
+        }
+
+        startLoading();
+        try {
+            await setDoc(
+                doc(db, "drippy-banks-users", user.id),
+                {
+                    phone: form.phone,
+                    country: {
+                        code: form.countryCode,
+                        name: form.countryName,
+                    },
+                    province: form.provinceName
+                        ? { code: form.provinceCode, name: form.provinceName }
+                        : null,
+                    addressStreet: form.addressStreet,
+                    addressCity: form.addressCity,
+                    addressPostalCode: form.addressPostalCode,
+                    finishedSetup: true,
+                    updatedAt: new Date(),
+                },
+                { merge: true },
+            );
+
+            setSavedAddress({
+                addressStreet: form.addressStreet,
+                addressCity: form.addressCity,
+                addressPostalCode: form.addressPostalCode,
+                country: {
+                    code: form.countryCode,
+                    name: form.countryName,
+                },
+            });
+            setIsAddressFormOpen(false);
+            toast.success("Address saved.");
+        } catch (error: unknown) {
+            const err = error as Error;
+            toast.error("Failed to save address.", {
+                description: err.message ?? "Unknown error",
+            });
+        } finally {
+            stopLoading();
+        }
+    };
+
+    const handleRemoveAddress = async () => {
+        if (!user?.id) {
+            toast.error("Missing user id. Please reload the page.");
+            return;
+        }
+
+        if (!savedAddress.addressStreet) {
+            toast.error("No address to remove.");
+            return;
+        }
+
+        startLoading();
+        try {
+            await setDoc(
+                doc(db, "drippy-banks-users", user.id),
+                {
+                    addressStreet: "",
+                    addressCity: "",
+                    addressPostalCode: "",
+                    province: null,
+                    updatedAt: new Date(),
+                },
+                { merge: true },
+            );
+
+            setSavedAddress({
+                addressStreet: "",
+                addressCity: "",
+                addressPostalCode: "",
+                country: user?.country ?? null,
+            });
+            setIsAddressFormOpen(false);
+            toast.success("Address removed.");
+        } catch (error: unknown) {
+            const err = error as Error;
+            toast.error("Failed to remove address.", {
+                description: err.message ?? "Unknown error",
+            });
+        } finally {
+            stopLoading();
+        }
+    };
+
+    const handleSaveCard = async () => {
+        if (!user?.id) {
+            toast.error("Missing user id. Please reload the page.");
+            return;
+        }
+
+        if (!cardHolderName.trim()) {
+            toast.error("Please enter the cardholder name.");
+            return;
+        }
+
+        const digits = cardNumber.replace(/\D/g, "");
+        if (digits.length < 13 || digits.length > 19) {
+            toast.error("Please enter a valid card number.");
+            return;
+        }
+
+        if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExpiry)) {
+            toast.error("Please use card expiry format MM/YY.");
+            return;
+        }
+
+        if (!/^\d{3,4}$/.test(cardCvv)) {
+            toast.error("Please enter a valid CVV.");
+            return;
+        }
+
+        if (!cardBillingPostalCode.trim()) {
+            toast.error("Please enter billing postal code.");
+            return;
+        }
+
+        const newMethod = {
+            id: crypto.randomUUID(),
+            type: "card" as const,
+            holderName: cardHolderName.trim(),
+            brand: detectCardBrand(digits),
+            last4: digits.slice(-4),
+            expiry: cardExpiry,
+            billingPostalCode: cardBillingPostalCode.trim(),
+            isDefault: savedPaymentMethods.length === 0,
+            createdAt: new Date(),
+        };
+
+        const updatedMethods = [...savedPaymentMethods, newMethod];
+
+        startLoading();
+        setSkipUserSync(true);
+        try {
+            await setDoc(
+                doc(db, "drippy-banks-users", user.id),
+                {
+                    paymentMethods: updatedMethods,
+                    updatedAt: new Date(),
+                },
+                { merge: true },
+            );
+
+            setSavedPaymentMethods(updatedMethods);
+            setCardNumber("");
+            setCardExpiry("");
+            setCardHolderName("");
+            setCardCvv("");
+            setCardBillingPostalCode("");
+            setIsPaymentFormOpen(false);
+            toast.success("Card added.");
+        } catch (error: unknown) {
+            const err = error as Error;
+            toast.error("Failed to save card.", {
+                description: err.message ?? "Unknown error",
+            });
+        } finally {
+            setSkipUserSync(false);
+            stopLoading();
+        }
+    };
+
+    const handleCardNumberChange = (value: string) => {
+        const digitsOnly = value.replace(/\D/g, "").slice(0, 16);
+        const grouped = digitsOnly.match(/.{1,4}/g)?.join(" ") ?? "";
+        setCardNumber(grouped);
+    };
+
+    const handleCardExpiryChange = (value: string) => {
+        const digitsOnly = value.replace(/\D/g, "").slice(0, 4);
+        if (digitsOnly.length <= 2) {
+            setCardExpiry(digitsOnly);
+            return;
+        }
+
+        const month = digitsOnly.slice(0, 2);
+        const year = digitsOnly.slice(2, 4);
+        setCardExpiry(`${month}/${year}`);
+    };
+
+    const handleCardCvvChange = (value: string) => {
+        const digitsOnly = value.replace(/\D/g, "").slice(0, 4);
+        setCardCvv(digitsOnly);
+    };
+
+    const handleRemoveCard = async (paymentMethodId: string) => {
+        if (!user?.id) {
+            toast.error("Missing user id. Please reload the page.");
+            return;
+        }
+
+        const targetMethod = savedPaymentMethods.find(
+            (method) => method.id === paymentMethodId,
+        );
+        if (targetMethod?.isDefault) {
+            toast.error("Default card cannot be removed.");
+            return;
+        }
+
+        const updatedMethods = savedPaymentMethods.filter(
+            (method) => method.id !== paymentMethodId,
+        );
+
+        startLoading();
+        try {
+            await setDoc(
+                doc(db, "drippy-banks-users", user.id),
+                {
+                    paymentMethods: updatedMethods,
+                    updatedAt: new Date(),
+                },
+                { merge: true },
+            );
+
+            setSavedPaymentMethods(updatedMethods);
+            toast.success("Card removed.");
+        } catch (error: unknown) {
+            const err = error as Error;
+            toast.error("Failed to remove card.", {
+                description: err.message ?? "Unknown error",
+            });
+        } finally {
+            stopLoading();
+        }
+    };
+
+    const countryOptions = useMemo(
+        () => countries.map((c) => ({ value: c.isoCode, label: c.name })),
+        [countries],
+    );
+
+    const stateOptions = useMemo(
+        () => states.map((s) => ({ value: s.isoCode, label: s.name })),
+        [states],
+    );
+
+    const detectedCardBrand = useMemo(
+        () => detectCardBrand(cardNumber.replace(/\D/g, "")),
+        [cardNumber],
+    );
+
     return (
         <div className="max-w-4xl mx-auto space-y-8">
             {/* Profile Header */}
@@ -60,9 +459,11 @@ export const ProfilePageUI = ({
                     </p>
                 </div>
 
-                <Button className="flex items-center gap-2 px-4 py-2  text-sm font-medium">
-                    <Settings className="h-4 w-4" />
-                    Edit Profile
+                <Button asChild className="flex items-center gap-2 px-4 py-2 text-sm font-medium">
+                    <Link href={`/${user.id}/profile/edit`}>
+                        <Settings className="h-4 w-4" />
+                        Edit Profile
+                    </Link>
                 </Button>
             </div>
 
@@ -114,132 +515,52 @@ export const ProfilePageUI = ({
 
                 {/* Content Area */}
                 <div className="md:col-span-3">
-                    {activeTab === "orders" && (
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="space-y-4"
-                        >
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">
-                                Order History
-                            </h2>
-                            {ORDERS.map((order) => (
-                                <div
-                                    key={order.id}
-                                    className="bg-white rounded-xl border border-gray-100 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-md transition-shadow"
-                                >
-                                    <div>
-                                        <div className="flex items-center gap-3 mb-1">
-                                            <span className="font-bold text-gray-900">
-                                                {order.id}
-                                            </span>
-                                            <span
-                                                className={`text-xs px-2 py-1 rounded-full ${order.status === "Delivered"
-                                                    ? "bg-green-100 text-green-700"
-                                                    : "bg-blue-100 text-blue-700"
-                                                    }`}
-                                            >
-                                                {order.status}
-                                            </span>
-                                        </div>
-                                        <p className="text-sm text-gray-500">{order.date}</p>
-                                        <p className="text-sm text-gray-600 mt-2">
-                                            {order.items.join(", ")}
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-6">
-                                        <span className="font-bold text-lg">
-                                            ${order.total.toFixed(2)}
-                                        </span>
-                                        <button className="text-gray-400 hover:text-black">
-                                            <ChevronRight className="h-5 w-5" />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </motion.div>
-                    )}
+                    {activeTab === "orders" && <OrdersTab orders={ORDERS} />}
 
                     {activeTab === "addresses" && (
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="space-y-4"
-                        >
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">
-                                Saved Addresses
-                            </h2>
-
-                            <Card className="relative">
-                                {/* Default Badge */}
-                                <div className="absolute top-6 right-6">
-                                    <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">
-                                        Default
-                                    </span>
-                                </div>
-
-                                <CardHeader>
-                                    <CardTitle className="text-gray-900 font-bold">
-                                        Home
-                                    </CardTitle>
-                                </CardHeader>
-
-                                <CardContent className="space-y-1">
-                                    <p className="text-gray-600">{user?.addressStreet}</p>
-                                    <p className="text-gray-600">
-                                        {user?.addressCity} {user?.addressPostalCode}
-                                    </p>
-                                    <p className="text-gray-600">{user?.country?.name}</p>
-
-                                    <div className="mt-4 flex gap-3">
-                                        <button className="text-sm font-medium text-black underline">
-                                            Edit
-                                        </button>
-                                        <button className="text-sm font-medium text-red-600 hover:underline">
-                                            Remove
-                                        </button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <button className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-medium hover:border-gray-400 hover:text-gray-700 transition-colors flex items-center justify-center gap-2">
-                                <MapPin className="h-5 w-5" />
-                                Add New Address
-                            </button>
-                        </motion.div>
+                        <AddressTab
+                            savedAddress={savedAddress}
+                            onOpenAddressForm={handleOpenAddressForm}
+                            onRemoveAddress={handleRemoveAddress}
+                            isAddressFormOpen={isAddressFormOpen}
+                            loading={loading}
+                            form={form}
+                            countryOptions={countryOptions}
+                            stateOptions={stateOptions}
+                            handleCountrySelect={handleCountrySelect}
+                            handleProvinceSelect={handleProvinceSelect}
+                            handleChange={handleChange}
+                            handleSaveAddress={handleSaveAddress}
+                            states={states}
+                        />
                     )}
 
                     {activeTab === "payment" && (
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="space-y-4"
-                        >
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">
-                                Payment Methods
-                            </h2>
-                            <div className="bg-white rounded-xl border border-gray-100 p-6 flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <div className="bg-gray-100 p-3 rounded-lg">
-                                        <CreditCard className="h-6 w-6 text-gray-700" />
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-gray-900">
-                                            Visa ending in 4242
-                                        </p>
-                                        <p className="text-sm text-gray-500">Expires 12/26</p>
-                                    </div>
-                                </div>
-                                <button className="text-sm text-red-600 font-medium">
-                                    Remove
-                                </button>
-                            </div>
-
-                            <button className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-medium hover:border-gray-400 hover:text-gray-700 transition-colors flex items-center justify-center gap-2">
-                                <CreditCard className="h-5 w-5" />
-                                Add New Card
-                            </button>
-                        </motion.div>
+                        <PaymentTab
+                            cardForm={{
+                                cardHolderName,
+                                setCardHolderName,
+                                cardNumber,
+                                handleCardNumberChange,
+                                detectedCardBrand,
+                                cardExpiry,
+                                handleCardExpiryChange,
+                                cardCvv,
+                                handleCardCvvChange,
+                                cardBillingPostalCode,
+                                setCardBillingPostalCode,
+                            }}
+                            methods={{
+                                savedPaymentMethods,
+                                handleSaveCard,
+                                handleRemoveCard,
+                                loading,
+                            }}
+                            ui={{
+                                isPaymentFormOpen,
+                                setIsPaymentFormOpen,
+                            }}
+                        />
                     )}
                 </div>
             </div>

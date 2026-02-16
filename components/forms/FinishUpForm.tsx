@@ -38,7 +38,6 @@ const FinishUpForm = ({
     title?: string;
     submitLabel?: string;
 }) => {
-    
     return (
         <Card className="w-full max-w-lg">
             <CardHeader>
@@ -48,7 +47,6 @@ const FinishUpForm = ({
             </CardHeader>
 
             <CardContent className="space-y-4">
-                {/* Phone */}
                 <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number</Label>
                     <Input
@@ -62,7 +60,6 @@ const FinishUpForm = ({
                     />
                 </div>
 
-                {/* Country */}
                 <div className="space-y-2">
                     <Label htmlFor="country">Country</Label>
                     <Select value={form.countryCode} onValueChange={handleCountrySelect}>
@@ -79,7 +76,6 @@ const FinishUpForm = ({
                     </Select>
                 </div>
 
-                {/* Province / State */}
                 <div className="space-y-2">
                     <Label htmlFor="province">Province / State</Label>
                     <Select
@@ -106,7 +102,6 @@ const FinishUpForm = ({
                     </Select>
                 </div>
 
-                {/* Address - Street */}
                 <div className="space-y-2">
                     <Label htmlFor="addressStreet">Street</Label>
                     <Input
@@ -119,7 +114,6 @@ const FinishUpForm = ({
                     />
                 </div>
 
-                {/* Address - City & Postal Code side by side */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="addressCity">City</Label>

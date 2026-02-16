@@ -1,132 +1,52 @@
 'use client'
 
+import { Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
-import { useState } from 'react';
 import Image from 'next/image';
-import { Product, useCart } from '@/context/CartContext';
-
-// Mock Data
-const PRODUCTS: Product[] = [
-    {
-        id: '1',
-        name: 'Classic White Tee',
-        price: 29.00,
-        category: 'Tops',
-        image: "/blindManWhite.jpeg"
-    },
-    {
-        id: '2',
-        name: 'Vintage Denim Jeans',
-        price: 9.45,
-        category: 'Caps',
-        image: '/cap.jpeg'
-    },
-    {
-        id: '15',
-        name: 'Vintage Denim Jeans',
-        price: 9.45,
-        category: 'Caps',
-        image: '/cap2.png'
-    },
-    {
-        id: '14',
-        name: 'Vintage Denim Jeans',
-        price: 9.45,
-        category: 'Caps',
-        image: '/cap3.png'
-    },
-    {
-        id: '3',
-        name: 'Vintage Denim Jeans',
-        price: 89.00,
-        category: 'Tops',
-        image: '/cropTop.jpeg'
-    },
-    {
-        id: '6',
-        name: 'Vintage Denim Jeans',
-        price: 89.00,
-        category: 'Tops',
-        image: '/dogGreen.jpeg'
-    },
-    {
-        id: '10',
-        name: 'Vintage Denim Jeans',
-        price: 89.00,
-        category: 'Tops',
-        image: '/skeleton.jpeg'
-    },
-    {
-        id: '11',
-        name: 'Vintage Denim Jeans',
-        price: 89.00,
-        category: 'Tops',
-        image: '/dogGreenYellow.jpeg'
-    },
-    {
-        id: '12',
-        name: 'Vintage Denim Jeans',
-        price: 89.00,
-        category: 'Tops',
-        image: '/normal.jpeg'
-    },
-    {
-        id: '13',
-        name: 'Vintage Denim Jeans',
-        price: 89.00,
-        category: 'Tops',
-        image: '/greenBack.jpeg'
-    },
-
-    {
-        id: '4',
-        name: 'Summer Floral',
-        price: 79.00,
-        category: 'Hoodies',
-        image: '/hoodieBlack.jpeg'
-    },
-    {
-        id: '7',
-        name: 'Summer Floral Dress',
-        price: 79.00,
-        category: 'Hoodies',
-        image: '/hoodieBlue.jpeg'
-    },
-    {
-        id: '8',
-        name: 'Summer Floral Dress',
-        price: 79.00,
-        category: 'Hoodies',
-        image: '/hoodieRed.jpeg'
-    },
-    {
-        id: '9',
-        name: 'Summer Floral Dress',
-        price: 79.00,
-        category: 'Hoodies',
-        image: '/hoodieWhite.jpeg'
-    },
-    {
-        id: '5',
-        name: 'Essential Black Hoodie',
-        price: 55.00,
-        category: 'Bags',
-        image: '/bag.jpeg'
-    },
-
-];
+import { useCart } from '@/context/CartContext';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { PRODUCTS } from './products';
 
 const CATEGORIES = ['All', 'Tops', 'Caps', 'Bags', 'Hoodies'];
 
-const ShopPage = () => {
+const ShopPageContent = () => {
     const { addToCart } = useCart();
-    const [selectedCategory, setSelectedCategory] = useState('All');
-    const [searchQuery, setSearchQuery] = useState('');
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const normalizeCategory = (value: string | null) =>
+        CATEGORIES.includes(value ?? '') ? (value as string) : 'All';
+
+    const selectedCategory = normalizeCategory(searchParams.get('category'));
+    const searchQuery = searchParams.get('q') ?? '';
+    const isFromNavSearch = searchParams.get('source') === 'nav-search';
+    const searchPlaceholder = isFromNavSearch
+        ? 'Search for a product from the navbar...'
+        : 'Search products...';
+
+    const updateParams = (updates: Record<string, string | null>) => {
+        const params = new URLSearchParams(searchParams.toString());
+
+        Object.entries(updates).forEach(([key, value]) => {
+            if (value == null) {
+                params.delete(key);
+                return;
+            }
+            params.set(key, value);
+        });
+
+        const query = params.toString();
+        router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    };
 
     const filteredProducts = PRODUCTS.filter((product) => {
         const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-        const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const normalizedQuery = searchQuery.trim().toLowerCase();
+        const matchesSearch =
+            normalizedQuery.length === 0 ||
+            product.name.toLowerCase().includes(normalizedQuery) ||
+            product.category.toLowerCase().includes(normalizedQuery);
         return matchesCategory && matchesSearch;
     });
 
@@ -139,14 +59,19 @@ const ShopPage = () => {
                     <p className="text-gray-500 mt-1">Check out the latest trends for this season.</p>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <div className="relative">
+                <div className="flex items-center gap-4 w-full md:w-auto">
+                    <div className="relative w-full">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                         <input
                             type="text"
-                            placeholder="Search products..."
+                            placeholder={searchPlaceholder}
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onChange={(e) =>
+                                updateParams({
+                                    q: e.target.value.trim() ? e.target.value : null,
+                                    source: null,
+                                })
+                            }
                             className="pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent w-full md:w-64"
                         />
                     </div>
@@ -158,7 +83,11 @@ const ShopPage = () => {
                 {CATEGORIES.map((category) => (
                     <button
                         key={category}
-                        onClick={() => setSelectedCategory(category)}
+                        onClick={() =>
+                            updateParams({
+                                category: category === 'All' ? null : category,
+                            })
+                        }
                         className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedCategory === category
                             ? 'bg-black text-white'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -171,7 +100,7 @@ const ShopPage = () => {
 
             {/* Product Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredProducts.map((product) => (
+                {filteredProducts.map((product, index) => (
                     <motion.div
                         key={product.id}
                         initial={{ opacity: 0, y: 20 }}
@@ -181,14 +110,15 @@ const ShopPage = () => {
                     >
                         <div className="aspect-3/4 w-full overflow-hidden rounded-lg relative">
                             <Image
-                                fill priority
+                                fill
+                                priority={index < 2}
                                 src={product.image}
                                 alt={product.name}
                                 className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                             />
                             <button
                                 onClick={() => addToCart(product)}
-                                className="absolute bottom-4 right-4 cursor-pointer bg-white p-3 rounded-full shadow-lg text-black opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:bg-gray-100"
+                                className="absolute bottom-4 right-4 cursor-pointer bg-white p-3 rounded-full shadow-lg text-black opacity-100 md:opacity-0 transform translate-y-0 md:translate-y-4 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-300 hover:bg-gray-100"
                             >
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm font-bold">+ Add</span>
@@ -214,6 +144,14 @@ const ShopPage = () => {
                 </div>
             )}
         </div>
+    );
+};
+
+const ShopPage = () => {
+    return (
+        <Suspense fallback={<div className="py-10 text-center text-gray-500">Loading shop...</div>}>
+            <ShopPageContent />
+        </Suspense>
     );
 };
 

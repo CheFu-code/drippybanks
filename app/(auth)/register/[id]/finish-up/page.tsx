@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { db } from "@/config/firebaseConfig";
 import { FormState } from "@/types/user";
 import { Country, ICountry, IState, State } from "country-state-city";
-import FinishUpForm from "../../_components/FinishUpForm";
+import FinishUpForm from "@/components/forms/FinishUpForm";
 
 const DEFAULT_COUNTRY_CODE = "ZA"; // Preselect South Africa (optional)
 

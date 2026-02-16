@@ -1,16 +1,26 @@
 import UserDropdown from "@/app/(public)/_components/Userdropdown";
+import { useCart } from "@/context/CartContext";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader, Menu, Search, ShoppingBag, X } from "lucide-react";
+import { Loader, Menu, ShoppingBag, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { buttonVariants } from "../ui/button";
-import { useRouter } from "next/navigation";
+
+const NAV_ITEMS = [
+    { label: "New Arrivals", href: "/shop" },
+    { label: "Women", href: "/shop?q=women" },
+    { label: "Men", href: "/shop?q=men" },
+    { label: "Caps", href: "/shop?category=Caps" },
+    { label: "Sale", href: "/shop?q=sale" },
+];
 
 export function Navbar() {
     const router = useRouter();
     const { user, loading } = useAuthUser();
+    const { cartCount } = useCart();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
@@ -43,25 +53,21 @@ export function Navbar() {
                     {/* Desktop Navigation */}
                     <div className="hidden md:block">
                         <div className="ml-10 flex items-baseline space-x-8">
-                            {["New Arrivals", "Women", "Men", "Caps", "Sale"].map(
-                                (item) => (
-                                    <a
-                                        key={item}
-                                        href="#"
-                                        className="text-sm font-medium text-white hover:text-gray-300 transition-colors"
-                                    >
-                                        {item}
-                                    </a>
-                                ),
-                            )}
+                            {NAV_ITEMS.map((item) => (
+                                <Link
+                                    key={item.label}
+                                    href={item.href}
+                                    className="text-sm font-medium text-white hover:text-gray-300 transition-colors"
+                                >
+                                    {item.label}
+                                </Link>
+                            ))}
                         </div>
                     </div>
 
                     {/* Icons */}
                     <div className="flex items-center space-x-4">
-                        <button className="p-2 text-white hover:bg-gray-100/30 transition-colors">
-                            <Search size={20} />
-                        </button>
+
                         {loading ? (
                             <Loader className="size-4 text-white animate-spin" />
                         ) : user ? (
@@ -79,10 +85,17 @@ export function Navbar() {
                                 Login
                             </Link>
                         )}
-                        <button className="p-2 text-white hover:bg-gray-100/30 transition-colors relative">
+                        <Link
+                            href="/cart"
+                            className="p-2 text-white hover:bg-gray-100/30 transition-colors relative"
+                        >
                             <ShoppingBag size={20} />
-                            <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-                        </button>
+                            {cartCount > 0 && (
+                                <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold flex items-center justify-center">
+                                    {cartCount}
+                                </span>
+                            )}
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -97,17 +110,16 @@ export function Navbar() {
                         className="md:hidden bg-white border-b border-gray-100 overflow-hidden"
                     >
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                            {["New Arrivals", "Women", "Men", "Caps", "Sale"].map(
-                                (item) => (
-                                    <a
-                                        key={item}
-                                        href="#"
-                                        className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-                                    >
-                                        {item}
-                                    </a>
-                                ),
-                            )}
+                            {NAV_ITEMS.map((item) => (
+                                <Link
+                                    key={item.label}
+                                    href={item.href}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                                >
+                                    {item.label}
+                                </Link>
+                            ))}
                         </div>
                     </motion.div>
                 )}
