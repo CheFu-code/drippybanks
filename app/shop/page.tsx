@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
 import Image from 'next/image';
@@ -9,7 +10,7 @@ import { PRODUCTS } from './products';
 
 const CATEGORIES = ['All', 'Tops', 'Caps', 'Bags', 'Hoodies'];
 
-const ShopPage = () => {
+const ShopPageContent = () => {
     const { addToCart } = useCart();
     const router = useRouter();
     const pathname = usePathname();
@@ -143,6 +144,14 @@ const ShopPage = () => {
                 </div>
             )}
         </div>
+    );
+};
+
+const ShopPage = () => {
+    return (
+        <Suspense fallback={<div className="py-10 text-center text-gray-500">Loading shop...</div>}>
+            <ShopPageContent />
+        </Suspense>
     );
 };
 
