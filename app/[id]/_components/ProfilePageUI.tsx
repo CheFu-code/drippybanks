@@ -1,6 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { db } from "@/config/firebaseConfig";
+import { AppUser, FormState } from "@/types/user";
+import { Country, ICountry, IState, State } from "country-state-city";
+import { doc, setDoc } from "firebase/firestore";
 import { motion } from "framer-motion";
 import {
     ChevronRight,
@@ -10,8 +15,38 @@ import {
     Package,
     Settings,
 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { FaCcAmex, FaCcDiscover, FaCcMastercard, FaCcVisa, FaCreditCard } from "react-icons/fa";
+import { toast } from "sonner";
+import FinishUpForm from "../../(auth)/register/_components/FinishUpForm";
 import { ORDERS } from "../profile/page";
-import { AppUser } from "@/types/user";
+
+const DEFAULT_COUNTRY_CODE = "ZA";
+
+const detectCardBrand = (cardDigits: string): string => {
+    if (/^4/.test(cardDigits)) return "Visa";
+    if (/^(5[1-5]|2[2-7])/.test(cardDigits)) return "Mastercard";
+    if (/^3[47]/.test(cardDigits)) return "American Express";
+    if (/^6(?:011|5)/.test(cardDigits)) return "Discover";
+    if (/^(50|5[6-9]|6[0-9])/.test(cardDigits)) return "Maestro";
+    return "Unknown";
+};
+
+const getCardBrandIcon = (brand?: string) => {
+    switch (brand) {
+        case "Visa":
+            return FaCcVisa;
+        case "Mastercard":
+            return FaCcMastercard;
+        case "American Express":
+            return FaCcAmex;
+        case "Discover":
+            return FaCcDiscover;
+        default:
+            return FaCreditCard;
+    }
+};
+
 export const ProfilePageUI = ({
     user,
     handleLogout,
@@ -23,6 +58,372 @@ export const ProfilePageUI = ({
     activeTab: "orders" | "addresses" | "payment"
     setActiveTab: (tab: "orders" | "addresses" | "payment") => void
 }) => {
+    const [loading, setLoading] = useState(false);
+    const [isAddressFormOpen, setIsAddressFormOpen] = useState(false);
+    const [isPaymentFormOpen, setIsPaymentFormOpen] = useState(false);
+    const [countries, setCountries] = useState<ICountry[]>([]);
+    const [states, setStates] = useState<IState[]>([]);
+    const [cardNumber, setCardNumber] = useState("");
+    const [cardExpiry, setCardExpiry] = useState("");
+    const [cardHolderName, setCardHolderName] = useState("");
+    const [cardCvv, setCardCvv] = useState("");
+    const [cardBillingPostalCode, setCardBillingPostalCode] = useState("");
+    const [savedPaymentMethods, setSavedPaymentMethods] = useState(user?.paymentMethods ?? []);
+
+    const [savedAddress, setSavedAddress] = useState({
+        addressStreet: user?.addressStreet ?? "",
+        addressCity: user?.addressCity ?? "",
+        addressPostalCode: user?.addressPostalCode ?? "",
+        country: user?.country ?? null,
+    });
+
+    const [form, setForm] = useState<FormState>({
+        phone: user?.phone ?? "",
+        countryCode: user?.country?.code ?? "",
+        countryName: user?.country?.name ?? "",
+        provinceCode: "",
+        provinceName: "",
+        addressStreet: user?.addressStreet ?? "",
+        addressCity: user?.addressCity ?? "",
+        addressPostalCode: user?.addressPostalCode ?? "",
+    });
+
+    useEffect(() => {
+        setSavedAddress({
+            addressStreet: user?.addressStreet ?? "",
+            addressCity: user?.addressCity ?? "",
+            addressPostalCode: user?.addressPostalCode ?? "",
+            country: user?.country ?? null,
+        });
+
+        setForm((prev) => ({
+            ...prev,
+            phone: user?.phone ?? prev.phone,
+            countryCode: user?.country?.code ?? prev.countryCode,
+            countryName: user?.country?.name ?? prev.countryName,
+            addressStreet: user?.addressStreet ?? "",
+            addressCity: user?.addressCity ?? "",
+            addressPostalCode: user?.addressPostalCode ?? "",
+        }));
+
+        setSavedPaymentMethods(user?.paymentMethods ?? []);
+    }, [user]);
+
+    useEffect(() => {
+        const all = Country.getAllCountries();
+        setCountries(all);
+
+        const initialCountryCode = user?.country?.code || DEFAULT_COUNTRY_CODE;
+        const selected = all.find((c) => c.isoCode === initialCountryCode);
+
+        if (selected) {
+            setForm((prev) => ({
+                ...prev,
+                countryCode: prev.countryCode || selected.isoCode,
+                countryName: prev.countryName || selected.name,
+            }));
+            setStates(State.getStatesOfCountry(selected.isoCode));
+        }
+    }, [user?.country?.code]);
+
+    const handleCountrySelect = (isoCode: string) => {
+        const selected = countries.find((c) => c.isoCode === isoCode);
+        setForm((prev) => ({
+            ...prev,
+            countryCode: isoCode,
+            countryName: selected?.name ?? "",
+            provinceCode: "",
+            provinceName: "",
+        }));
+        setStates(State.getStatesOfCountry(isoCode) || []);
+    };
+
+    const handleProvinceSelect = (stateCode: string) => {
+        const selected = states.find((s) => s.isoCode === stateCode);
+        setForm((prev) => ({
+            ...prev,
+            provinceCode: selected?.isoCode ?? "",
+            provinceName: selected?.name ?? "",
+        }));
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleOpenAddressForm = () => {
+        const countryCode = savedAddress.country?.code || form.countryCode;
+        if (countryCode) {
+            setStates(State.getStatesOfCountry(countryCode) || []);
+        }
+
+        setForm((prev) => ({
+            ...prev,
+            phone: user?.phone ?? prev.phone,
+            countryCode,
+            countryName: savedAddress.country?.name || prev.countryName,
+            addressStreet: savedAddress.addressStreet,
+            addressCity: savedAddress.addressCity,
+            addressPostalCode: savedAddress.addressPostalCode,
+        }));
+        setIsAddressFormOpen(true);
+    };
+
+    const handleSaveAddress = async () => {
+        if (!user?.id) {
+            toast.error("Missing user id. Please reload the page.");
+            return;
+        }
+
+        if (!form.countryCode || !form.countryName) {
+            toast.error("Please select a country.");
+            return;
+        }
+
+        if (!form.provinceCode) {
+            toast.error("Please select a province.");
+            return;
+        }
+
+        if (!form.addressStreet || !form.addressCity || !form.addressPostalCode) {
+            toast.error("Please complete your address (street, city, postal code).");
+            return;
+        }
+
+        if (!form.phone) {
+            toast.error("Please enter your phone number.");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            await setDoc(
+                doc(db, "drippy-banks-users", user.id),
+                {
+                    phone: form.phone,
+                    country: {
+                        code: form.countryCode,
+                        name: form.countryName,
+                    },
+                    province: form.provinceName
+                        ? { code: form.provinceCode, name: form.provinceName }
+                        : null,
+                    addressStreet: form.addressStreet,
+                    addressCity: form.addressCity,
+                    addressPostalCode: form.addressPostalCode,
+                    finishedSetup: true,
+                    updatedAt: new Date(),
+                },
+                { merge: true },
+            );
+
+            setSavedAddress({
+                addressStreet: form.addressStreet,
+                addressCity: form.addressCity,
+                addressPostalCode: form.addressPostalCode,
+                country: {
+                    code: form.countryCode,
+                    name: form.countryName,
+                },
+            });
+            setIsAddressFormOpen(false);
+            toast.success("Address saved.");
+        } catch (error: unknown) {
+            const err = error as Error;
+            toast.error("Failed to save address.", {
+                description: err.message ?? "Unknown error",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRemoveAddress = async () => {
+        if (!user?.id) {
+            toast.error("Missing user id. Please reload the page.");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            await setDoc(
+                doc(db, "drippy-banks-users", user.id),
+                {
+                    addressStreet: "",
+                    addressCity: "",
+                    addressPostalCode: "",
+                    province: null,
+                    updatedAt: new Date(),
+                },
+                { merge: true },
+            );
+
+            setSavedAddress({
+                addressStreet: "",
+                addressCity: "",
+                addressPostalCode: "",
+                country: user?.country ?? null,
+            });
+            setIsAddressFormOpen(false);
+            toast.success("Address removed.");
+        } catch (error: unknown) {
+            const err = error as Error;
+            toast.error("Failed to remove address.", {
+                description: err.message ?? "Unknown error",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSaveCard = async () => {
+        if (!user?.id) {
+            toast.error("Missing user id. Please reload the page.");
+            return;
+        }
+
+        if (!cardHolderName.trim()) {
+            toast.error("Please enter the cardholder name.");
+            return;
+        }
+
+        const digits = cardNumber.replace(/\D/g, "");
+        if (digits.length < 12) {
+            toast.error("Please enter a valid card number.");
+            return;
+        }
+
+        if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExpiry)) {
+            toast.error("Please use card expiry format MM/YY.");
+            return;
+        }
+
+        if (!/^\d{3,4}$/.test(cardCvv)) {
+            toast.error("Please enter a valid CVV.");
+            return;
+        }
+
+        if (!cardBillingPostalCode.trim()) {
+            toast.error("Please enter billing postal code.");
+            return;
+        }
+
+        const newMethod = {
+            id: crypto.randomUUID(),
+            type: "card" as const,
+            holderName: cardHolderName.trim(),
+            brand: detectCardBrand(digits),
+            last4: digits.slice(-4),
+            expiry: cardExpiry,
+            billingPostalCode: cardBillingPostalCode.trim(),
+            isDefault: savedPaymentMethods.length === 0,
+            cardNumber: digits,
+            createdAt: new Date(),
+        };
+
+        const updatedMethods = [...savedPaymentMethods, newMethod];
+
+        setLoading(true);
+        try {
+            await setDoc(
+                doc(db, "drippy-banks-users", user.id),
+                {
+                    paymentMethods: updatedMethods,
+                    updatedAt: new Date(),
+                },
+                { merge: true },
+            );
+
+            setSavedPaymentMethods(updatedMethods);
+            setCardNumber("");
+            setCardExpiry("");
+            setCardHolderName("");
+            setCardCvv("");
+            setCardBillingPostalCode("");
+            setIsPaymentFormOpen(false);
+            toast.success("Card added.");
+        } catch (error: unknown) {
+            const err = error as Error;
+            toast.error("Failed to save card.", {
+                description: err.message ?? "Unknown error",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCardNumberChange = (value: string) => {
+        const digitsOnly = value.replace(/\D/g, "").slice(0, 16);
+        const grouped = digitsOnly.match(/.{1,4}/g)?.join(" ") ?? "";
+        setCardNumber(grouped);
+    };
+
+    const handleCardExpiryChange = (value: string) => {
+        const digitsOnly = value.replace(/\D/g, "").slice(0, 4);
+        if (digitsOnly.length <= 2) {
+            setCardExpiry(digitsOnly);
+            return;
+        }
+
+        const month = digitsOnly.slice(0, 2);
+        const year = digitsOnly.slice(2, 4);
+        setCardExpiry(`${month}/${year}`);
+    };
+
+    const handleCardCvvChange = (value: string) => {
+        const digitsOnly = value.replace(/\D/g, "").slice(0, 4);
+        setCardCvv(digitsOnly);
+    };
+
+    const handleRemoveCard = async (paymentMethodId: string) => {
+        if (!user?.id) {
+            toast.error("Missing user id. Please reload the page.");
+            return;
+        }
+
+        const updatedMethods = savedPaymentMethods.filter(
+            (method) => method.id !== paymentMethodId,
+        );
+
+        setLoading(true);
+        try {
+            await setDoc(
+                doc(db, "drippy-banks-users", user.id),
+                {
+                    paymentMethods: updatedMethods,
+                    updatedAt: new Date(),
+                },
+                { merge: true },
+            );
+
+            setSavedPaymentMethods(updatedMethods);
+            toast.success("Card removed.");
+        } catch (error: unknown) {
+            const err = error as Error;
+            toast.error("Failed to remove card.", {
+                description: err.message ?? "Unknown error",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const countryOptions = useMemo(
+        () => countries.map((c) => ({ value: c.isoCode, label: c.name })),
+        [countries],
+    );
+
+    const stateOptions = useMemo(
+        () => states.map((s) => ({ value: s.isoCode, label: s.name })),
+        [states],
+    );
+
+    const detectedCardBrand = useMemo(
+        () => detectCardBrand(cardNumber.replace(/\D/g, "")),
+        [cardNumber],
+    );
+
     return (
         <div className="max-w-4xl mx-auto space-y-8">
             {/* Profile Header */}
@@ -184,28 +585,61 @@ export const ProfilePageUI = ({
                                     </CardTitle>
                                 </CardHeader>
 
-                                <CardContent className="space-y-1">
-                                    <p className="text-gray-600">{user?.addressStreet}</p>
-                                    <p className="text-gray-600">
-                                        {user?.addressCity} {user?.addressPostalCode}
-                                    </p>
-                                    <p className="text-gray-600">{user?.country?.name}</p>
+                                {savedAddress.addressStreet ? (
+                                    <CardContent className="space-y-1">
+                                        <p className="text-gray-600">{savedAddress.addressStreet}</p>
+                                        <p className="text-gray-600">
+                                            {savedAddress.addressCity} {savedAddress.addressPostalCode}
+                                        </p>
+                                        <p className="text-gray-600">{savedAddress.country?.name}</p>
 
-                                    <div className="mt-4 flex gap-3">
-                                        <button className="text-sm font-medium text-black underline">
-                                            Edit
-                                        </button>
-                                        <button className="text-sm font-medium text-red-600 hover:underline">
-                                            Remove
-                                        </button>
-                                    </div>
-                                </CardContent>
+                                        <div className="mt-4 flex gap-3">
+                                            <button
+                                                onClick={handleOpenAddressForm}
+                                                className="text-sm font-medium text-black underline"
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                onClick={handleRemoveAddress}
+                                                className="text-sm font-medium text-red-600 hover:underline"
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </CardContent>
+                                ) : (
+                                    <CardContent className="space-y-1">
+                                        <p className="text-gray-600">
+                                            No saved address yet.
+                                        </p>
+                                    </CardContent>
+                                )}
                             </Card>
 
-                            <button className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-medium hover:border-gray-400 hover:text-gray-700 transition-colors flex items-center justify-center gap-2">
+                            <button
+                                onClick={handleOpenAddressForm}
+                                className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-medium hover:border-gray-400 hover:text-gray-700 transition-colors flex items-center justify-center gap-2"
+                            >
                                 <MapPin className="h-5 w-5" />
-                                Add New Address
+                                {savedAddress.addressStreet ? "Update Address" : "Add New Address"}
                             </button>
+
+                            {isAddressFormOpen && (
+                                <FinishUpForm
+                                    handleChange={handleChange}
+                                    handleSubmit={handleSaveAddress}
+                                    loading={loading}
+                                    form={form}
+                                    countryOptions={countryOptions}
+                                    stateOptions={stateOptions}
+                                    handleCountrySelect={handleCountrySelect}
+                                    handleProvinceSelect={handleProvinceSelect}
+                                    states={states}
+                                    title="Add or Update Address"
+                                    submitLabel="Save Address"
+                                />
+                            )}
                         </motion.div>
                     )}
 
@@ -218,27 +652,132 @@ export const ProfilePageUI = ({
                             <h2 className="text-xl font-bold text-gray-900 mb-4">
                                 Payment Methods
                             </h2>
-                            <div className="bg-white rounded-xl border border-gray-100 p-6 flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <div className="bg-gray-100 p-3 rounded-lg">
-                                        <CreditCard className="h-6 w-6 text-gray-700" />
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-gray-900">
-                                            Visa ending in 4242
-                                        </p>
-                                        <p className="text-sm text-gray-500">Expires 12/26</p>
-                                    </div>
+                            {savedPaymentMethods.length === 0 ? (
+                                <div className="bg-white rounded-xl border border-gray-100 p-6">
+                                    <p className="text-sm text-gray-500">No payment methods saved yet.</p>
                                 </div>
-                                <button className="text-sm text-red-600 font-medium">
-                                    Remove
-                                </button>
-                            </div>
+                            ) : (
+                                savedPaymentMethods.map((method) => {
+                                    const CardBrandIcon = getCardBrandIcon(method.brand);
+                                    return (
+                                    <div
+                                        key={method.id}
+                                        className="bg-white rounded-xl border border-gray-100 p-6 flex items-center justify-between"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="bg-gray-100 p-3 rounded-lg">
+                                                <CardBrandIcon className="h-6 w-6 text-gray-700" />
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-gray-900">
+                                                    {method.brand ?? "Card"} *****{method.last4}
+                                                </p>
+                                                <p className="text-sm text-gray-500">
+                                                    {method.holderName ?? "Cardholder"} - Expires {method.expiry}
+                                                </p>
+                                                <p className="text-sm text-gray-500">
+                                                    Billing ZIP {method.billingPostalCode ?? "N/A"}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => handleRemoveCard(method.id)}
+                                            className="text-sm text-red-600 font-medium"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                    );
+                                })
+                            )}
 
-                            <button className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-medium hover:border-gray-400 hover:text-gray-700 transition-colors flex items-center justify-center gap-2">
+                            <button
+                                onClick={() => setIsPaymentFormOpen((prev) => !prev)}
+                                className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-medium hover:border-gray-400 hover:text-gray-700 transition-colors flex items-center justify-center gap-2"
+                            >
                                 <CreditCard className="h-5 w-5" />
-                                Add New Card
+                                {isPaymentFormOpen ? "Close Card Form" : "Add New Card"}
                             </button>
+
+                            {isPaymentFormOpen && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="text-xl font-semibold">
+                                            Add Payment Card
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-gray-700">
+                                                Cardholder Name
+                                            </label>
+                                            <Input
+                                                value={cardHolderName}
+                                                onChange={(e) => setCardHolderName(e.target.value)}
+                                                placeholder="John Doe"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-gray-700">
+                                                Card Number
+                                            </label>
+                                            <Input
+                                                value={cardNumber}
+                                                onChange={(e) => handleCardNumberChange(e.target.value)}
+                                                placeholder="4242 4242 4242 4242"
+                                                inputMode="numeric"
+                                                maxLength={19}
+                                            />
+                                            <p className="text-xs text-gray-500">
+                                                Detected card type: {detectedCardBrand}
+                                            </p>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-gray-700">
+                                                Expiry (MM/YY)
+                                            </label>
+                                            <Input
+                                                value={cardExpiry}
+                                                onChange={(e) => handleCardExpiryChange(e.target.value)}
+                                                placeholder="12/26"
+                                                maxLength={5}
+                                            />
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-gray-700">
+                                                    CVV
+                                                </label>
+                                                <Input
+                                                    value={cardCvv}
+                                                    onChange={(e) => handleCardCvvChange(e.target.value)}
+                                                    placeholder="123"
+                                                    inputMode="numeric"
+                                                    maxLength={4}
+                                                />
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-gray-700">
+                                                    Billing ZIP / Postal Code
+                                                </label>
+                                                <Input
+                                                    value={cardBillingPostalCode}
+                                                    onChange={(e) => setCardBillingPostalCode(e.target.value)}
+                                                    placeholder="0002"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <Button onClick={handleSaveCard} disabled={loading} className="w-full">
+                                            {loading ? "Saving..." : "Save Card"}
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            )}
                         </motion.div>
                     )}
                 </div>

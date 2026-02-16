@@ -23,6 +23,8 @@ const FinishUpForm = ({
     handleCountrySelect,
     handleProvinceSelect,
     states,
+    title = "Finish Setting Up Your Account",
+    submitLabel = "Complete Setup",
 }: {
     handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     handleSubmit: () => void;
@@ -33,13 +35,15 @@ const FinishUpForm = ({
     handleCountrySelect: (isoCode: string) => void;
     handleProvinceSelect: (stateCode: string) => void;
     states: IState[]
+    title?: string;
+    submitLabel?: string;
 }) => {
     
     return (
         <Card className="w-full max-w-lg">
             <CardHeader>
                 <CardTitle className="text-xl font-semibold">
-                    Finish Setting Up Your Account
+                    {title}
                 </CardTitle>
             </CardHeader>
 
@@ -149,7 +153,7 @@ const FinishUpForm = ({
                     onClick={handleSubmit}
                     disabled={loading}
                 >
-                    {loading ? "Saving..." : "Complete Setup"}
+                    {loading ? "Saving..." : submitLabel}
                 </Button>
             </CardContent>
         </Card>

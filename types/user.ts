@@ -44,8 +44,11 @@ export type AppUser = {
     paymentMethods?: Array<{
         id: string;
         type: "card" | "paypal" | "bank" | "crypto";
+        holderName?: string;
+        brand?: string;
         last4?: string; // For cards
         expiry?: string;
+        billingPostalCode?: string;
         isDefault?: boolean;
     }>;
 
