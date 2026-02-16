@@ -1,4 +1,5 @@
 import { ProductCard } from './ProductCard';
+import Link from 'next/link';
 
 const products = [
     {
@@ -48,9 +49,12 @@ export function FeaturedProducts() {
             </div>
 
             <div className="mt-12 text-center">
-                <button className="px-8 py-3 border border-gray-900 text-gray-900 rounded-full font-medium hover:bg-gray-900 hover:text-white transition-colors">
+                <Link
+                    href="/shop"
+                    className="inline-block px-8 py-3 border border-gray-900 text-gray-900 rounded-full font-medium hover:bg-gray-900 hover:text-white transition-colors"
+                >
                     View All Products
-                </button>
+                </Link>
             </div>
         </section>
     );
