@@ -4,7 +4,6 @@ import { db } from "@/config/firebaseConfig";
 import { AppUser, FormState } from "@/types/user";
 import { Country, ICountry, IState, State } from "country-state-city";
 import { doc, setDoc } from "firebase/firestore";
-import { ORDERS } from "@/lib/mockOrders";
 import Link from "next/link";
 import {
     CreditCard,
@@ -515,7 +514,7 @@ export const ProfilePageUI = ({
 
                 {/* Content Area */}
                 <div className="md:col-span-3">
-                    {activeTab === "orders" && <OrdersTab orders={ORDERS} />}
+                    {activeTab === "orders" && <OrdersTab userId={user.id} />}
 
                     {activeTab === "addresses" && (
                         <AddressTab

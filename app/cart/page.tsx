@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/Home/Navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,9 +10,9 @@ import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/context/CartContext';
 
 export default function CartPage() {
+    const router = useRouter();
     const { cart, cartTotal, addToCart, decreaseQuantity, removeFromCart, clearCart } = useCart();
-    // TODO(handleCheckout): Replace with real checkout flow when checkout route/API is implemented.
-    const handleCheckout = () => undefined;
+    const handleCheckout = () => router.push('/checkout');
 
     return (
         <div className="min-h-screen p-5 bg-gray-100 font-sans text-gray-900 selection:bg-gray-900 selection:text-white">
@@ -85,7 +86,7 @@ export default function CartPage() {
                                     <p className="text-lg font-semibold">Total</p>
                                     <p className="text-lg font-semibold">${cartTotal.toFixed(2)}</p>
                                 </div>
-                                <Button className="w-full" onClick={handleCheckout} disabled>
+                                <Button className="w-full" onClick={handleCheckout}>
                                     Checkout
                                 </Button>
                             </>

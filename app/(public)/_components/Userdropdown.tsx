@@ -89,7 +89,7 @@ export default function UserDropdown({ user }: UserDropdownProps) {
 
                 <DropdownMenuItem asChild>
                     <Button variant="destructive" onClick={() => handleLogout()} className="flex items-center gap-2">
-                        <LogOutIcon size={16} className="opacity-60" aria-hidden="true" />
+                        <LogOutIcon size={16} className=" text-white" aria-hidden="true" />
                         <span>Logout</span>
                     </Button>
                 </DropdownMenuItem>
