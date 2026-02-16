@@ -17,6 +17,7 @@ export const OrdersTab = ({ userId }: { userId: string }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let isActive = true;
         const fetchOrders = async () => {
             try {
                 const ordersRef = collection(db, "drippy-banks-orders");
@@ -51,24 +52,33 @@ export const OrdersTab = ({ userId }: { userId: string }) => {
 
                 fetchedOrders.sort((a, b) => b.sortTime - a.sortTime);
 
-                setOrders(
-                    fetchedOrders.map((order) => ({
-                        id: order.id,
-                        date: order.date,
-                        total: order.total,
-                        status: order.status,
-                        items: order.items,
-                    })),
-                );
+                if (isActive) {
+                    setOrders(
+                        fetchedOrders.map((order) => ({
+                            id: order.id,
+                            date: order.date,
+                            total: order.total,
+                            status: order.status,
+                            items: order.items,
+                        })),
+                    );
+                }
             } catch (error) {
                 console.error("Failed to fetch orders:", error);
-                setOrders([]);
+                if (isActive) {
+                    setOrders([]);
+                }
             } finally {
-                setLoading(false);
+                if (isActive) {
+                    setLoading(false);
+                }
             }
         };
 
         void fetchOrders();
+        return () => {
+            isActive = false;
+        };
     }, [userId]);
 
     return (

@@ -20,6 +20,7 @@ type CheckoutFormLayoutProps = {
     effectiveUseSavedAddress: boolean;
     effectivePaymentChoice: PaymentChoice;
     effectiveSelectedSavedCardId: string;
+    isCardPaymentSelected: boolean;
     savedCards: SavedPaymentMethod[];
     onSubmit: React.FormEventHandler<HTMLFormElement>;
     onFormFieldChange: (field: keyof CheckoutForm, value: string) => void;
@@ -40,6 +41,7 @@ export function CheckoutFormLayout({
     effectiveUseSavedAddress,
     effectivePaymentChoice,
     effectiveSelectedSavedCardId,
+    isCardPaymentSelected,
     savedCards,
     onSubmit,
     onFormFieldChange,
@@ -60,7 +62,7 @@ export function CheckoutFormLayout({
                             <Label htmlFor="fullName">Full name</Label>
                             <Input
                                 id="fullName"
-                                value={form.fullName || user?.fullname || ''}
+                                value={form.fullName}
                                 onChange={(e) => onFormFieldChange('fullName', e.target.value)}
                                 placeholder="Jane Doe"
                                 required
@@ -71,7 +73,7 @@ export function CheckoutFormLayout({
                             <Input
                                 id="email"
                                 type="email"
-                                value={form.email || user?.email || ''}
+                                value={form.email}
                                 onChange={(e) => onFormFieldChange('email', e.target.value)}
                                 placeholder="jane@example.com"
                                 required
@@ -81,7 +83,7 @@ export function CheckoutFormLayout({
                             <Label htmlFor="phone">Phone</Label>
                             <Input
                                 id="phone"
-                                value={form.phone || user?.phone || ''}
+                                value={form.phone}
                                 onChange={(e) => onFormFieldChange('phone', e.target.value)}
                                 placeholder="+1 555 000 0000"
                                 required
@@ -315,6 +317,11 @@ export function CheckoutFormLayout({
                                 You will pay in cash when your order is delivered.
                             </p>
                         )}
+                        {isCardPaymentSelected && (
+                            <p className="text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+                                Card payment is coming soon. Please select Cash on Delivery to place your order.
+                            </p>
+                        )}
                     </CardContent>
                 </Card>
             </div>
@@ -368,7 +375,7 @@ export function CheckoutFormLayout({
                         <p className="text-lg font-semibold">${grandTotal.toFixed(2)}</p>
                     </div>
 
-                    <Button className="w-full" type="submit" disabled={isSubmitting}>
+                    <Button className="w-full" type="submit" disabled={isSubmitting || isCardPaymentSelected}>
                         {isSubmitting ? 'Placing order...' : 'Place Order'}
                     </Button>
                     <Button className="w-full" variant="outline" type="button" asChild>

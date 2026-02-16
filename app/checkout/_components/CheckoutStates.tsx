@@ -52,6 +52,8 @@ export function EmptyCartCheckoutCard() {
 
 export function OrderConfirmationCard({ placedOrder }: { placedOrder: SavedOrder }) {
     const router = useRouter();
+    const shippingLabel = placedOrder.shipping === 0 ? 'Free' : `$${placedOrder.shipping.toFixed(2)}`;
+    const taxLabel = placedOrder.tax === 0 ? 'Free' : `$${placedOrder.tax.toFixed(2)}`;
 
     return (
         <Card className="border-gray-200">
@@ -67,8 +69,8 @@ export function OrderConfirmationCard({ placedOrder }: { placedOrder: SavedOrder
                 </p>
                 <div className="rounded-lg bg-gray-50 border p-4 text-sm space-y-1">
                     <p>Subtotal: ${placedOrder.subtotal.toFixed(2)}</p>
-                    <p>Shipping: Free</p>
-                    <p>Tax: Free</p>
+                    <p>Shipping: {shippingLabel}</p>
+                    <p>Tax: {taxLabel}</p>
                     <p className="font-semibold">Total: ${placedOrder.total.toFixed(2)}</p>
                 </div>
                 <div className="flex gap-3">

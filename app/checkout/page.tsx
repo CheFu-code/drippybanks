@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { toast } from 'sonner';
 import { Navbar } from '@/components/Home/Navbar';
@@ -53,14 +53,29 @@ export default function CheckoutPage() {
     const effectiveUseSavedAddress = useSavedAddressOverride ?? hasSavedAddress;
     const effectivePaymentChoice = paymentChoiceOverride ?? (savedCards.length > 0 ? 'saved' : 'new');
     const effectiveSelectedSavedCardId = selectedSavedCardId || defaultSavedCard?.id || '';
+    const isCardPaymentSelected = effectivePaymentChoice !== 'cash';
 
-    const shipping = useMemo(() => 0, []);
-    const tax = useMemo(() => 0, []);
-    const grandTotal = useMemo(() => cartTotal + shipping + tax, [cartTotal, shipping, tax]);
+    const shipping = 0;
+    const tax = 0;
+    const grandTotal = cartTotal + shipping + tax;
 
-    const onFormFieldChange = (field: keyof CheckoutForm, value: string) => {
+    const onFormFieldChange = useCallback((field: keyof CheckoutForm, value: string) => {
         setForm((prev) => ({ ...prev, [field]: value }));
-    };
+    }, []);
+
+    useEffect(() => {
+        if (!user) return;
+
+        if (!form.fullName && user.fullname) {
+            onFormFieldChange('fullName', user.fullname);
+        }
+        if (!form.email && user.email) {
+            onFormFieldChange('email', user.email);
+        }
+        if (!form.phone && user.phone) {
+            onFormFieldChange('phone', user.phone);
+        }
+    }, [user, form.fullName, form.email, form.phone, onFormFieldChange]);
 
     const validateCheckout = () => {
         const fullName = form.fullName.trim() || user?.fullname?.trim() || '';
@@ -100,6 +115,12 @@ export default function CheckoutPage() {
             return;
         }
 
+        const finalPaymentMethod = effectivePaymentChoice === 'cash' ? 'cash' : 'card';
+        if (finalPaymentMethod === 'card') {
+            toast.info('Card payment is coming soon. Please use Cash on Delivery for now.');
+            return;
+        }
+
         const validationError = validateCheckout();
         if (validationError) {
             toast.error(validationError);
@@ -107,7 +128,6 @@ export default function CheckoutPage() {
         }
 
         setIsSubmitting(true);
-        await new Promise((resolve) => setTimeout(resolve, 900));
 
         const finalAddress = effectiveUseSavedAddress && hasSavedAddress
             ? {
@@ -123,19 +143,12 @@ export default function CheckoutPage() {
                 country: form.country,
             };
 
-        const finalPaymentMethod = effectivePaymentChoice === 'cash' ? 'cash' : 'card';
         const fullName = form.fullName.trim() || user?.fullname?.trim() || '';
         const email = form.email.trim() || user?.email?.trim() || '';
         const phone = form.phone.trim() || user?.phone?.trim() || '';
 
-        if (finalPaymentMethod === 'card') {
-            setIsSubmitting(false);
-            toast.info('Card payment is coming soon. Please use Cash on Delivery for now.');
-            return;
-        }
-
         const order: SavedOrder = {
-            id: `ORD-${Date.now().toString().slice(-8)}`,
+            id: `ORD-${crypto.randomUUID()}`,
             date: new Date().toISOString(),
             status: 'Processing',
             total: Number(grandTotal.toFixed(2)),
@@ -221,6 +234,7 @@ export default function CheckoutPage() {
                         effectiveUseSavedAddress={effectiveUseSavedAddress}
                         effectivePaymentChoice={effectivePaymentChoice}
                         effectiveSelectedSavedCardId={effectiveSelectedSavedCardId}
+                        isCardPaymentSelected={isCardPaymentSelected}
                         savedCards={savedCards}
                         onSubmit={handlePlaceOrder}
                         onFormFieldChange={onFormFieldChange}
