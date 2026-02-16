@@ -245,6 +245,11 @@ export const ProfilePageUI = ({
             return;
         }
 
+        if (savedAddress.addressStreet) {
+            toast.error("Default address cannot be removed.");
+            return;
+        }
+
         setLoading(true);
         try {
             await setDoc(
@@ -379,6 +384,14 @@ export const ProfilePageUI = ({
     const handleRemoveCard = async (paymentMethodId: string) => {
         if (!user?.id) {
             toast.error("Missing user id. Please reload the page.");
+            return;
+        }
+
+        const targetMethod = savedPaymentMethods.find(
+            (method) => method.id === paymentMethodId,
+        );
+        if (targetMethod?.isDefault) {
+            toast.error("Default card cannot be removed.");
             return;
         }
 
@@ -602,9 +615,10 @@ export const ProfilePageUI = ({
                                             </button>
                                             <button
                                                 onClick={handleRemoveAddress}
-                                                className="text-sm font-medium text-red-600 hover:underline"
+                                                disabled
+                                                className="text-sm font-medium text-gray-400 cursor-not-allowed"
                                             >
-                                                Remove
+                                                Default Address
                                             </button>
                                         </div>
                                     </CardContent>
@@ -680,13 +694,17 @@ export const ProfilePageUI = ({
                                                 </p>
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={() => handleRemoveCard(method.id)}
-                                            className="text-sm text-red-600 font-medium"
-                                        >
-                                            Remove
-                                        </button>
-                                    </div>
+                                            <button
+                                                onClick={() => handleRemoveCard(method.id)}
+                                                disabled={method.isDefault}
+                                                className={`text-sm font-medium ${method.isDefault
+                                                    ? "text-gray-400 cursor-not-allowed"
+                                                    : "text-red-600"
+                                                    }`}
+                                            >
+                                                {method.isDefault ? "Default Card" : "Remove"}
+                                            </button>
+                                        </div>
                                     );
                                 })
                             )}
