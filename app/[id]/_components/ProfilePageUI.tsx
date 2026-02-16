@@ -1,14 +1,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { db } from "@/config/firebaseConfig";
 import { AppUser, FormState } from "@/types/user";
 import { Country, ICountry, IState, State } from "country-state-city";
 import { doc, setDoc } from "firebase/firestore";
-import { motion } from "framer-motion";
 import {
-    ChevronRight,
     CreditCard,
     LogOut,
     MapPin,
@@ -16,36 +12,14 @@ import {
     Settings,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { FaCcAmex, FaCcDiscover, FaCcMastercard, FaCcVisa, FaCreditCard } from "react-icons/fa";
 import { toast } from "sonner";
-import FinishUpForm from "../../(auth)/register/_components/FinishUpForm";
 import { ORDERS } from "../profile/page";
+import { detectCardBrand } from "./profile/cardBrand";
+import { OrdersTab } from "./profile/OrdersTab";
+import { AddressTab } from "./profile/AddressTab";
+import { PaymentTab } from "./profile/PaymentTab";
 
 const DEFAULT_COUNTRY_CODE = "ZA";
-
-const detectCardBrand = (cardDigits: string): string => {
-    if (/^4/.test(cardDigits)) return "Visa";
-    if (/^(5[1-5]|2[2-7])/.test(cardDigits)) return "Mastercard";
-    if (/^3[47]/.test(cardDigits)) return "American Express";
-    if (/^6(?:011|5)/.test(cardDigits)) return "Discover";
-    if (/^(50|5[6-9]|6[0-9])/.test(cardDigits)) return "Maestro";
-    return "Unknown";
-};
-
-const getCardBrandIcon = (brand?: string) => {
-    switch (brand) {
-        case "Visa":
-            return FaCcVisa;
-        case "Mastercard":
-            return FaCcMastercard;
-        case "American Express":
-            return FaCcAmex;
-        case "Discover":
-            return FaCcDiscover;
-        default:
-            return FaCreditCard;
-    }
-};
 
 export const ProfilePageUI = ({
     user,
@@ -528,275 +502,46 @@ export const ProfilePageUI = ({
 
                 {/* Content Area */}
                 <div className="md:col-span-3">
-                    {activeTab === "orders" && (
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="space-y-4"
-                        >
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">
-                                Order History
-                            </h2>
-                            {ORDERS.map((order) => (
-                                <div
-                                    key={order.id}
-                                    className="bg-white rounded-xl border border-gray-100 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-md transition-shadow"
-                                >
-                                    <div>
-                                        <div className="flex items-center gap-3 mb-1">
-                                            <span className="font-bold text-gray-900">
-                                                {order.id}
-                                            </span>
-                                            <span
-                                                className={`text-xs px-2 py-1 rounded-full ${order.status === "Delivered"
-                                                    ? "bg-green-100 text-green-700"
-                                                    : "bg-blue-100 text-blue-700"
-                                                    }`}
-                                            >
-                                                {order.status}
-                                            </span>
-                                        </div>
-                                        <p className="text-sm text-gray-500">{order.date}</p>
-                                        <p className="text-sm text-gray-600 mt-2">
-                                            {order.items.join(", ")}
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-6">
-                                        <span className="font-bold text-lg">
-                                            ${order.total.toFixed(2)}
-                                        </span>
-                                        <button className="text-gray-400 hover:text-black">
-                                            <ChevronRight className="h-5 w-5" />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </motion.div>
-                    )}
+                    {activeTab === "orders" && <OrdersTab orders={ORDERS} />}
 
                     {activeTab === "addresses" && (
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="space-y-4"
-                        >
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">
-                                Saved Addresses
-                            </h2>
-
-                            <Card className="relative">
-                                {/* Default Badge */}
-                                <div className="absolute top-6 right-6">
-                                    <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">
-                                        Default
-                                    </span>
-                                </div>
-
-                                <CardHeader>
-                                    <CardTitle className="text-gray-900 font-bold">
-                                        Home
-                                    </CardTitle>
-                                </CardHeader>
-
-                                {savedAddress.addressStreet ? (
-                                    <CardContent className="space-y-1">
-                                        <p className="text-gray-600">{savedAddress.addressStreet}</p>
-                                        <p className="text-gray-600">
-                                            {savedAddress.addressCity} {savedAddress.addressPostalCode}
-                                        </p>
-                                        <p className="text-gray-600">{savedAddress.country?.name}</p>
-
-                                        <div className="mt-4 flex gap-3">
-                                            <button
-                                                onClick={handleOpenAddressForm}
-                                                className="text-sm font-medium text-black underline"
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={handleRemoveAddress}
-                                                disabled
-                                                className="text-sm font-medium text-gray-400 cursor-not-allowed"
-                                            >
-                                                Default Address
-                                            </button>
-                                        </div>
-                                    </CardContent>
-                                ) : (
-                                    <CardContent className="space-y-1">
-                                        <p className="text-gray-600">
-                                            No saved address yet.
-                                        </p>
-                                    </CardContent>
-                                )}
-                            </Card>
-
-                            <button
-                                onClick={handleOpenAddressForm}
-                                className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-medium hover:border-gray-400 hover:text-gray-700 transition-colors flex items-center justify-center gap-2"
-                            >
-                                <MapPin className="h-5 w-5" />
-                                {savedAddress.addressStreet ? "Update Address" : "Add New Address"}
-                            </button>
-
-                            {isAddressFormOpen && (
-                                <FinishUpForm
-                                    handleChange={handleChange}
-                                    handleSubmit={handleSaveAddress}
-                                    loading={loading}
-                                    form={form}
-                                    countryOptions={countryOptions}
-                                    stateOptions={stateOptions}
-                                    handleCountrySelect={handleCountrySelect}
-                                    handleProvinceSelect={handleProvinceSelect}
-                                    states={states}
-                                    title="Add or Update Address"
-                                    submitLabel="Save Address"
-                                />
-                            )}
-                        </motion.div>
+                        <AddressTab
+                            savedAddress={savedAddress}
+                            onOpenAddressForm={handleOpenAddressForm}
+                            onRemoveAddress={handleRemoveAddress}
+                            isAddressFormOpen={isAddressFormOpen}
+                            loading={loading}
+                            form={form}
+                            countryOptions={countryOptions}
+                            stateOptions={stateOptions}
+                            handleCountrySelect={handleCountrySelect}
+                            handleProvinceSelect={handleProvinceSelect}
+                            handleChange={handleChange}
+                            handleSaveAddress={handleSaveAddress}
+                            states={states}
+                        />
                     )}
 
                     {activeTab === "payment" && (
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="space-y-4"
-                        >
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">
-                                Payment Methods
-                            </h2>
-                            {savedPaymentMethods.length === 0 ? (
-                                <div className="bg-white rounded-xl border border-gray-100 p-6">
-                                    <p className="text-sm text-gray-500">No payment methods saved yet.</p>
-                                </div>
-                            ) : (
-                                savedPaymentMethods.map((method) => {
-                                    const CardBrandIcon = getCardBrandIcon(method.brand);
-                                    return (
-                                    <div
-                                        key={method.id}
-                                        className="bg-white rounded-xl border border-gray-100 p-6 flex items-center justify-between"
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className="bg-gray-100 p-3 rounded-lg">
-                                                <CardBrandIcon className="h-6 w-6 text-gray-700" />
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-gray-900">
-                                                    {method.brand ?? "Card"} *****{method.last4}
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                    {method.holderName ?? "Cardholder"} - Expires {method.expiry}
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                    Billing ZIP {method.billingPostalCode ?? "N/A"}
-                                                </p>
-                                            </div>
-                                        </div>
-                                            <button
-                                                onClick={() => handleRemoveCard(method.id)}
-                                                disabled={method.isDefault}
-                                                className={`text-sm font-medium ${method.isDefault
-                                                    ? "text-gray-400 cursor-not-allowed"
-                                                    : "text-red-600"
-                                                    }`}
-                                            >
-                                                {method.isDefault ? "Default Card" : "Remove"}
-                                            </button>
-                                        </div>
-                                    );
-                                })
-                            )}
-
-                            <button
-                                onClick={() => setIsPaymentFormOpen((prev) => !prev)}
-                                className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-medium hover:border-gray-400 hover:text-gray-700 transition-colors flex items-center justify-center gap-2"
-                            >
-                                <CreditCard className="h-5 w-5" />
-                                {isPaymentFormOpen ? "Close Card Form" : "Add New Card"}
-                            </button>
-
-                            {isPaymentFormOpen && (
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle className="text-xl font-semibold">
-                                            Add Payment Card
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="space-y-4">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">
-                                                Cardholder Name
-                                            </label>
-                                            <Input
-                                                value={cardHolderName}
-                                                onChange={(e) => setCardHolderName(e.target.value)}
-                                                placeholder="John Doe"
-                                            />
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">
-                                                Card Number
-                                            </label>
-                                            <Input
-                                                value={cardNumber}
-                                                onChange={(e) => handleCardNumberChange(e.target.value)}
-                                                placeholder="4242 4242 4242 4242"
-                                                inputMode="numeric"
-                                                maxLength={19}
-                                            />
-                                            <p className="text-xs text-gray-500">
-                                                Detected card type: {detectedCardBrand}
-                                            </p>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">
-                                                Expiry (MM/YY)
-                                            </label>
-                                            <Input
-                                                value={cardExpiry}
-                                                onChange={(e) => handleCardExpiryChange(e.target.value)}
-                                                placeholder="12/26"
-                                                maxLength={5}
-                                            />
-                                        </div>
-
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-gray-700">
-                                                    CVV
-                                                </label>
-                                                <Input
-                                                    value={cardCvv}
-                                                    onChange={(e) => handleCardCvvChange(e.target.value)}
-                                                    placeholder="123"
-                                                    inputMode="numeric"
-                                                    maxLength={4}
-                                                />
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-gray-700">
-                                                    Billing ZIP / Postal Code
-                                                </label>
-                                                <Input
-                                                    value={cardBillingPostalCode}
-                                                    onChange={(e) => setCardBillingPostalCode(e.target.value)}
-                                                    placeholder="0002"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <Button onClick={handleSaveCard} disabled={loading} className="w-full">
-                                            {loading ? "Saving..." : "Save Card"}
-                                        </Button>
-                                    </CardContent>
-                                </Card>
-                            )}
-                        </motion.div>
+                        <PaymentTab
+                            savedPaymentMethods={savedPaymentMethods}
+                            isPaymentFormOpen={isPaymentFormOpen}
+                            setIsPaymentFormOpen={setIsPaymentFormOpen}
+                            cardHolderName={cardHolderName}
+                            setCardHolderName={setCardHolderName}
+                            cardNumber={cardNumber}
+                            handleCardNumberChange={handleCardNumberChange}
+                            detectedCardBrand={detectedCardBrand}
+                            cardExpiry={cardExpiry}
+                            handleCardExpiryChange={handleCardExpiryChange}
+                            cardCvv={cardCvv}
+                            handleCardCvvChange={handleCardCvvChange}
+                            cardBillingPostalCode={cardBillingPostalCode}
+                            setCardBillingPostalCode={setCardBillingPostalCode}
+                            handleSaveCard={handleSaveCard}
+                            handleRemoveCard={handleRemoveCard}
+                            loading={loading}
+                        />
                     )}
                 </div>
             </div>
