@@ -13,10 +13,14 @@ import {
     updateDoc,
 } from "firebase/firestore";
 import {
+    ArrowUpRight,
+    BadgeCheck,
+    Clock3,
     Loader2,
     Search,
     ShieldCheck,
     ShoppingBag,
+    Sparkles,
     Users,
     Wallet,
 } from "lucide-react";
@@ -59,6 +63,14 @@ const currency = (value: number) =>
     new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" }).format(
         value,
     );
+const formatDate = (value: Date | null) =>
+    value
+        ? value.toLocaleDateString("en-ZA", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        })
+        : "Unknown date";
 const asDate = (value: unknown) => {
     if (value instanceof Timestamp) return value.toDate();
     if (value instanceof Date) return value;
@@ -168,6 +180,32 @@ export default function AdminDashboardPage() {
         () => orders.filter((order) => order.status !== "Delivered").length,
         [orders],
     );
+    const deliveredOrders = useMemo(
+        () => orders.filter((order) => order.status === "Delivered").length,
+        [orders],
+    );
+    const averageOrderValue = useMemo(
+        () => (orders.length === 0 ? 0 : revenue / orders.length),
+        [orders.length, revenue],
+    );
+    const statusBreakdown = useMemo(() => {
+        const counts = ORDER_STATUSES.reduce((acc, status) => {
+            acc[status] = 0;
+            return acc;
+        }, {} as Record<OrderStatus, number>);
+
+        orders.forEach((order) => {
+            counts[order.status] += 1;
+        });
+
+        const highest = Math.max(...Object.values(counts), 1);
+        return ORDER_STATUSES.map((status) => ({
+            status,
+            count: counts[status],
+            width: `${Math.max((counts[status] / highest) * 100, 6)}%`,
+        }));
+    }, [orders]);
+
     const filteredOrders = useMemo(() => {
         const q = search.trim().toLowerCase();
         return orders.filter((order) => {
@@ -193,6 +231,7 @@ export default function AdminDashboardPage() {
         return PRODUCTS.map((product) => ({
             ...product,
             sold: countByName.get(product.name) ?? 0,
+            revenue: product.price * (countByName.get(product.name) ?? 0),
         }))
             .sort((a, b) => b.sold - a.sold)
             .slice(0, 8);
@@ -217,7 +256,19 @@ export default function AdminDashboardPage() {
     };
 
     if (loading) {
-        return <div className="min-h-screen bg-slate-950" />;
+        return (
+            <div className="min-h-screen bg-slate-950 text-white">
+                <Navbar />
+                <main className="max-w-7xl mx-auto px-5 pt-24 pb-12">
+                    <Card className="border-white/10 bg-white/5">
+                        <CardContent className="py-16 flex items-center justify-center gap-3">
+                            <Loader2 className="h-5 w-5 animate-spin text-cyan-300" />
+                            <span className="text-slate-200">Loading admin dashboard...</span>
+                        </CardContent>
+                    </Card>
+                </main>
+            </div>
+        );
     }
     if (!user || user.role !== "admin") {
         return (
@@ -247,44 +298,68 @@ export default function AdminDashboardPage() {
         <div className="min-h-screen bg-slate-950 text-slate-100">
             <Navbar />
             <main className="max-w-7xl mx-auto px-5 pb-12 pt-24">
-                <section className="rounded-3xl border border-white/10 bg-linear-to-br from-slate-900 to-cyan-950 p-8">
-                    <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">
-                        Admin Dashboard
-                    </p>
-                    <h1 className="text-3xl font-semibold mt-2">
-                        Drippy Banks Control Center
-                    </h1>
-                    <p className="text-slate-300 mt-2">
-                        Manage orders, products, and customer activity.
-                    </p>
+                <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950 p-8 shadow-[0_30px_80px_-40px_rgba(14,165,233,0.65)]">
+                    <div className="pointer-events-none absolute -top-20 -right-16 h-64 w-64 rounded-full bg-cyan-500/25 blur-3xl" />
+                    <div className="pointer-events-none absolute -bottom-24 -left-12 h-56 w-56 rounded-full bg-fuchsia-500/15 blur-3xl" />
+                    <div className="relative">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-cyan-200">
+                                <Sparkles className="h-3 w-3" />
+                                Admin Dashboard
+                            </span>
+                            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/30 bg-emerald-300/10 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-emerald-200">
+                                <BadgeCheck className="h-3 w-3" />
+                                Live Metrics
+                            </span>
+                        </div>
+                        <h1 className="mt-4 text-3xl md:text-4xl font-semibold">
+                            Drippy Banks Control Center
+                        </h1>
+                        <p className="mt-3 max-w-2xl text-slate-300">
+                            Oversee orders, track product velocity, and monitor customer activity
+                            in one polished command surface.
+                        </p>
+                    </div>
                 </section>
 
                 <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <Card className="bg-white/5 border-white/10">
+                    <Card className="border-white/10 bg-gradient-to-br from-emerald-500/12 to-emerald-400/0">
                         <CardContent className="p-5">
-                            <Wallet className="h-5 w-5 text-emerald-300" />
-                            <p className="text-slate-400 text-xs mt-2">Revenue</p>
+                            <div className="flex items-center justify-between">
+                                <Wallet className="h-5 w-5 text-emerald-300" />
+                                <ArrowUpRight className="h-4 w-4 text-emerald-200/70" />
+                            </div>
+                            <p className="text-slate-300 text-xs mt-3">Total Revenue</p>
                             <p className="text-2xl font-semibold text-white">{currency(revenue)}</p>
                         </CardContent>
                     </Card>
-                    <Card className="bg-white/5 border-white/10">
+                    <Card className="border-white/10 bg-gradient-to-br from-cyan-500/12 to-cyan-400/0">
                         <CardContent className="p-5">
-                            <ShoppingBag className="h-5 w-5 text-cyan-300" />
-                            <p className="text-slate-400 text-xs mt-2">Orders</p>
+                            <div className="flex items-center justify-between">
+                                <ShoppingBag className="h-5 w-5 text-cyan-300" />
+                                <ArrowUpRight className="h-4 w-4 text-cyan-200/70" />
+                            </div>
+                            <p className="text-slate-300 text-xs mt-3">Orders</p>
                             <p className="text-2xl font-semibold text-white">{orders.length}</p>
                         </CardContent>
                     </Card>
-                    <Card className="bg-white/5 border-white/10">
+                    <Card className="border-white/10 bg-gradient-to-br from-fuchsia-500/12 to-fuchsia-400/0">
                         <CardContent className="p-5">
-                            <Users className="h-5 w-5 text-fuchsia-300" />
-                            <p className="text-slate-400 text-xs mt-2">Customers</p>
+                            <div className="flex items-center justify-between">
+                                <Users className="h-5 w-5 text-fuchsia-300" />
+                                <ArrowUpRight className="h-4 w-4 text-fuchsia-200/70" />
+                            </div>
+                            <p className="text-slate-300 text-xs mt-3">Customers</p>
                             <p className="text-2xl font-semibold text-white">{users.length}</p>
                         </CardContent>
                     </Card>
-                    <Card className="bg-white/5 border-white/10">
+                    <Card className="border-white/10 bg-gradient-to-br from-amber-500/12 to-amber-400/0">
                         <CardContent className="p-5">
-                            <ShoppingBag className="h-5 w-5 text-amber-300" />
-                            <p className="text-slate-400 text-xs mt-2">Pending</p>
+                            <div className="flex items-center justify-between">
+                                <Clock3 className="h-5 w-5 text-amber-300" />
+                                <ArrowUpRight className="h-4 w-4 text-amber-200/70" />
+                            </div>
+                            <p className="text-slate-300 text-xs mt-3">Pending Orders</p>
                             <p className="text-2xl font-semibold text-white">{pendingOrders}</p>
                         </CardContent>
                     </Card>
@@ -292,28 +367,34 @@ export default function AdminDashboardPage() {
 
                 <section className="mt-6">
                     <Tabs value={tab} onValueChange={setTab}>
-                        <TabsList className="bg-white/10 border border-white/10 ">
+                        <TabsList className="border border-white/10 bg-white/5 p-1 h-auto">
                             <TabsTrigger className="text-white" value="overview">Overview</TabsTrigger>
                             <TabsTrigger className="text-white" value="orders">Orders</TabsTrigger>
                             <TabsTrigger className="text-white" value="products">Products</TabsTrigger>
                             <TabsTrigger className="text-white" value="customers">Customers</TabsTrigger>
                         </TabsList>
 
-                        <TabsContent value="overview" className="mt-4">
-                            <Card className="bg-slate-900/70 border-white/10">
+                        <TabsContent value="overview" className="mt-4 grid gap-4 xl:grid-cols-[1.4fr_1fr]">
+                            <Card className="bg-slate-900/75 border-white/10">
                                 <CardHeader>
                                     <CardTitle className="text-white">Latest Orders</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-3">
+                                    {orders.length === 0 && (
+                                        <p className="text-sm text-slate-400">No orders yet.</p>
+                                    )}
                                     {orders.slice(0, 6).map((order) => (
                                         <div
                                             key={order.id}
-                                            className="rounded-lg border border-white/10 p-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2"
+                                            className="rounded-xl border border-white/10 bg-white/[0.03] p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2"
                                         >
                                             <div>
                                                 <p className="font-medium text-white">{order.id}</p>
                                                 <p className="text-xs text-slate-400">
                                                     {order.customerName} ({order.customerEmail})
+                                                </p>
+                                                <p className="text-xs text-slate-500 mt-1">
+                                                    {formatDate(order.createdAt)}
                                                 </p>
                                             </div>
                                             <div className="flex items-center gap-3">
@@ -328,10 +409,54 @@ export default function AdminDashboardPage() {
                                     ))}
                                 </CardContent>
                             </Card>
+
+                            <div className="space-y-4">
+                                <Card className="bg-slate-900/75 border-white/10">
+                                    <CardHeader>
+                                        <CardTitle className="text-white">Performance Snapshot</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+                                            <p className="text-xs text-slate-400">Average Order Value</p>
+                                            <p className="text-xl font-semibold text-white">
+                                                {currency(averageOrderValue)}
+                                            </p>
+                                        </div>
+                                        <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+                                            <p className="text-xs text-slate-400">Delivered Orders</p>
+                                            <p className="text-xl font-semibold text-white">
+                                                {deliveredOrders}
+                                            </p>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                <Card className="bg-slate-900/75 border-white/10">
+                                    <CardHeader>
+                                        <CardTitle className="text-white">Order Status Mix</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-3">
+                                        {statusBreakdown.map((entry) => (
+                                            <div key={entry.status} className="space-y-1">
+                                                <div className="flex items-center justify-between text-xs text-slate-300">
+                                                    <span>{entry.status}</span>
+                                                    <span>{entry.count}</span>
+                                                </div>
+                                                <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
+                                                    <div
+                                                        className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-fuchsia-400"
+                                                        style={{ width: entry.width }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </TabsContent>
 
                         <TabsContent value="orders" className="mt-4">
-                            <Card className="bg-slate-900/70 border-white/10">
+                            <Card className="bg-slate-900/75 border-white/10">
                                 <CardHeader>
                                     <CardTitle className="text-white">Manage Orders</CardTitle>
                                 </CardHeader>
@@ -343,7 +468,7 @@ export default function AdminDashboardPage() {
                                                 value={search}
                                                 onChange={(e) => setSearch(e.target.value)}
                                                 placeholder="Search orders..."
-                                                className="pl-9 bg-slate-300 border-slate-700"
+                                                className="pl-9 bg-slate-900 border-slate-700 text-white placeholder:text-slate-400"
                                             />
                                         </div>
                                         <select
@@ -351,20 +476,27 @@ export default function AdminDashboardPage() {
                                             onChange={(e) =>
                                                 setStatusFilter(e.target.value as "all" | OrderStatus)
                                             }
-                                            className="h-10 rounded-md border border-slate-700 bg-slate-300 px-3 text-sm"
+                                            className="h-10 rounded-md border border-slate-700 bg-slate-900 px-3 text-sm text-white"
                                         >
-                                            <option className="text-white" value="all">All statuses</option>
+                                            <option value="all">All statuses</option>
                                             {ORDER_STATUSES.map((s) => (
-                                                <option className="text-white" key={s} value={s}>
+                                                <option key={s} value={s}>
                                                     {s}
                                                 </option>
                                             ))}
                                         </select>
                                     </div>
+                                    {filteredOrders.length === 0 && (
+                                        <div className="rounded-lg border border-dashed border-white/20 p-6 text-center">
+                                            <p className="text-sm text-slate-400">
+                                                No orders match your filters.
+                                            </p>
+                                        </div>
+                                    )}
                                     {filteredOrders.map((order) => (
                                         <div
                                             key={order.id}
-                                            className="rounded-lg border border-white/10 p-4"
+                                            className="rounded-xl border border-white/10 bg-white/[0.03] p-4"
                                         >
                                             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                                                 <div>
@@ -372,9 +504,12 @@ export default function AdminDashboardPage() {
                                                     <p className="text-xs text-slate-400">
                                                         {order.customerName} ({order.customerEmail})
                                                     </p>
+                                                    <p className="text-xs text-slate-500 mt-1">
+                                                        {formatDate(order.createdAt)}
+                                                    </p>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <p className="font-medium text-green-500">{currency(order.total)}</p>
+                                                    <p className="font-medium text-emerald-300">{currency(order.total)}</p>
                                                     <select
                                                         defaultValue={order.status}
                                                         onChange={(e) =>
@@ -392,7 +527,7 @@ export default function AdminDashboardPage() {
                                                         ))}
                                                     </select>
                                                     {updatingOrderId === order.id && (
-                                                        <Loader2 className="h-4 w-4 animate-spin text-white" />
+                                                        <Loader2 className="h-4 w-4 animate-spin text-cyan-300" />
                                                     )}
                                                 </div>
                                             </div>
@@ -403,15 +538,18 @@ export default function AdminDashboardPage() {
                         </TabsContent>
 
                         <TabsContent value="products" className="mt-4">
-                            <Card className="bg-slate-900/70 border-white/10">
+                            <Card className="bg-slate-900/75 border-white/10">
                                 <CardHeader>
                                     <CardTitle className="text-white">Product Performance</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-3">
+                                    {topProducts.length === 0 && (
+                                        <p className="text-sm text-slate-400">No product sales data yet.</p>
+                                    )}
                                     {topProducts.map((product) => (
                                         <div
                                             key={product.id}
-                                            className="rounded-lg border border-white/10 p-3 flex items-center justify-between gap-3"
+                                            className="rounded-xl border border-white/10 bg-white/[0.03] p-4 flex items-center justify-between gap-3"
                                         >
                                             <div>
                                                 <p className="font-medium text-white">{product.name}</p>
@@ -424,6 +562,9 @@ export default function AdminDashboardPage() {
                                                 <p className="text-xs text-slate-400">
                                                     {product.sold} sold
                                                 </p>
+                                                <p className="text-xs text-emerald-300">
+                                                    {currency(product.revenue)} revenue
+                                                </p>
                                             </div>
                                         </div>
                                     ))}
@@ -432,15 +573,18 @@ export default function AdminDashboardPage() {
                         </TabsContent>
 
                         <TabsContent value="customers" className="mt-4">
-                            <Card className="bg-slate-900/70 border-white/10">
+                            <Card className="bg-slate-900/75 border-white/10">
                                 <CardHeader>
                                     <CardTitle className="text-white">Customer Accounts</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-3">
+                                    {users.length === 0 && (
+                                        <p className="text-sm text-slate-400">No customer accounts found.</p>
+                                    )}
                                     {users.map((account) => (
                                         <div
                                             key={account.id}
-                                            className="rounded-lg border border-white/10 p-3 flex items-center justify-between gap-3"
+                                            className="rounded-xl border border-white/10 bg-white/[0.03] p-4 flex items-center justify-between gap-3"
                                         >
                                             <div>
                                                 <p className="font-medium text-white">{account.fullname}</p>
