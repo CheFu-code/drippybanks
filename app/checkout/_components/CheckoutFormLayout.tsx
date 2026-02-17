@@ -348,7 +348,7 @@ export function CheckoutFormLayout({
                                     <p className="text-sm text-muted-foreground">Qty {item.quantity}</p>
                                 </div>
                                 <p className="text-sm font-medium">
-                                    ${(item.price * item.quantity).toFixed(2)}
+                                    R{(item.price * item.quantity).toFixed(2)}
                                 </p>
                             </div>
                         ))}
@@ -358,7 +358,7 @@ export function CheckoutFormLayout({
                     <div className="space-y-2 text-sm">
                         <div className="flex items-center justify-between">
                             <span className="text-muted-foreground">Subtotal</span>
-                            <span>${cartTotal.toFixed(2)}</span>
+                            <span>R{cartTotal.toFixed(2)}</span>
                         </div>
                         <div className="flex items-center justify-between">
                             <span className="text-muted-foreground">Shipping</span>
@@ -372,7 +372,7 @@ export function CheckoutFormLayout({
                     <Separator />
                     <div className="flex items-center justify-between">
                         <p className="text-base font-semibold">Total</p>
-                        <p className="text-lg font-semibold">${grandTotal.toFixed(2)}</p>
+                        <p className="text-lg font-semibold">R{grandTotal.toFixed(2)}</p>
                     </div>
 
                     <Button className="w-full" type="submit" disabled={isSubmitting || isCardPaymentSelected}>

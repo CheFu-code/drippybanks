@@ -5,28 +5,28 @@ const products = [
     {
         id: '1',
         name: 'Classic White Tee',
-        price: 10.00,
+        price: 300.00,
         category: 'Essentials',
         image:'/blindManWhite.jpeg'
     },
     {
         id: '2',
         name: 'Women Classic Tee',
-        price: 12.55,
+        price: 300.00,
         category: 'Women',
         image:'/customerFive.jpeg'
     },
     {
         id: '3',
         name: 'Urban Skeleton Claw Graphic T-Shirt',
-        price: 15.60,
+        price: 300.00,
         category: 'Unisex',
         image:'/customerThree.jpeg'
     },
     {
         id: '4',
         name: 'Urban Streetwear Set',
-        price: 15.68,
+        price: 300.00,
         category: 'Men',
         image:'/customerFour.jpeg',
     },

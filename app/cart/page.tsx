@@ -70,7 +70,7 @@ export default function CartPage() {
                                             </div>
                                         </div>
                                         <div className="text-right space-y-2">
-                                            <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                                            <p className="font-medium">R{(item.price * item.quantity).toFixed(2)}</p>
                                             <Button
                                                 size="sm"
                                                 variant="destructive"
@@ -84,7 +84,7 @@ export default function CartPage() {
                                 <Separator />
                                 <div className="flex items-center justify-between">
                                     <p className="text-lg font-semibold">Total</p>
-                                    <p className="text-lg font-semibold">${cartTotal.toFixed(2)}</p>
+                                    <p className="text-lg font-semibold">R{cartTotal.toFixed(2)}</p>
                                 </div>
                                 <Button className="w-full" onClick={handleCheckout}>
                                     Checkout

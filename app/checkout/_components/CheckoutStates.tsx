@@ -52,8 +52,8 @@ export function EmptyCartCheckoutCard() {
 
 export function OrderConfirmationCard({ placedOrder }: { placedOrder: SavedOrder }) {
     const router = useRouter();
-    const shippingLabel = placedOrder.shipping === 0 ? 'Free' : `$${placedOrder.shipping.toFixed(2)}`;
-    const taxLabel = placedOrder.tax === 0 ? 'Free' : `$${placedOrder.tax.toFixed(2)}`;
+    const shippingLabel = placedOrder.shipping === 0 ? 'Free' : `R${placedOrder.shipping.toFixed(2)}`;
+    const taxLabel = placedOrder.tax === 0 ? 'Free' : `R${placedOrder.tax.toFixed(2)}`;
 
     return (
         <Card className="border-gray-200">
@@ -68,10 +68,10 @@ export function OrderConfirmationCard({ placedOrder }: { placedOrder: SavedOrder
                     We&apos;ve sent confirmation to {placedOrder.customer.email}.
                 </p>
                 <div className="rounded-lg bg-gray-50 border p-4 text-sm space-y-1">
-                    <p>Subtotal: ${placedOrder.subtotal.toFixed(2)}</p>
+                    <p>Subtotal: R{placedOrder.subtotal.toFixed(2)}</p>
                     <p>Shipping: {shippingLabel}</p>
                     <p>Tax: {taxLabel}</p>
-                    <p className="font-semibold">Total: ${placedOrder.total.toFixed(2)}</p>
+                    <p className="font-semibold">Total: R{placedOrder.total.toFixed(2)}</p>
                 </div>
                 <div className="flex gap-3">
                     <Button asChild>
