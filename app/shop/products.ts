@@ -9,6 +9,13 @@ export const PRODUCTS: Product[] = [
     image: "/blindManWhite.jpeg",
   },
   {
+    id: "30",
+    name: "Black Thug Graphic Tee",
+    price: 400.0,
+    category: "Tops",
+    image: "/thug.png",
+  },
+  {
     id: "2",
     name: "Classic Black Cap",
     price: 150.0,
@@ -56,7 +63,14 @@ export const PRODUCTS: Product[] = [
     name: "Volt Pup Graphic Tee",
     price: 350.0,
     category: "Tops",
-    image: "/dogGreenYellow.jpeg",
+    image: "/dogGreen.png",
+  },
+  {
+    id: "11",
+    name: "Pink Volt Pup Graphic",
+    price: 350.0,
+    category: "Tops",
+    image: "/dogPink.png",
   },
   {
     id: "12",

@@ -1,10 +1,12 @@
-import React from 'react'
-import LoginForm from './_components/LoginForm'
+import { Suspense } from "react";
+import LoginForm from "./_components/LoginForm";
 
 const page = () => {
     return (
-        <LoginForm />
-    )
-}
+        <Suspense fallback={<div className="text-sm text-muted-foreground">Loading login...</div>}>
+            <LoginForm />
+        </Suspense>
+    );
+};
 
-export default page
+export default page;
