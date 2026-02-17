@@ -2,8 +2,12 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Navbar } from '@/components/Home/Navbar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { db } from '@/config/firebaseConfig';
 import { useCart } from '@/context/CartContext';
 import { useAuthUser } from '@/hooks/useAuthUser';
@@ -18,6 +22,7 @@ import { CheckoutForm, PaymentChoice, SavedOrder, SavedPaymentMethod } from './_
 const ORDER_STORAGE_KEY = 'drippybanks.orders';
 
 export default function CheckoutPage() {
+    const router = useRouter();
     const { user, loading: userLoading } = useAuthUser();
     const { cart, cartTotal, clearCart } = useCart();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,6 +82,12 @@ export default function CheckoutPage() {
         }
     }, [user, form.fullName, form.email, form.phone, onFormFieldChange]);
 
+    useEffect(() => {
+        if (!userLoading && !user) {
+            router.replace('/login?next=/checkout');
+        }
+    }, [userLoading, user, router]);
+
     const validateCheckout = () => {
         const fullName = form.fullName.trim() || user?.fullname?.trim() || '';
         const email = form.email.trim() || user?.email?.trim() || '';
@@ -109,6 +120,12 @@ export default function CheckoutPage() {
 
     const handlePlaceOrder = async (event: FormEvent) => {
         event.preventDefault();
+
+        if (!user) {
+            toast.error('Please sign in to place an order.');
+            router.push('/login?next=/checkout');
+            return;
+        }
 
         if (cart.length === 0) {
             toast.error('Your cart is empty.');
@@ -220,9 +237,29 @@ export default function CheckoutPage() {
                 </div>
 
                 {userLoading && <LoadingCheckoutCard />}
+                {!userLoading && !user && (
+                    <Card className="border-gray-200">
+                        <CardHeader>
+                            <CardTitle className="text-xl">Sign in required</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <p className="text-sm text-muted-foreground">
+                                You need an account to continue with checkout and place orders.
+                            </p>
+                            <div className="flex items-center gap-3">
+                                <Button asChild>
+                                    <Link href="/login?next=/checkout">Go to Login</Link>
+                                </Button>
+                                <Button variant="outline" asChild>
+                                    <Link href="/cart">Back to Cart</Link>
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
                 {!userLoading && placedOrder && <OrderConfirmationCard placedOrder={placedOrder} />}
                 {!userLoading && !placedOrder && cart.length === 0 && <EmptyCartCheckoutCard />}
-                {!userLoading && !placedOrder && cart.length > 0 && (
+                {!userLoading && user && !placedOrder && cart.length > 0 && (
                     <CheckoutFormLayout
                         user={user}
                         form={form}

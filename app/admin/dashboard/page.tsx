@@ -343,7 +343,7 @@ export default function AdminDashboardPage() {
                                                 value={search}
                                                 onChange={(e) => setSearch(e.target.value)}
                                                 placeholder="Search orders..."
-                                                className="pl-9 bg-slate-800 border-slate-700 text-white"
+                                                className="pl-9 bg-slate-300 border-slate-700"
                                             />
                                         </div>
                                         <select
@@ -351,7 +351,7 @@ export default function AdminDashboardPage() {
                                             onChange={(e) =>
                                                 setStatusFilter(e.target.value as "all" | OrderStatus)
                                             }
-                                            className="h-10 rounded-md border border-slate-700 bg-slate-800 px-3 text-sm"
+                                            className="h-10 rounded-md border border-slate-700 bg-slate-300 px-3 text-sm"
                                         >
                                             <option className="text-white" value="all">All statuses</option>
                                             {ORDER_STATUSES.map((s) => (

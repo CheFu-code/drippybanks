@@ -19,10 +19,13 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { getLoginErrorMessage } from "@/helpers/getErrorMsg";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { useSearchParams } from "next/navigation";
 
 export default function LoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { user, loading: authLoading } = useAuthUser();
+    const nextPath = searchParams.get("next") || "/";
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -30,9 +33,9 @@ export default function LoginForm() {
 
     useEffect(() => {
         if (!authLoading && user) {
-            router.replace("/");
+            router.replace(nextPath);
         }
-    }, [authLoading, user, router]);
+    }, [authLoading, user, router, nextPath]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -42,7 +45,7 @@ export default function LoginForm() {
             await signInWithEmailAndPassword(auth, email, password);
             toast.success("Logged in successfully!");
 
-            router.push("/");
+            router.push(nextPath);
         } catch (error: unknown) {
             toast.error("Login failed", {
                 description: getLoginErrorMessage(error),

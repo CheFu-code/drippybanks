@@ -5,15 +5,19 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useLogout } from "@/hooks/useLogout";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useParams } from "next/navigation";
 import { ProfilePageUI } from "../_components/ProfilePageUI";
 
 const ProfilePage = () => {
     const { handleLogout } = useLogout();
     const { user, loading } = useAuthUser();
+    const params = useParams<{ id?: string | string[] }>();
+    const routeUserId = Array.isArray(params.id) ? params.id[0] : params.id;
     const [activeTab, setActiveTab] = useState<
         "orders" | "addresses" | "payment"
     >("orders");
+    const isRouteOwner = useMemo(() => routeUserId === user?.id, [routeUserId, user?.id]);
 
     if (loading) {
         return (
@@ -62,6 +66,29 @@ const ProfilePage = () => {
                     <CardContent className="flex items-center gap-3">
                         <Button asChild>
                             <Link href="/login">Go to Login</Link>
+                        </Button>
+                        <Button variant="outline" asChild>
+                            <Link href="/">Back to Home</Link>
+                        </Button>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
+
+    if (!isRouteOwner) {
+        return (
+            <div className="p-5 max-w-2xl mx-auto">
+                <Card>
+                    <CardHeader>
+                        <h2 className="text-xl font-semibold">Access denied</h2>
+                        <p className="text-sm text-muted-foreground">
+                            You can only view your own profile.
+                        </p>
+                    </CardHeader>
+                    <CardContent className="flex items-center gap-3">
+                        <Button asChild>
+                            <Link href={`/${user.id}/profile`}>Go to your profile</Link>
                         </Button>
                         <Button variant="outline" asChild>
                             <Link href="/">Back to Home</Link>
