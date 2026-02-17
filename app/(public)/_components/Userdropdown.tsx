@@ -78,9 +78,9 @@ export default function UserDropdown({ user }: UserDropdownProps) {
                     </DropdownMenuItem>
 
                     {user?.role === 'admin' && (<DropdownMenuItem asChild>
-                        <Link href='/admin/products/new' className="flex items-center gap-2">
+                        <Link href='/admin/dashboard' className="flex items-center gap-2">
                             <GiClothes size={16} className="opacity-60" aria-hidden="true" />
-                            <span>Add Product</span>
+                            <span>Admin Dashboard</span>
                         </Link>
                     </DropdownMenuItem>)}
                 </DropdownMenuGroup>

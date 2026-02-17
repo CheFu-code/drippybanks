@@ -8,11 +8,19 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/context/CartContext';
+import { useAuthUser } from '@/hooks/useAuthUser';
 
 export default function CartPage() {
     const router = useRouter();
+    const { user } = useAuthUser();
     const { cart, cartTotal, addToCart, decreaseQuantity, removeFromCart, clearCart } = useCart();
-    const handleCheckout = () => router.push('/checkout');
+    const handleCheckout = () => {
+        if (!user) {
+            router.push('/login?next=/checkout');
+            return;
+        }
+        router.push('/checkout');
+    };
 
     return (
         <div className="min-h-screen p-5 bg-gray-100 font-sans text-gray-900 selection:bg-gray-900 selection:text-white">
