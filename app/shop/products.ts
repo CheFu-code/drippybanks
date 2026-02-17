@@ -22,6 +22,13 @@ export const PRODUCTS: Product[] = [
     category: "Caps",
     image: "/capBlue.png",
   },
+  {
+    id: "28",
+    name: "Classic Blue Cap",
+    price: 150.0,
+    category: "Caps",
+    image: "/capRed.png",
+  },
 
   {
     id: "3",
