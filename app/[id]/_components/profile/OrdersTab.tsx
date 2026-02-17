@@ -119,7 +119,7 @@ export const OrdersTab = ({ userId }: { userId: string }) => {
                         <p className="text-sm text-gray-600 mt-2">{order.items.join(", ")}</p>
                     </div>
                     <div className="flex items-center gap-6">
-                        <span className="font-bold text-lg">${order.total.toFixed(2)}</span>
+                        <span className="font-bold text-lg">R{order.total.toFixed(2)}</span>
                         <span className="text-gray-400" aria-hidden="true">
                             <ChevronRight className="h-5 w-5" />
                         </span>

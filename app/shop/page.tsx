@@ -132,7 +132,7 @@ const ShopPageContent = () => {
                                 </h3>
                                 <p className="mt-1 text-sm text-gray-500">{product.category}</p>
                             </div>
-                            <p className="text-sm font-medium text-gray-900">${product.price}</p>
+                            <p className="text-sm font-medium text-gray-900">R{product.price}</p>
                         </div>
                     </motion.div>
                 ))}

@@ -53,7 +53,7 @@ export function ProductCard({
                 <h3 className="text-lg font-medium text-gray-900 group-hover:text-gray-600 transition-colors">
                     {name}
                 </h3>
-                <p className="text-gray-500">${price.toFixed(2)}</p>
+                <p className="text-gray-500">R{price.toFixed(2)}</p>
             </div>
         </motion.div>
     );
