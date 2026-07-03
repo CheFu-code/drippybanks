@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import { buildChefuLoginUrl, makeChefuReturnUrl } from "@/config/chefuAuth";
+import { useEffect, useMemo } from "react";
 
 interface LoginPageProps {
     searchParams: {

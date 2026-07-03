@@ -51,6 +51,7 @@ const ProfilePage = () => {
                     </Card>
                 </div>
             </div>
+            </div>
         );
     }
 
@@ -75,6 +76,7 @@ const ProfilePage = () => {
                     </CardContent>
                 </Card>
             </div>
+        </div>
         );
     }
 
@@ -99,6 +101,7 @@ const ProfilePage = () => {
                     </CardContent>
                 </Card>
             </div>
+        </div>
         );
     }
     return (

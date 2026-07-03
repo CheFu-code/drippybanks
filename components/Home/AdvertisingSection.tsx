@@ -8,19 +8,49 @@ const campaignImages = [
     label: 'Fresh streetwear style',
   },
   {
-    src: '/newPic/ad-09.jpeg',
+    src: '/newPic/ad-02.jpeg',
     alt: 'Drippy Banks campaign look 2',
-    label: 'Bold, premium drops',
+    label: 'Iconic premium fits',
   },
   {
-    src: '/newPic/ad-07.jpeg',
+    src: '/newPic/ad-03.jpeg',
     alt: 'Drippy Banks campaign look 3',
-    label: 'Designed for every city corner',
+    label: 'High-shine urban essentials',
   },
   {
     src: '/newPic/ad-04.jpeg',
     alt: 'Drippy Banks campaign look 4',
     label: 'Stay fresh, stay drippy',
+  },
+  {
+    src: '/newPic/ad-05.jpeg',
+    alt: 'Drippy Banks campaign look 5',
+    label: 'Bold silhouettes with edge',
+  },
+  {
+    src: '/newPic/ad-06.jpeg',
+    alt: 'Drippy Banks campaign look 6',
+    label: 'Luxury street attitude',
+  },
+  {
+    src: '/newPic/ad-07.jpeg',
+    alt: 'Drippy Banks campaign look 7',
+    label: 'Designed for every city corner',
+  },
+  {
+    src: '/newPic/ad-08.jpeg',
+    alt: 'Drippy Banks campaign look 8',
+    label: 'Midnight-ready wardrobe pieces',
+  },
+  {
+    src: '/newPic/ad-09.jpeg',
+    alt: 'Drippy Banks campaign look 9',
+    label: 'Bold, premium drops',
+  },
+  {
+    src: '/newPic/ad-10.jpeg',
+    alt: 'Drippy Banks campaign look 10',
+    label: 'Next-level drip essentials',
   },
 ];
 

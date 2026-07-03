@@ -165,14 +165,15 @@ export default function EditProfilePage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="flex items-center gap-3">
-                        <Button asChild>
-                            <Link href="/login">Go to Login</Link>
-                        </Button>
-                        <Button variant="outline" asChild>
-                            <Link href="/">Back to Home</Link>
-                        </Button>
-                    </CardContent>
-                </Card>
+                            <Button asChild>
+                                <Link href="/login">Go to Login</Link>
+                            </Button>
+                            <Button variant="outline" asChild>
+                                <Link href="/">Back to Home</Link>
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         );
     }
@@ -192,6 +193,7 @@ export default function EditProfilePage() {
                         </Button>
                     </CardContent>
                 </Card>
+                </div>
             </div>
         );
     }
@@ -205,7 +207,7 @@ export default function EditProfilePage() {
                         <CardDescription className="text-slate-400">Update your personal and account details.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
                                 <Label htmlFor="fullname">Full name</Label>
                                 <Input
@@ -314,17 +316,18 @@ export default function EditProfilePage() {
                                 </div>
                             </div>
 
-                        <div className="flex items-center justify-end gap-3">
-                            <Button type="button" variant="outline" asChild>
-                                <Link href={`/${user.id}/profile`}>Cancel</Link>
-                            </Button>
-                            <Button type="submit" disabled={saving}>
-                                {saving ? "Saving..." : "Save Changes"}
-                            </Button>
-                        </div>
-                    </form>
-                </CardContent>
-            </Card>
+                            <div className="flex items-center justify-end gap-3">
+                                <Button type="button" variant="outline" asChild>
+                                    <Link href={`/${user.id}/profile`}>Cancel</Link>
+                                </Button>
+                                <Button type="submit" disabled={saving}>
+                                    {saving ? "Saving..." : "Save Changes"}
+                                </Button>
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 }
