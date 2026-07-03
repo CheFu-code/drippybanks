@@ -5,7 +5,6 @@ import { FeaturedProducts } from '@/components/Home/FeaturedProducts';
 import { Footer } from '@/components/Home/Footer';
 import { Hero } from '@/components/Home/Hero';
 import { Navbar } from '@/components/Home/Navbar';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useNewsletterSubscription } from '@/hooks/useNewsletterSubscription';
 import { useState } from 'react';
@@ -23,24 +22,24 @@ function App() {
     };
 
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-gray-900 selection:text-white">
+        <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-amber-300 selection:text-slate-950">
             <Navbar />
-            <main className="pt-16">
+            <main className="pt-24">
                 <Hero />
                 <CategoryGrid />
                 <FeaturedProducts />
 
                 {/* Newsletter Section */}
                 <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
-                    <div className="bg-gray-900 text-white rounded-2xl p-8 md:p-16 relative overflow-hidden">
-                        {/* Abstract Background Shapes */}
-                        <div className="absolute top-0 left-0 w-64 h-64 bg-gray-800 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 opacity-50 pointer-events-none"></div>
-                        <div className="absolute bottom-0 right-0 w-64 h-64 bg-gray-700 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 opacity-50 pointer-events-none"></div>
-
-                        <div className="relative z-10 max-w-2xl mx-auto">
-                            <h2 className="text-3xl md:text-4xl font-bold mb-6 tracking-tight">Join the Club</h2>
-                            <p className="text-gray-300 mb-8 text-lg">
-                                Get 15% off your first order when you sign up for our newsletter. Plus, get early access to new drops and exclusive events.
+                    <div className="bg-slate-900/90 text-white rounded-[2rem] p-10 shadow-2xl ring-1 ring-white/10 overflow-hidden relative">
+                        <div className="absolute -top-10 -left-10 h-48 w-48 rounded-full bg-amber-400/10 blur-3xl" />
+                        <div className="absolute -bottom-10 -right-10 h-48 w-48 rounded-full bg-cyan-400/10 blur-3xl" />
+                        <div className="relative z-10 mx-auto max-w-2xl">
+                            <h2 className="text-3xl md:text-4xl font-semibold mb-6 tracking-tight">
+                                Join the Club
+                            </h2>
+                            <p className="text-slate-300 mb-8 text-lg">
+                                Get 15% off your first order and early access to new drops, VIP launches, and exclusive events.
                             </p>
                             <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
                                 <Input
@@ -48,18 +47,22 @@ function App() {
                                     placeholder="Enter your email address"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="text-white placeholder:text-white/80 border-white/30 bg-white/10"
+                                    className="text-white placeholder:text-slate-400 border-white/10 bg-white/5"
                                 />
-                                <Button type="submit" disabled={isSubmitting}>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="inline-flex items-center justify-center rounded-full bg-amber-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-70"
+                                >
                                     {isSubmitting ? 'Subscribing...' : 'Subscribe'}
-                                </Button>
+                                </button>
                             </form>
                             {message && (
                                 <p className={`mt-3 text-sm ${message.type === 'success' ? 'text-emerald-300' : 'text-red-300'}`}>
                                     {message.text}
                                 </p>
                             )}
-                            <p className="mt-4 text-xs text-gray-400">
+                            <p className="mt-4 text-xs text-slate-500">
                                 By subscribing you agree to our Terms & Conditions and Privacy Policy.
                             </p>
                         </div>

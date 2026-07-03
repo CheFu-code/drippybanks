@@ -1,90 +1,43 @@
-'use client'
+"use client";
 
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore"; // import Firestore functions
-import React, { useState } from "react";
-import { toast } from "sonner";
-import RegisterForm from "./_components/RegisterForm";
-import { auth, db } from "@/config/firebaseConfig"; // make sure db is exported
-import { useRouter } from "next/navigation";
-import { FirebaseError } from "firebase/app";
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { buildChefuRegisterUrl, makeChefuReturnUrl } from "@/config/chefuAuth";
 
-const Register = () => {
-    const router = useRouter()
-    const [email, setEmail] = useState("");
-    const [fullname, setFullname] = useState("");
-    const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
+export default function RegisterPage() {
+    const searchParams = useSearchParams();
 
-    const handleRegister = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!fullname) {
-            toast.error("Please enter your full name");
-            return;
-        }
+    useEffect(() => {
+        const next = searchParams.get("next") ?? "/";
+        const returnTo = makeChefuReturnUrl(next);
+        const target = buildChefuRegisterUrl(returnTo);
 
-        setLoading(true);
-
-        try {
-            // Create user
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            await updateProfile(userCredential.user, { displayName: fullname });
-            await setDoc(doc(db, "drippy-banks-users", userCredential.user.uid), {
-                fullname,
-                email,
-                createdAt: new Date(),
-                role: 'customer',
-                isEmailVerified: false,
-                isPhoneVerified: false,
-            });
-
-            toast.success("Account created successfully!", {
-                description: "You’ll be redirected to complete your profile setup.",
-                style: {
-                    background: "#000",
-                    color: "#fff",
-                    border: "1px solid #333",
-                },
-            });
-
-            router.replace(`/register/${userCredential.user.uid}/finish-up`);
-        } catch (error: unknown) {
-            let message = "Something went wrong!";
-
-            if (error instanceof FirebaseError) {
-                switch (error.code) {
-                    case "auth/email-already-in-use":
-                        message = "This email is already in use.";
-                        break;
-                    case "auth/invalid-email":
-                        message = "The email address is invalid.";
-                        break;
-                    case "auth/weak-password":
-                        message = "Password should be at least 6 characters.";
-                        break;
-                    default:
-                        message = error.message;
-                }
-            }
-
-            toast.error(message);
-        } finally {
-            setLoading(false);
-        }
-    };
+        window.location.assign(target);
+    }, [searchParams]);
 
     return (
-        <RegisterForm
-            email={email}
-            setEmail={setEmail}
-            fullname={fullname}
-            setFullname={setFullname}
-            password={password}
-            setPassword={setPassword}
-            handleRegister={handleRegister}
-            loading={loading}
-        />
+        <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4 py-16">
+            <div className="w-full max-w-xl rounded-[2rem] border border-white/10 bg-slate-900/90 p-10 shadow-2xl backdrop-blur-xl">
+                <p className="text-sm uppercase tracking-[0.35em] text-amber-300/80 mb-4">
+                    Join the premium network
+                </p>
+                <h1 className="text-4xl font-semibold tracking-tight mb-6">
+                    Create your CheFu Account
+                </h1>
+                <p className="text-slate-300 leading-relaxed mb-8">
+                    Register through CheFu Account to unlock premium access, order tracking, and a seamless shopping experience across the CheFu family of apps.
+                </p>
+                <div className="rounded-full bg-slate-800/80 p-5 text-center text-slate-400">
+                    Redirecting now… If nothing happens,{' '}
+                    <a
+                        href={buildChefuRegisterUrl(makeChefuReturnUrl(searchParams.get("next") ?? "/"))}
+                        className="text-amber-300 hover:text-amber-200 transition-colors"
+                    >
+                        click here
+                    </a>
+                    .
+                </div>
+            </div>
+        </div>
     );
-};
-
-export default Register;
+}

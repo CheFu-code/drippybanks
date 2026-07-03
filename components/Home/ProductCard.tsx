@@ -22,39 +22,38 @@ export function ProductCard({
     const { addToCart } = useCart();
 
     return (
-        <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+        <motion.article
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="group cursor-pointer"
+            transition={{ duration: 0.4 }}
+            className="group overflow-hidden rounded-[1.75rem] border border-white/5 bg-slate-950/90 shadow-xl shadow-slate-950/30"
         >
-            <div className="relative overflow-hidden aspect-3/4 mb-4 bg-gray-100 rounded-lg">
+            <div className="relative aspect-[4/5] overflow-hidden bg-slate-900">
                 <Image
                     fill
                     priority
                     src={image}
                     alt={name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-transparent" />
                 <button
                     type="button"
                     aria-label={`Add ${name} to cart`}
                     onClick={() => addToCart({ id, name, price, image, category })}
-                    className="absolute bottom-4 right-4 bg-white p-3 rounded-full shadow-lg translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hover:bg-gray-50 cursor-pointer"
+                    className="absolute bottom-4 right-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-amber-300 text-slate-950 shadow-lg shadow-amber-300/20 opacity-0 transition-all duration-300 group-hover:opacity-100"
                 >
                     <Plus size={20} />
                 </button>
-                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wider">
+                <span className="absolute left-4 top-4 rounded-full bg-slate-950/75 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-300">
                     {category}
-                </div>
+                </span>
             </div>
-            <div className="space-y-1">
-                <h3 className="text-lg font-medium text-gray-900 group-hover:text-gray-600 transition-colors">
-                    {name}
-                </h3>
-                <p className="text-gray-500">R{price.toFixed(2)}</p>
+            <div className="space-y-2 p-5">
+                <h3 className="text-lg font-semibold text-white transition-colors group-hover:text-amber-300">{name}</h3>
+                <p className="text-sm text-slate-400">R{price.toFixed(2)}</p>
             </div>
-        </motion.div>
+        </motion.article>
     );
 }

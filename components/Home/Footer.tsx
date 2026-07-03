@@ -34,14 +34,14 @@ const resolveHelpHref = (item: HelpLink, userId?: string) => {
 const renderFooterLink = (href: string, label: string) => {
     if (href.startsWith('/')) {
         return (
-            <Link href={href} className="text-gray-400 hover:text-white transition-colors text-sm">
+            <Link href={href} className="text-slate-300 hover:text-white transition-colors text-sm">
                 {label}
             </Link>
         );
     }
 
     return (
-        <a href={href} className="text-gray-400 hover:text-white transition-colors text-sm">
+        <a href={href} className="text-slate-300 hover:text-white transition-colors text-sm">
             {label}
         </a>
     );
@@ -61,30 +61,37 @@ export function Footer() {
     };
 
     return (
-        <footer className="bg-gray-900 text-white pt-16 pb-8">
+        <footer className="bg-slate-950 text-slate-100 pt-16 pb-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-                    {/* Brand */}
+                <div className="grid grid-cols-1 gap-12 lg:grid-cols-4 mb-14">
                     <div className="space-y-4">
-                        <h3 className="text-2xl font-bold tracking-tighter">Drippy Banks</h3>
-                        <p className="text-gray-400 text-sm leading-relaxed">
-                            Elevating your everyday style with premium quality and sustainable fashion. Designed for the modern individual.
+                        <p className="text-sm uppercase tracking-[0.35em] text-amber-300">Drippy Banks</p>
+                        <h3 className="text-2xl font-semibold text-white">Premium streetwear with a modern edge.</h3>
+                        <p className="text-sm leading-7 text-slate-400">
+                            Built for bold style, crafted for lasting wear, and designed to feel luxurious from every angle.
                         </p>
-                        <div className="flex space-x-4">
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors"><Instagram size={20} /></a>
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors"><Twitter size={20} /></a>
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors"><Facebook size={20} /></a>
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors"><Youtube size={20} /></a>
+                        <div className="flex items-center gap-3 text-slate-400">
+                            <a href="#" className="rounded-full border border-white/10 bg-white/5 p-3 text-slate-200 transition hover:border-amber-300/30 hover:bg-amber-400/10">
+                                <Instagram size={18} />
+                            </a>
+                            <a href="#" className="rounded-full border border-white/10 bg-white/5 p-3 text-slate-200 transition hover:border-amber-300/30 hover:bg-amber-400/10">
+                                <Twitter size={18} />
+                            </a>
+                            <a href="#" className="rounded-full border border-white/10 bg-white/5 p-3 text-slate-200 transition hover:border-amber-300/30 hover:bg-amber-400/10">
+                                <Facebook size={18} />
+                            </a>
+                            <a href="#" className="rounded-full border border-white/10 bg-white/5 p-3 text-slate-200 transition hover:border-amber-300/30 hover:bg-amber-400/10">
+                                <Youtube size={18} />
+                            </a>
                         </div>
                     </div>
 
-                    {/* Shop */}
                     <div>
-                        <h4 className="text-lg font-semibold mb-6">Shop</h4>
+                        <h4 className="text-lg font-semibold text-white mb-6">Shop</h4>
                         <ul className="space-y-3">
                             {SHOP_LINKS.map((item) => (
                                 <li key={item.label}>
-                                    <Link href={item.href} className="text-gray-400 hover:text-white transition-colors text-sm">
+                                    <Link href={item.href} className="text-slate-300 hover:text-white text-sm transition-colors">
                                         {item.label}
                                     </Link>
                                 </li>
@@ -92,9 +99,8 @@ export function Footer() {
                         </ul>
                     </div>
 
-                    {/* Help */}
                     <div>
-                        <h4 className="text-lg font-semibold mb-6">Help</h4>
+                        <h4 className="text-lg font-semibold text-white mb-6">Support</h4>
                         <ul className="space-y-3">
                             {HELP_LINKS.map((item) => (
                                 <li key={item.label}>
@@ -104,58 +110,51 @@ export function Footer() {
                         </ul>
                     </div>
 
-                    {/* Newsletter */}
                     <div>
-                        <h4 className="text-lg font-semibold mb-6">Subscribe</h4>
-                        <p className="text-gray-400 text-sm mb-4">
-                            Sign up for our newsletter to get the latest news, announcements, and special offers.
+                        <h4 className="text-lg font-semibold text-white mb-6">Stay updated</h4>
+                        <p className="text-sm leading-7 text-slate-400 mb-5">
+                            Subscribe for release alerts, exclusive offers, and early access to new drops.
                         </p>
-                        <form onSubmit={handleSubscribe} className="flex flex-col space-y-3">
+                        <form onSubmit={handleSubscribe} className="space-y-3">
                             <input
                                 type="email"
-                                placeholder="Enter your email"
+                                placeholder="Email address"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="bg-gray-800 border border-gray-700 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-500 text-sm"
+                                className="w-full rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-amber-300 focus:ring-2 focus:ring-amber-300/20"
                             />
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="bg-white text-gray-900 font-medium px-4 py-2 rounded-md hover:bg-gray-100 transition-colors text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                                className="w-full rounded-2xl bg-amber-300 px-4 py-3 text-sm font-semibold uppercase tracking-[0.15em] text-slate-950 transition hover:bg-amber-200 disabled:cursor-not-allowed disabled:opacity-60"
                             >
                                 {isSubmitting ? 'Subscribing...' : 'Subscribe'}
                             </button>
-                            {message && (
-                                <p
-                                    className={`text-xs ${message.type === 'success' ? 'text-emerald-300' : 'text-red-300'
-                                        }`}
-                                >
-                                    {message.text}
-                                </p>
-                            )}
                         </form>
+                        {message && (
+                            <p className={`mt-3 text-xs ${message.type === 'success' ? 'text-emerald-300' : 'text-rose-300'}`}>
+                                {message.text}
+                            </p>
+                        )}
                     </div>
                 </div>
 
-                <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-                    <div className="text-center md:text-left">
-                        <p>&copy; {new Date().getFullYear()} DrippyBanks Inc. All rights reserved.</p>
-                        <p className="mt-1 text-xs text-gray-400">
-                            Crafted with care by the{' '}
-                            <a
-                                href="https://chefuinc.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="underline-offset-2 hover:underline text-gray-300 hover:text-white transition-colors"
-                            >
-                                CheFu Inc.
-                            </a>
-                            .
-                        </p>
-                    </div>
-                    <div className="flex space-x-6 mt-4 md:mt-0">
-                        <a href="#" className="hover:text-gray-400">Privacy Policy</a>
-                        <a href="#" className="hover:text-gray-400">Terms of Service</a>
+                <div className="border-t border-white/10 pt-8 flex flex-col gap-3 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
+                    <p>&copy; {new Date().getFullYear()} DrippyBanks Inc. All rights reserved.</p>
+                    <p>
+                        Crafted with precision by{' '}
+                        <a
+                            href="https://chefuinc.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-amber-300 hover:text-amber-200"
+                        >
+                            CheFu Inc.
+                        </a>
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                        <a href="#" className="text-slate-400 hover:text-white">Privacy Policy</a>
+                        <a href="#" className="text-slate-400 hover:text-white">Terms of Service</a>
                     </div>
                 </div>
             </div>

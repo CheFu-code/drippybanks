@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
     title: "Drippy Banks",
     description:
-        "Drippy Banks is a clothing brand serving fresh drip, bold fits, and standout streetwear essentials.",
+        "Drippy Banks is the premium streetwear destination for bold drops, elevated essentials, and seamless CheFu account access.",
 };
 
 export default function RootLayout({
@@ -28,7 +28,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+                className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-slate-950 text-slate-100`}
             >
                 <CartProvider>
                     {children}

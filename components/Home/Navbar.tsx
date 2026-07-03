@@ -24,98 +24,87 @@ export function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-accent-foreground backdrop-blur-md border-b border-gray-100">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
-                    {/* Mobile Menu Button */}
-                    <div className="flex items-center md:hidden">
-                        <button
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="p-2 rounded-md text-white hover:bg-gray-100/30"
-                        >
-                            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                        </button>
+        <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-slate-950/90 backdrop-blur-xl shadow-lg shadow-slate-950/20">
+            <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+                <button
+                    onClick={() => router.push("/")}
+                    className="flex items-center gap-3 text-white"
+                >
+                    <Image
+                        src={"/drippybanks.png"}
+                        alt="Drippy Banks"
+                        width={44}
+                        height={44}
+                        className="rounded-full"
+                    />
+                    <div className="text-left">
+                        <p className="text-sm uppercase tracking-[0.4em] text-slate-400">Drippy Banks</p>
+                        <span className="text-base font-semibold tracking-tight">Premium streetwear</span>
                     </div>
+                </button>
 
-                    {/* Logo */}
-                    <button
-                        onClick={() => router.push("/")}
-                        className="shrink-0 cursor-pointer flex items-center justify-center md:justify-start flex-1 md:flex-none"
-                    >
-                        <Image
-                            src={"/drippybanks.png"}
-                            alt="Logo"
-                            width={100}
-                            height={100}
-                        />
-                    </button>
-
-                    {/* Desktop Navigation */}
-                    <div className="hidden md:block">
-                        <div className="ml-10 flex items-baseline space-x-8">
-                            {NAV_ITEMS.map((item) => (
-                                <Link
-                                    key={item.label}
-                                    href={item.href}
-                                    className="text-sm font-medium text-white hover:text-gray-300 transition-colors"
-                                >
-                                    {item.label}
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Icons */}
-                    <div className="flex items-center space-x-4">
-
-                        {loading ? (
-                            <Loader className="size-4 text-white animate-spin" />
-                        ) : user ? (
-                            <Link
-                                href="/"
-                                className="text-sm font-medium transition-colors hover:text-primary"
-                            >
-                                <UserDropdown user={user} />
-                            </Link>
-                        ) : (
-                            <Link
-                                href="/login"
-                                className={buttonVariants({ size: "sm", variant: "outline" })}
-                            >
-                                Login
-                            </Link>
-                        )}
+                <div className="hidden md:flex items-center gap-8">
+                    {NAV_ITEMS.map((item) => (
                         <Link
-                            href="/cart"
-                            className="p-2 text-white hover:bg-gray-100/30 transition-colors relative"
+                            key={item.label}
+                            href={item.href}
+                            className="text-sm font-medium uppercase tracking-[0.18em] text-slate-300 transition hover:text-white"
                         >
-                            <ShoppingBag size={20} />
-                            {cartCount > 0 && (
-                                <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold flex items-center justify-center">
-                                    {cartCount}
-                                </span>
-                            )}
+                            {item.label}
                         </Link>
-                    </div>
+                    ))}
+                </div>
+
+                <div className="flex items-center gap-3">
+                    {loading ? (
+                        <Loader className="h-5 w-5 text-amber-300 animate-spin" />
+                    ) : user ? (
+                        <UserDropdown user={user} />
+                    ) : (
+                        <Link
+                            href="/login"
+                            className={buttonVariants({ size: "sm", variant: "default", className: "rounded-full px-4 py-2" })}
+                        >
+                            Login
+                        </Link>
+                    )}
+
+                    <Link
+                        href="/cart"
+                        className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:bg-white/10"
+                    >
+                        <ShoppingBag size={20} />
+                        {cartCount > 0 && (
+                            <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-amber-400 px-1.5 text-[10px] font-semibold text-slate-950">
+                                {cartCount}
+                            </span>
+                        )}
+                    </Link>
+
+                    <button
+                        className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 p-2 text-white transition hover:bg-white/10 md:hidden"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    >
+                        {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                    </button>
                 </div>
             </div>
 
-            {/* Mobile Menu */}
             <AnimatePresence>
                 {isMenuOpen && (
                     <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="md:hidden bg-white border-b border-gray-100 overflow-hidden"
+                        className="overflow-hidden border-t border-white/10 bg-slate-950/95 md:hidden"
                     >
-                        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                        <div className="space-y-1 px-4 py-3">
                             {NAV_ITEMS.map((item) => (
                                 <Link
                                     key={item.label}
                                     href={item.href}
                                     onClick={() => setIsMenuOpen(false)}
-                                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                                    className="block rounded-2xl px-4 py-3 text-sm font-medium uppercase tracking-[0.15em] text-slate-300 transition hover:bg-white/5 hover:text-white"
                                 >
                                     {item.label}
                                 </Link>

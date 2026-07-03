@@ -2,57 +2,69 @@
 'use client'
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 export function Hero() {
-    const router = useRouter()
+    const router = useRouter();
+
     return (
-        <div className="relative h-[80vh] w-full overflow-hidden">
-            {/* Background Image */}
+        <section className="relative overflow-hidden bg-slate-950 text-white">
             <div className="absolute inset-0">
                 <Image
-                    fill priority
-                    src="https://images.unsplash.com/photo-1765009433753-c7462637d21f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBjbG90aGluZyUyMHN0b3JlJTIwaW50ZXJpb3IlMjBmYXNoaW9ufGVufDF8fHx8MTc3MDYzODg4NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                    alt="Modern Clothing Store"
-                    className="w-full h-full object-cover"
+                    fill
+                    priority
+                    src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1200&q=80"
+                    alt="Luxury streetwear"
+                    className="object-cover opacity-80"
                 />
-                <div className="absolute inset-0 bg-black/30" />
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-950/85 via-slate-950/65 to-rose-950/55" />
             </div>
 
-            {/* Content */}
-            <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
-                <div className="max-w-xl text-white">
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className="text-5xl md:text-7xl font-bold tracking-tight mb-6"
-                    >
-                        Summer <br />
-                        Collection &apos;26
-                    </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="text-lg md:text-xl text-gray-200 mb-8 max-w-md"
-                    >
-                        Discover the latest trends in fashion with our new summer arrival. Comfort meets style.
-                    </motion.p>
+            <div className="relative mx-auto flex min-h-[80vh] max-w-7xl flex-col justify-center px-4 py-24 sm:px-6 lg:px-8">
+                <div className="max-w-3xl space-y-8">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.4 }}
+                        transition={{ duration: 0.8 }}
+                        className="space-y-6"
                     >
-                        <button onClick={() => router.push('/shop')} className="bg-white cursor-pointer text-gray-900 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-colors flex items-center space-x-2 group">
-                            <span>Shop Now</span>
-                            <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                        <p className="inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.35em] text-slate-200/80">
+                            New season drop
+                        </p>
+                        <h1 className="text-5xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl">
+                            Streetwear redefined for the modern premium wardrobe.
+                        </h1>
+                        <p className="max-w-2xl text-lg leading-8 text-slate-300">
+                            Explore bold silhouettes, elevated essentials, and a curated collection designed to stand out on every city corner.
+                        </p>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.9, delay: 0.2 }}
+                        className="flex flex-col gap-4 sm:flex-row"
+                    >
+                        <button
+                            type="button"
+                            onClick={() => router.push('/shop')}
+                            className="inline-flex items-center justify-center rounded-full bg-amber-400 px-7 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-slate-950 shadow-xl shadow-amber-500/20 transition hover:bg-amber-300"
+                        >
+                            Shop the edit
+                            <ArrowRight size={18} className="ml-3" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => router.push('/wishlist')}
+                            className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-7 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white transition hover:border-white/25 hover:bg-white/10"
+                        >
+                            View the wishlist
                         </button>
                     </motion.div>
                 </div>
             </div>
-        </div>
+        </section>
     );
 }

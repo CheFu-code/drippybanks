@@ -1,12 +1,43 @@
-import { Suspense } from "react";
-import LoginForm from "./_components/LoginForm";
+"use client";
 
-const page = () => {
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { buildChefuLoginUrl, makeChefuReturnUrl } from "@/config/chefuAuth";
+
+export default function LoginPage() {
+    const searchParams = useSearchParams();
+
+    useEffect(() => {
+        const next = searchParams.get("next") ?? "/";
+        const returnTo = makeChefuReturnUrl(next);
+        const target = buildChefuLoginUrl(returnTo);
+
+        window.location.assign(target);
+    }, [searchParams]);
+
     return (
-        <Suspense fallback={<div className="text-sm text-muted-foreground">Loading login...</div>}>
-            <LoginForm />
-        </Suspense>
+        <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4 py-16">
+            <div className="w-full max-w-xl rounded-[2rem] border border-white/10 bg-slate-900/90 p-10 shadow-2xl backdrop-blur-xl">
+                <p className="text-sm uppercase tracking-[0.35em] text-amber-300/80 mb-4">
+                    Secure sign in
+                </p>
+                <h1 className="text-4xl font-semibold tracking-tight mb-6">
+                    Continue with CheFu Account
+                </h1>
+                <p className="text-slate-300 leading-relaxed mb-8">
+                    You are being redirected to CheFu Account to complete authentication and keep your session secure across the CheFu ecosystem.
+                </p>
+                <div className="rounded-full bg-slate-800/80 p-5 text-center text-slate-400">
+                    Redirecting now… If nothing happens,{' '}
+                    <a
+                        href={buildChefuLoginUrl(makeChefuReturnUrl(searchParams.get("next") ?? "/"))}
+                        className="text-amber-300 hover:text-amber-200 transition-colors"
+                    >
+                        click here
+                    </a>
+                    .
+                </div>
+            </div>
+        </div>
     );
-};
-
-export default page;
+}

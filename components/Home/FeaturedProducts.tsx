@@ -5,56 +5,58 @@ const products = [
     {
         id: '1',
         name: 'Classic White Tee',
-        price: 300.00,
+        price: 300.0,
         category: 'Essentials',
-        image:'/blindManWhite.jpeg'
+        image: '/blindManWhite.jpeg',
     },
     {
         id: '2',
         name: 'Women Classic Tee',
-        price: 300.00,
+        price: 300.0,
         category: 'Women',
-        image:'/customerFive.jpeg'
+        image: '/customerFive.jpeg',
     },
     {
         id: '3',
         name: 'Urban Skeleton Claw Graphic T-Shirt',
-        price: 300.00,
+        price: 300.0,
         category: 'Unisex',
-        image:'/customerThree.jpeg'
+        image: '/customerThree.jpeg',
     },
     {
         id: '4',
         name: 'Urban Streetwear Set',
-        price: 300.00,
+        price: 300.0,
         category: 'Men',
-        image:'/customerFour.jpeg',
+        image: '/customerFour.jpeg',
     },
 ];
 
 export function FeaturedProducts() {
     return (
-        <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-gray-50/50 rounded-3xl my-12">
-            <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold tracking-tight text-gray-900 mb-4">Trending Now</h2>
-                <p className="text-gray-500 max-w-2xl mx-auto">
-                    Our most popular pieces, curated just for you. Get them before they&apos;re gone.
-                </p>
-            </div>
+        <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div className="rounded-[2rem] border border-white/10 bg-slate-900/80 p-10 shadow-2xl shadow-slate-950/40">
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                    <div className="max-w-2xl">
+                        <p className="text-sm uppercase tracking-[0.35em] text-amber-300">Trending now</p>
+                        <h2 className="mt-4 text-4xl font-semibold tracking-tight text-white">Premium pieces made to stand out.</h2>
+                        <p className="mt-4 max-w-xl text-slate-400">
+                            Discover the top-selling items for a flawless streetwear edit. Crafted with premium materials and elevated details.
+                        </p>
+                    </div>
+                    <Link
+                        href="/shop"
+                        className="inline-flex items-center justify-center rounded-full border border-amber-300/30 bg-amber-300/10 px-6 py-3 text-sm font-semibold uppercase tracking-[0.15em] text-amber-100 transition hover:bg-amber-300/20"
+                    >
+                        View all products
+                    </Link>
+                </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                {products.map((product) => (
-                    <ProductCard key={product.id} {...product} />
-                ))}
-            </div>
-
-            <div className="mt-12 text-center">
-                <Link
-                    href="/shop"
-                    className="inline-block px-8 py-3 border border-gray-900 text-gray-900 rounded-full font-medium hover:bg-gray-900 hover:text-white transition-colors"
-                >
-                    View All Products
-                </Link>
+                <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+                    {products.map((product) => (
+                        <ProductCard key={product.id} {...product} />
+                    ))}
+                </div>
             </div>
         </section>
     );
