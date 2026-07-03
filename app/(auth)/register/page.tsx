@@ -1,19 +1,24 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 import { buildChefuRegisterUrl, makeChefuReturnUrl } from "@/config/chefuAuth";
 
-export default function RegisterPage() {
-    const searchParams = useSearchParams();
+interface RegisterPageProps {
+    searchParams: {
+        next?: string | string[];
+    };
+}
+
+export default function RegisterPage({ searchParams }: RegisterPageProps) {
+    const next = Array.isArray(searchParams.next)
+        ? searchParams.next[0]
+        : searchParams.next ?? "/";
+    const returnTo = makeChefuReturnUrl(next);
+    const target = buildChefuRegisterUrl(returnTo);
 
     useEffect(() => {
-        const next = searchParams.get("next") ?? "/";
-        const returnTo = makeChefuReturnUrl(next);
-        const target = buildChefuRegisterUrl(returnTo);
-
         window.location.assign(target);
-    }, [searchParams]);
+    }, [target]);
 
     return (
         <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4 py-16">
@@ -29,10 +34,7 @@ export default function RegisterPage() {
                 </p>
                 <div className="rounded-full bg-slate-800/80 p-5 text-center text-slate-400">
                     Redirecting now… If nothing happens,{' '}
-                    <a
-                        href={buildChefuRegisterUrl(makeChefuReturnUrl(searchParams.get("next") ?? "/"))}
-                        className="text-amber-300 hover:text-amber-200 transition-colors"
-                    >
+                    <a href={target} className="text-amber-300 hover:text-amber-200 transition-colors">
                         click here
                     </a>
                     .
