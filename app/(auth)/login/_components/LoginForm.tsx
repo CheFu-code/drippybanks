@@ -68,7 +68,7 @@ export default function LoginForm() {
                 <CardHeader>
                     <CardTitle>Checking session...</CardTitle>
                     <CardDescription>
-                        Please wait while we verify your account state.
+                        Please wait while we verify your account session.
                     </CardDescription>
                 </CardHeader>
             </Card>

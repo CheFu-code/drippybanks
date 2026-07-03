@@ -22,24 +22,24 @@ export function buildChefuRegisterUrl(returnTo?: string) {
 }
 
 export function normalizeReturnPath(path: string) {
-  if (path.startsWith("http://") || path.startsWith("https://")) {
-    return path;
-  }
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+        return path;
+    }
 
-  if (path.startsWith("/")) {
-    return path;
-  }
+    if (path.startsWith("/")) {
+        return path;
+    }
 
-  return `/${path}`;
+    return `/${path}`;
 }
 
 export function makeChefuReturnUrl(path: string, origin?: string) {
-  const normalized = normalizeReturnPath(path);
+    const normalized = normalizeReturnPath(path);
 
-  if (origin && normalized.startsWith("/")) {
-    const cleanOrigin = origin.replace(/\/$/, "");
-    return `${cleanOrigin}${normalized}`;
-  }
+    if (origin && normalized.startsWith("/")) {
+        const cleanOrigin = origin.replace(/\/$/, "");
+        return `${cleanOrigin}${normalized}`;
+    }
 
-  return normalized;
+    return normalized;
 }

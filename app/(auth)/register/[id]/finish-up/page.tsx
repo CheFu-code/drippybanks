@@ -34,7 +34,7 @@ const FinishSetupAccount = () => {
 
     // Load countries on mount
     useEffect(() => {
-        const all = Country.getAllCountries(); // [{ name, isoCode, phonecode, flag, ... }]
+        const all = Country.getAllCountries(); 
         setCountries(all);
 
         // Optionally default to South Africa
