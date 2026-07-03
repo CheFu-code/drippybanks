@@ -5,6 +5,7 @@ import { FeaturedProducts } from '@/components/Home/FeaturedProducts';
 import { Footer } from '@/components/Home/Footer';
 import { Hero } from '@/components/Home/Hero';
 import { Navbar } from '@/components/Home/Navbar';
+import { AdvertisingSection } from '@/components/Home/AdvertisingSection';
 import { Input } from '@/components/ui/input';
 import { useNewsletterSubscription } from '@/hooks/useNewsletterSubscription';
 import { useState } from 'react';
@@ -27,6 +28,7 @@ function App() {
             <main className="pt-24">
                 <Hero />
                 <CategoryGrid />
+                <AdvertisingSection />
                 <FeaturedProducts />
 
                 {/* Newsletter Section */}

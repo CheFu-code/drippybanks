@@ -1,7 +1,7 @@
 const CHEFU_ACCOUNT_APP_URL =
     process.env.NEXT_PUBLIC_CHEFU_ACCOUNT_URL ||
     "https://myaccount.chefuinc.com";
-const CHEFU_ACCOUNT_APP_ID = "academy";
+const CHEFU_ACCOUNT_APP_ID = "drippybanks";
 
 function buildChefuAuthUrl(path: "/login" | "/register", returnTo?: string) {
     const params = new URLSearchParams({ app: CHEFU_ACCOUNT_APP_ID });
@@ -33,6 +33,13 @@ export function normalizeReturnPath(path: string) {
   return `/${path}`;
 }
 
-export function makeChefuReturnUrl(path: string) {
-  return normalizeReturnPath(path);
+export function makeChefuReturnUrl(path: string, origin?: string) {
+  const normalized = normalizeReturnPath(path);
+
+  if (origin && normalized.startsWith("/")) {
+    const cleanOrigin = origin.replace(/\/$/, "");
+    return `${cleanOrigin}${normalized}`;
+  }
+
+  return normalized;
 }

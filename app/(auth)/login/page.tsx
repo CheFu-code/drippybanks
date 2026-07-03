@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { buildChefuLoginUrl, makeChefuReturnUrl } from "@/config/chefuAuth";
 
 interface LoginPageProps {
@@ -9,15 +9,26 @@ interface LoginPageProps {
     };
 }
 
+function resolveNextPath(value?: string | string[]) {
+    if (Array.isArray(value)) {
+        return value[0] || "/";
+    }
+
+    return value || "/";
+}
+
 export default function LoginPage({ searchParams }: LoginPageProps) {
-    const next = Array.isArray(searchParams.next)
-        ? searchParams.next[0]
-        : searchParams.next ?? "/";
-    const returnTo = makeChefuReturnUrl(next);
-    const target = buildChefuLoginUrl(returnTo);
+    const nextPath = useMemo(() => resolveNextPath(searchParams.next), [searchParams.next]);
+    const target = useMemo(() => {
+        const origin = typeof window === "undefined" ? "" : window.location.origin;
+        const returnTo = makeChefuReturnUrl(nextPath, origin);
+        return buildChefuLoginUrl(returnTo);
+    }, [nextPath]);
 
     useEffect(() => {
-        window.location.assign(target);
+        if (target !== "#") {
+            window.location.assign(target);
+        }
     }, [target]);
 
     return (
@@ -27,10 +38,10 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
                     Secure sign in
                 </p>
                 <h1 className="text-4xl font-semibold tracking-tight mb-6">
-                    Continue with CheFu Account
+                    Sign in to Drippy Banks
                 </h1>
                 <p className="text-slate-300 leading-relaxed mb-8">
-                    You are being redirected to CheFu Account to complete authentication and keep your session secure across the CheFu ecosystem.
+                    You are being redirected to CheFu Account to sign in securely and return to Drippy Banks.
                 </p>
                 <div className="rounded-full bg-slate-800/80 p-5 text-center text-slate-400">
                     Redirecting now… If nothing happens,{' '}

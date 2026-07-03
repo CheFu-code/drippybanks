@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { buildChefuRegisterUrl, makeChefuReturnUrl } from "@/config/chefuAuth";
 
 interface RegisterPageProps {
@@ -9,15 +9,26 @@ interface RegisterPageProps {
     };
 }
 
+function resolveNextPath(value?: string | string[]) {
+    if (Array.isArray(value)) {
+        return value[0] || "/";
+    }
+
+    return value || "/";
+}
+
 export default function RegisterPage({ searchParams }: RegisterPageProps) {
-    const next = Array.isArray(searchParams.next)
-        ? searchParams.next[0]
-        : searchParams.next ?? "/";
-    const returnTo = makeChefuReturnUrl(next);
-    const target = buildChefuRegisterUrl(returnTo);
+    const nextPath = useMemo(() => resolveNextPath(searchParams.next), [searchParams.next]);
+    const target = useMemo(() => {
+        const origin = typeof window === "undefined" ? "" : window.location.origin;
+        const returnTo = makeChefuReturnUrl(nextPath, origin);
+        return buildChefuRegisterUrl(returnTo);
+    }, [nextPath]);
 
     useEffect(() => {
-        window.location.assign(target);
+        if (target !== "#") {
+            window.location.assign(target);
+        }
     }, [target]);
 
     return (
@@ -27,10 +38,10 @@ export default function RegisterPage({ searchParams }: RegisterPageProps) {
                     Join the premium network
                 </p>
                 <h1 className="text-4xl font-semibold tracking-tight mb-6">
-                    Create your CheFu Account
+                    Create your Drippy Banks account
                 </h1>
                 <p className="text-slate-300 leading-relaxed mb-8">
-                    Register through CheFu Account to unlock premium access, order tracking, and a seamless shopping experience across the CheFu family of apps.
+                    Register through CheFu Account to unlock premium access, order tracking, and a seamless Drippy Banks experience.
                 </p>
                 <div className="rounded-full bg-slate-800/80 p-5 text-center text-slate-400">
                     Redirecting now… If nothing happens,{' '}
