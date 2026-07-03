@@ -422,9 +422,9 @@ export const ProfilePageUI = ({
     );
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="max-w-4xl mx-auto space-y-8 px-5 pb-12">
             {/* Profile Header */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 flex flex-col md:flex-row items-start md:items-center gap-6">
+            <div className="bg-slate-900/80 rounded-2xl p-8 shadow-xl border border-white/10 flex flex-col md:flex-row items-start md:items-center gap-6">
                 <div className="relative">
                     <div className="h-24 w-24 rounded-full overflow-hidden border-4 border-white shadow-md">
                         <Avatar className="h-full w-full object-cover rounded-full">
@@ -440,15 +440,15 @@ export const ProfilePageUI = ({
 
                 <div className="flex-1">
                     <div className="flex items-center gap-3">
-                        <h1 className="text-2xl font-bold text-gray-900">
+                        <h1 className="text-2xl font-bold text-white">
                             {user.fullname}
                         </h1>
-                        <span className="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                        <span className="bg-amber-300/15 text-amber-200 text-xs font-semibold px-2.5 py-0.5 rounded-full">
                             Gold Member
                         </span>
                     </div>
-                    <p className="text-gray-500">{user.email}</p>
-                    <p className="text-sm text-gray-400 mt-1">
+                    <p className="text-slate-300">{user.email}</p>
+                    <p className="text-sm text-slate-400 mt-1">
                         Member since{" "}
                         {user?.createdAt ? new Date(user.createdAt).toLocaleDateString("en-ZA", {
                             year: "numeric",
@@ -473,7 +473,7 @@ export const ProfilePageUI = ({
                         onClick={() => setActiveTab("orders")}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${activeTab === "orders"
                             ? "bg-black text-white"
-                            : "text-gray-600 hover:bg-gray-100"
+                            : "text-slate-300 hover:bg-slate-900"
                             }`}
                     >
                         <Package className="h-4 w-4" />
@@ -482,8 +482,8 @@ export const ProfilePageUI = ({
                     <button
                         onClick={() => setActiveTab("addresses")}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${activeTab === "addresses"
-                            ? "bg-black text-white"
-                            : "text-gray-600 hover:bg-gray-100"
+                            ? "bg-amber-300 text-slate-950"
+                            : "text-slate-300 hover:bg-slate-900"
                             }`}
                     >
                         <MapPin className="h-4 w-4" />
@@ -492,15 +492,15 @@ export const ProfilePageUI = ({
                     <button
                         onClick={() => setActiveTab("payment")}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${activeTab === "payment"
-                            ? "bg-black text-white"
-                            : "text-gray-600 hover:bg-gray-100"
+                            ? "bg-amber-300 text-slate-950"
+                            : "text-slate-300 hover:bg-slate-900"
                             }`}
                     >
                         <CreditCard className="h-4 w-4" />
                         Payment Methods
                     </button>
 
-                    <div className="pt-4 border-t border-gray-100 mt-4">
+                    <div className="pt-4 border-t border-white/10 mt-4">
                         <Button
                             className="cursor-pointer"
                             variant={"destructive"}

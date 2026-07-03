@@ -5,9 +5,9 @@ import ShopPage from './page';
 
 function App() {
     return (
-        <div className="min-h-screen p-5 bg-gray-100 font-sans text-gray-900 selection:bg-gray-900 selection:text-white">
+        <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
             <Navbar />
-            <main className="pt-16">
+            <main className="pt-24 px-5">
                 <ShopPage />
             </main>
         </div>

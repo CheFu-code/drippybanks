@@ -55,13 +55,13 @@ const ShopPageContent = () => {
             {/* Header and Filters */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">New Arrivals</h1>
-                    <p className="text-gray-500 mt-1">Check out the latest trends for this season.</p>
+                    <h1 className="text-3xl font-bold text-white">New Arrivals</h1>
+                    <p className="text-slate-400 mt-1">Check out the latest premium drops for this season.</p>
                 </div>
 
                 <div className="flex items-center gap-4 w-full md:w-auto">
                     <div className="relative w-full">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
                         <input
                             type="text"
                             placeholder={searchPlaceholder}
@@ -72,7 +72,7 @@ const ShopPageContent = () => {
                                     source: null,
                                 })
                             }
-                            className="pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent w-full md:w-64"
+                            className="pl-10 pr-4 py-2 border border-white/10 rounded-full bg-slate-900 text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent w-full md:w-64"
                         />
                     </div>
                 </div>
@@ -89,8 +89,8 @@ const ShopPageContent = () => {
                             })
                         }
                         className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedCategory === category
-                            ? 'bg-black text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            ? 'bg-amber-300 text-slate-950'
+                            : 'bg-slate-900 text-slate-300 hover:bg-slate-800'
                             }`}
                     >
                         {category}
@@ -106,9 +106,9 @@ const ShopPageContent = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="group border border-gray-500/70 rounded-xl overflow-hidden shadow-lg"
+                        className="group overflow-hidden rounded-xl border border-white/10 bg-slate-900/70 shadow-xl shadow-slate-950/30"
                     >
-                        <div className="aspect-3/4 w-full overflow-hidden rounded-lg relative">
+                        <div className="aspect-3/4 w-full overflow-hidden rounded-lg relative bg-slate-950">
                             <Image
                                 fill
                                 priority={index < 2}
@@ -118,21 +118,21 @@ const ShopPageContent = () => {
                             />
                             <button
                                 onClick={() => addToCart(product)}
-                                className="absolute bottom-4 right-4 cursor-pointer bg-white p-3 rounded-full shadow-lg text-black opacity-100 md:opacity-0 transform translate-y-0 md:translate-y-4 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-300 hover:bg-gray-100"
+                                className="absolute bottom-4 right-4 cursor-pointer bg-amber-300 p-3 rounded-full shadow-lg text-slate-950 opacity-0 md:group-hover:opacity-100 transform translate-y-4 md:group-hover:translate-y-0 transition-all duration-300 hover:bg-amber-200"
                             >
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm font-bold">+ Add</span>
                                 </div>
                             </button>
                         </div>
-                        <div className="mt-4 flex justify-between px-2 pb-2">
+                        <div className="mt-4 flex justify-between px-4 pb-5">
                             <div>
-                                <h3 className="text-sm text-gray-700 font-medium">
+                                <h3 className="text-sm text-white font-medium">
                                     {product.name}
                                 </h3>
-                                <p className="mt-1 text-sm text-gray-500">{product.category}</p>
+                                <p className="mt-1 text-sm text-slate-400">{product.category}</p>
                             </div>
-                            <p className="text-sm font-medium text-gray-900">R{product.price}</p>
+                            <p className="text-sm font-semibold text-amber-300">R{product.price}</p>
                         </div>
                     </motion.div>
                 ))}
@@ -140,7 +140,7 @@ const ShopPageContent = () => {
 
             {filteredProducts.length === 0 && (
                 <div className="text-center py-20">
-                    <p className="text-gray-500">No products found.</p>
+                    <p className="text-slate-400">No products found.</p>
                 </div>
             )}
         </div>
@@ -149,7 +149,7 @@ const ShopPageContent = () => {
 
 const ShopPage = () => {
     return (
-        <Suspense fallback={<div className="py-10 text-center text-gray-500">Loading shop...</div>}>
+        <Suspense fallback={<div className="py-10 text-center text-slate-400">Loading shop...</div>}>
             <ShopPageContent />
         </Suspense>
     );

@@ -87,25 +87,25 @@ export const OrdersTab = ({ userId }: { userId: string }) => {
             animate={{ opacity: 1, x: 0 }}
             className="space-y-4"
         >
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Order History</h2>
+            <h2 className="text-xl font-bold text-white mb-4">Order History</h2>
             {loading && (
-                <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
-                    <p className="text-gray-600">Loading your orders...</p>
+                <div className="bg-slate-900 rounded-xl border border-white/10 p-8 text-center">
+                    <p className="text-slate-400">Loading your orders...</p>
                 </div>
             )}
             {!loading && orders.length === 0 && (
-                <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
-                    <p className="text-gray-600">You have no orders yet.</p>
+                <div className="bg-slate-900 rounded-xl border border-white/10 p-8 text-center">
+                    <p className="text-slate-400">You have no orders yet.</p>
                 </div>
             )}
             {!loading && orders.map((order) => (
                 <div
                     key={order.id}
-                    className="bg-white rounded-xl border border-gray-100 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-md transition-shadow"
+                    className="bg-slate-900 rounded-xl border border-white/10 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-lg transition-shadow"
                 >
                     <div>
                         <div className="flex items-center gap-3 mb-1">
-                            <span className="font-bold text-gray-900">{order.id}</span>
+                            <span className="font-bold text-white">{order.id}</span>
                             <span
                                 className={`text-xs px-2 py-1 rounded-full ${order.status === "Delivered"
                                     ? "bg-green-100 text-green-700"
@@ -115,12 +115,12 @@ export const OrdersTab = ({ userId }: { userId: string }) => {
                                 {order.status}
                             </span>
                         </div>
-                        <p className="text-sm text-gray-500">{order.date}</p>
-                        <p className="text-sm text-gray-600 mt-2">{order.items.join(", ")}</p>
+                        <p className="text-sm text-slate-400">{order.date}</p>
+                        <p className="text-sm text-slate-400 mt-2">{order.items.join(", ")}</p>
                     </div>
                     <div className="flex items-center gap-6">
                         <span className="font-bold text-lg">R{order.total.toFixed(2)}</span>
-                        <span className="text-gray-400" aria-hidden="true">
+                        <span className="text-slate-500" aria-hidden="true">
                             <ChevronRight className="h-5 w-5" />
                         </span>
                     </div>

@@ -53,26 +53,26 @@ export const AddressTab = ({
             animate={{ opacity: 1, x: 0 }}
             className="space-y-4"
         >
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Saved Addresses</h2>
+            <h2 className="text-xl font-bold text-white mb-4">Saved Addresses</h2>
 
             <Card className="relative">
                 <div className="absolute top-6 right-6">
-                    <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">
+                    <span className="bg-slate-800 text-slate-200 text-xs px-2 py-1 rounded">
                         Default
                     </span>
                 </div>
 
                 <CardHeader>
-                    <CardTitle className="text-gray-900 font-bold">Home</CardTitle>
+                    <CardTitle className="text-white font-bold">Home</CardTitle>
                 </CardHeader>
 
                 {savedAddress.addressStreet ? (
                     <CardContent className="space-y-1">
-                        <p className="text-gray-600">{savedAddress.addressStreet}</p>
-                        <p className="text-gray-600">
-                            {savedAddress.addressCity} {savedAddress.addressPostalCode}
-                        </p>
-                        <p className="text-gray-600">{savedAddress.country?.name}</p>
+<p className="text-slate-300">{savedAddress.addressStreet}</p>
+                    <p className="text-slate-300">
+                        {savedAddress.addressCity} {savedAddress.addressPostalCode}
+                    </p>
+                    <p className="text-slate-300">{savedAddress.country?.name}</p>
 
                         <div className="mt-4 flex gap-3">
                             <button
@@ -91,14 +91,14 @@ export const AddressTab = ({
                     </CardContent>
                 ) : (
                     <CardContent className="space-y-1">
-                        <p className="text-gray-600">No saved address yet.</p>
+                        <p className="text-slate-400">No saved address yet.</p>
                     </CardContent>
                 )}
             </Card>
 
             <button
                 onClick={onOpenAddressForm}
-                className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-medium hover:border-gray-400 hover:text-gray-700 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-4 border-2 border-dashed border-white/10 rounded-xl text-slate-300 font-medium hover:border-slate-400 hover:text-white transition-colors flex items-center justify-center gap-2"
             >
                 <MapPin className="h-5 w-5" />
                 {savedAddress.addressStreet ? "Update Address" : "Add New Address"}

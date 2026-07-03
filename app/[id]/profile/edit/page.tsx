@@ -122,46 +122,49 @@ export default function EditProfilePage() {
 
     if (loading) {
         return (
-            <div className="p-5 max-w-3xl mx-auto">
-                <Card>
-                    <CardHeader className="space-y-3">
-                        <div className="h-7 w-40 rounded-md bg-gray-200 animate-pulse" />
-                        <div className="h-4 w-72 rounded-md bg-gray-100 animate-pulse" />
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        <div className="space-y-2">
-                            <div className="h-4 w-24 rounded bg-gray-200 animate-pulse" />
-                            <div className="h-10 w-full rounded-md bg-gray-100 animate-pulse" />
-                        </div>
-                        <div className="space-y-2">
-                            <div className="h-4 w-20 rounded bg-gray-200 animate-pulse" />
-                            <div className="h-10 w-full rounded-md bg-gray-100 animate-pulse" />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="h-10 w-full rounded-md bg-gray-100 animate-pulse" />
-                            <div className="h-10 w-full rounded-md bg-gray-100 animate-pulse" />
-                        </div>
-                        <div className="flex justify-end gap-3 pt-2">
-                            <div className="h-10 w-24 rounded-md bg-gray-100 animate-pulse" />
-                            <div className="h-10 w-32 rounded-md bg-gray-200 animate-pulse" />
-                        </div>
-                    </CardContent>
-                </Card>
+            <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
+                <div className="p-5 max-w-3xl mx-auto">
+                    <Card className="bg-slate-900/80 border-white/10">
+                        <CardHeader className="space-y-3">
+                            <div className="h-7 w-40 rounded-md bg-slate-800 animate-pulse" />
+                            <div className="h-4 w-72 rounded-md bg-slate-800 animate-pulse" />
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="space-y-2">
+                                <div className="h-4 w-24 rounded bg-slate-800 animate-pulse" />
+                                <div className="h-10 w-full rounded-md bg-slate-800 animate-pulse" />
+                            </div>
+                            <div className="space-y-2">
+                                <div className="h-4 w-20 rounded bg-slate-800 animate-pulse" />
+                                <div className="h-10 w-full rounded-md bg-slate-800 animate-pulse" />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="h-10 w-full rounded-md bg-slate-800 animate-pulse" />
+                                <div className="h-10 w-full rounded-md bg-slate-800 animate-pulse" />
+                            </div>
+                            <div className="flex justify-end gap-3 pt-2">
+                                <div className="h-10 w-24 rounded-md bg-slate-800 animate-pulse" />
+                                <div className="h-10 w-32 rounded-md bg-slate-800 animate-pulse" />
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         );
     }
 
     if (!user) {
         return (
-            <div className="p-5 max-w-2xl mx-auto">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Sign in required</CardTitle>
-                        <CardDescription>
-                            You need to be signed in to edit your profile details.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex items-center gap-3">
+            <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
+                <div className="p-5 max-w-2xl mx-auto">
+                    <Card className="bg-slate-900/80 border-white/10">
+                        <CardHeader>
+                            <CardTitle className="text-white">Sign in required</CardTitle>
+                            <CardDescription className="text-slate-400">
+                                You need to be signed in to edit your profile details.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex items-center gap-3">
                         <Button asChild>
                             <Link href="/login">Go to Login</Link>
                         </Button>
@@ -176,8 +179,9 @@ export default function EditProfilePage() {
 
     if (!isRouteOwner) {
         return (
-            <div className="p-5 max-w-2xl mx-auto">
-                <Card>
+            <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
+                <div className="p-5 max-w-2xl mx-auto">
+                    <Card className="bg-slate-900/80 border-white/10">
                     <CardHeader>
                         <CardTitle>Access denied</CardTitle>
                         <CardDescription>You can only edit your own profile.</CardDescription>
@@ -193,13 +197,14 @@ export default function EditProfilePage() {
     }
 
     return (
-        <div className="p-5 max-w-3xl mx-auto">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Edit Profile</CardTitle>
-                    <CardDescription>Update your personal and account details.</CardDescription>
-                </CardHeader>
-                <CardContent>
+        <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
+            <div className="p-5 max-w-3xl mx-auto">
+                <Card className="bg-slate-900/80 border-white/10">
+                    <CardHeader>
+                        <CardTitle className="text-white">Edit Profile</CardTitle>
+                        <CardDescription className="text-slate-400">Update your personal and account details.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
                                 <Label htmlFor="fullname">Full name</Label>

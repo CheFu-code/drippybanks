@@ -228,22 +228,22 @@ export default function CheckoutPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 font-sans text-gray-900 selection:bg-gray-900 selection:text-white">
+        <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
             <Navbar />
             <main className="max-w-6xl mx-auto px-5 pb-12 pt-24">
                 <div className="mb-6">
-                    <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Secure checkout</p>
-                    <h1 className="text-3xl font-semibold mt-2">Complete your order</h1>
+                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Secure checkout</p>
+                    <h1 className="text-3xl font-semibold mt-2 text-white">Complete your order</h1>
                 </div>
 
                 {userLoading && <LoadingCheckoutCard />}
                 {!userLoading && !user && (
-                    <Card className="border-gray-200">
+                    <Card className="border-white/10 bg-slate-900/80">
                         <CardHeader>
-                            <CardTitle className="text-xl">Sign in required</CardTitle>
+                            <CardTitle className="text-xl text-white">Sign in required</CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-3">
-                            <p className="text-sm text-muted-foreground">
+                        <CardContent className="space-y-3 text-slate-300">
+                            <p className="text-sm text-slate-400">
                                 You need an account to continue with checkout and place orders.
                             </p>
                             <div className="flex items-center gap-3">

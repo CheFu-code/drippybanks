@@ -23,10 +23,10 @@ export default function CartPage() {
     };
 
     return (
-        <div className="min-h-screen p-5 bg-gray-100 font-sans text-gray-900 selection:bg-gray-900 selection:text-white">
+        <div className="min-h-screen p-5 bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
             <Navbar />
-            <main className="pt-20 max-w-5xl mx-auto">
-                <Card>
+            <main className="pt-24 max-w-5xl mx-auto">
+                <Card className="bg-slate-900/80 border-white/10">
                     <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle className="text-2xl">Your Cart</CardTitle>
                         {cart.length > 0 && (
@@ -38,7 +38,7 @@ export default function CartPage() {
                     <CardContent className="space-y-4">
                         {cart.length === 0 ? (
                             <div className="py-10 text-center space-y-3">
-                                <p className="text-muted-foreground">Your cart is empty.</p>
+                                <p className="text-slate-400">Your cart is empty.</p>
                                 <Button asChild>
                                     <Link href="/shop">Continue Shopping</Link>
                                 </Button>
@@ -47,7 +47,7 @@ export default function CartPage() {
                             <>
                                 {cart.map((item) => (
                                     <div key={item.id} className="flex items-center gap-4">
-                                        <div className="relative h-20 w-20 rounded-md overflow-hidden border bg-white">
+                                        <div className="relative h-20 w-20 rounded-md overflow-hidden border border-white/10 bg-slate-900">
                                             <Image
                                                 fill
                                                 src={item.image}
@@ -58,9 +58,9 @@ export default function CartPage() {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="font-medium truncate">{item.name}</p>
-                                            <p className="text-sm text-muted-foreground">{item.category}</p>
+                                            <p className="text-sm text-slate-400">{item.category}</p>
                                             <div className="flex items-center gap-2">
-                                                <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                                                <p className="text-sm text-slate-400">Qty: {item.quantity}</p>
                                                 <Button
                                                     size="sm"
                                                     variant="outline"

@@ -53,7 +53,7 @@ export function CheckoutFormLayout({
     return (
         <form className="grid gap-6 lg:grid-cols-[1.45fr_1fr]" onSubmit={onSubmit}>
             <div className="space-y-6">
-                <Card className="border-gray-200">
+                <Card className="border-white/10 bg-slate-900/80">
                     <CardHeader>
                         <CardTitle className="text-xl">Contact information</CardTitle>
                     </CardHeader>
@@ -92,19 +92,19 @@ export function CheckoutFormLayout({
                     </CardContent>
                 </Card>
 
-                <Card className="border-gray-200">
+                <Card className="border-white/10 bg-slate-900/80">
                     <CardHeader>
                         <CardTitle className="text-xl">Shipping address</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {hasSavedAddress && effectiveUseSavedAddress ? (
-                            <div className="rounded-lg border bg-gray-50 p-4">
+                            <div className="rounded-lg border border-white/10 bg-slate-950/80 p-4">
                                 <p className="text-sm font-medium">Using your saved address</p>
-                                <p className="text-sm text-muted-foreground mt-2">{user?.addressStreet}</p>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-sm text-slate-400 mt-2">{user?.addressStreet}</p>
+                                <p className="text-sm text-slate-400">
                                     {user?.addressCity} {user?.addressPostalCode}
                                 </p>
-                                <p className="text-sm text-muted-foreground">{user?.country?.name}</p>
+                                <p className="text-sm text-slate-400">{user?.country?.name}</p>
                                 <div className="flex gap-2 mt-3">
                                     <Button
                                         type="button"
@@ -170,9 +170,9 @@ export function CheckoutFormLayout({
                             </div>
                         )}
                         {!hasSavedAddress && user?.id && (
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-xs text-slate-400">
                                 No saved address found on your profile. Add one in{' '}
-                                <Link href={`/${user.id}/profile`} className="underline">
+                                <Link href={`/${user.id}/profile`} className="underline text-amber-200 hover:text-white">
                                     profile settings
                                 </Link>{' '}
                                 or fill it in here.
@@ -181,7 +181,7 @@ export function CheckoutFormLayout({
                     </CardContent>
                 </Card>
 
-                <Card className="border-gray-200">
+                <Card className="border-white/10 bg-slate-900/80">
                     <CardHeader>
                         <CardTitle className="text-xl">Payment</CardTitle>
                     </CardHeader>
@@ -197,8 +197,8 @@ export function CheckoutFormLayout({
                                             onClick={() => onSelectSavedCard(card.id)}
                                             className={`w-full rounded-lg border p-3 text-left transition-colors ${
                                                 effectivePaymentChoice === 'saved' && effectiveSelectedSavedCardId === card.id
-                                                    ? 'border-gray-900 bg-gray-900 text-white'
-                                                    : 'border-gray-300 bg-white hover:bg-gray-50'
+                                                    ? 'border-white/10 bg-slate-900 text-white'
+                                                    : 'border-slate-700 bg-slate-950 hover:bg-slate-900'
                                             }`}
                                         >
                                             <p className="font-medium">
@@ -241,8 +241,8 @@ export function CheckoutFormLayout({
                                     onClick={() => onSelectPaymentChoice('new')}
                                     className={`rounded-lg border px-4 py-3 text-left transition-colors ${
                                         effectivePaymentChoice === 'new'
-                                            ? 'border-gray-900 bg-gray-900 text-white'
-                                            : 'border-gray-300 bg-white hover:bg-gray-50'
+                                            ? 'border-white/20 bg-slate-800 text-white'
+                                            : 'border-white/10 bg-slate-950/70 text-slate-100 hover:bg-slate-900'
                                     }`}
                                 >
                                     Credit or debit card
@@ -252,8 +252,8 @@ export function CheckoutFormLayout({
                                     onClick={() => onSelectPaymentChoice('cash')}
                                     className={`rounded-lg border px-4 py-3 text-left transition-colors ${
                                         effectivePaymentChoice === 'cash'
-                                            ? 'border-gray-900 bg-gray-900 text-white'
-                                            : 'border-gray-300 bg-white hover:bg-gray-50'
+                                            ? 'border-white/20 bg-slate-800 text-white'
+                                            : 'border-white/10 bg-slate-950/70 text-slate-100 hover:bg-slate-900'
                                     }`}
                                 >
                                     Cash on delivery
@@ -313,7 +313,7 @@ export function CheckoutFormLayout({
                             </div>
                         )}
                         {effectivePaymentChoice === 'cash' && (
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-slate-400">
                                 You will pay in cash when your order is delivered.
                             </p>
                         )}
@@ -326,7 +326,7 @@ export function CheckoutFormLayout({
                 </Card>
             </div>
 
-            <Card className="border-gray-200 h-fit lg:sticky lg:top-24">
+            <Card className="border-white/10 bg-slate-900/80 h-fit lg:sticky lg:top-24">
                 <CardHeader>
                     <CardTitle className="text-xl">Order summary</CardTitle>
                 </CardHeader>
@@ -334,7 +334,7 @@ export function CheckoutFormLayout({
                     <div className="max-h-72 overflow-y-auto pr-1 space-y-3">
                         {cart.map((item) => (
                             <div key={item.id} className="flex gap-3">
-                                <div className="relative h-16 w-16 overflow-hidden rounded-md border bg-white">
+                                <div className="relative h-16 w-16 overflow-hidden rounded-md border border-white/10 bg-slate-950">
                                     <Image
                                         fill
                                         src={item.image}
@@ -345,7 +345,7 @@ export function CheckoutFormLayout({
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="font-medium truncate">{item.name}</p>
-                                    <p className="text-sm text-muted-foreground">Qty {item.quantity}</p>
+                                    <p className="text-sm text-slate-400">Qty {item.quantity}</p>
                                 </div>
                                 <p className="text-sm font-medium">
                                     R{(item.price * item.quantity).toFixed(2)}
@@ -357,15 +357,15 @@ export function CheckoutFormLayout({
                     <Separator />
                     <div className="space-y-2 text-sm">
                         <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground">Subtotal</span>
+                            <span className="text-slate-400">Subtotal</span>
                             <span>R{cartTotal.toFixed(2)}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground">Shipping</span>
+                            <span className="text-slate-400">Shipping</span>
                             <span>Free</span>
                         </div>
                         <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground">Tax</span>
+                            <span className="text-slate-400">Tax</span>
                             <span>Free</span>
                         </div>
                     </div>

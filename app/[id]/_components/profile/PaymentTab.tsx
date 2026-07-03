@@ -47,10 +47,10 @@ export const PaymentTab = ({
             animate={{ opacity: 1, x: 0 }}
             className="space-y-4"
         >
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Payment Methods</h2>
+            <h2 className="text-xl font-bold text-white mb-4">Payment Methods</h2>
             {methods.savedPaymentMethods.length === 0 ? (
-                <div className="bg-white rounded-xl border border-gray-100 p-6">
-                    <p className="text-sm text-gray-500">No payment methods saved yet.</p>
+                <div className="bg-slate-900 rounded-xl border border-white/10 p-6">
+                    <p className="text-sm text-slate-400">No payment methods saved yet.</p>
                 </div>
             ) : (
                 methods.savedPaymentMethods.map((method) => {
@@ -58,20 +58,20 @@ export const PaymentTab = ({
                     return (
                         <div
                             key={method.id}
-                            className="bg-white rounded-xl border border-gray-100 p-6 flex items-center justify-between"
+                            className="bg-slate-900 rounded-xl border border-white/10 p-6 flex items-center justify-between"
                         >
                             <div className="flex items-center gap-4">
-                                <div className="bg-gray-100 p-3 rounded-lg">
-                                    <CardBrandIcon className="h-6 w-6 text-gray-700" />
+                                <div className="bg-slate-800 p-3 rounded-lg">
+                                    <CardBrandIcon className="h-6 w-6 text-amber-300" />
                                 </div>
                                 <div>
-                                    <p className="font-bold text-gray-900">
+                                    <p className="font-bold text-white">
                                         {method.brand ?? "Card"} *****{method.last4}
                                     </p>
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-sm text-slate-400">
                                         {method.holderName ?? "Cardholder"} - Expires {method.expiry}
                                     </p>
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-sm text-slate-400">
                                         Billing ZIP {method.billingPostalCode ?? "N/A"}
                                     </p>
                                 </div>
@@ -93,20 +93,20 @@ export const PaymentTab = ({
 
             <button
                 onClick={() => ui.setIsPaymentFormOpen((prev) => !prev)}
-                className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-medium hover:border-gray-400 hover:text-gray-700 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-4 border-2 border-dashed border-white/10 rounded-xl text-slate-300 font-medium hover:border-slate-400 hover:text-white transition-colors flex items-center justify-center gap-2"
             >
                 <CreditCard className="h-5 w-5" />
                 {ui.isPaymentFormOpen ? "Close Card Form" : "Add New Card"}
             </button>
 
             {ui.isPaymentFormOpen && (
-                <Card>
+                <Card className="border-white/10 bg-slate-900/80">
                     <CardHeader>
-                        <CardTitle className="text-xl font-semibold">Add Payment Card</CardTitle>
+                        <CardTitle className="text-xl font-semibold text-white">Add Payment Card</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium text-gray-700">Cardholder Name</Label>
+                            <Label className="text-sm font-medium text-slate-300">Cardholder Name</Label>
                             <Input
                                 value={cardForm.cardHolderName}
                                 onChange={(e) => cardForm.setCardHolderName(e.target.value)}
@@ -115,7 +115,7 @@ export const PaymentTab = ({
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium text-gray-700">Card Number</Label>
+                            <Label className="text-sm font-medium text-slate-300">Card Number</Label>
                             <Input
                                 value={cardForm.cardNumber}
                                 onChange={(e) => cardForm.handleCardNumberChange(e.target.value)}
@@ -123,13 +123,13 @@ export const PaymentTab = ({
                                 inputMode="numeric"
                                 maxLength={19}
                             />
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-slate-400">
                                 Detected card type: {cardForm.detectedCardBrand}
                             </p>
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium text-gray-700">Expiry (MM/YY)</Label>
+                            <Label className="text-sm font-medium text-slate-300">Expiry (MM/YY)</Label>
                             <Input
                                 value={cardForm.cardExpiry}
                                 onChange={(e) => cardForm.handleCardExpiryChange(e.target.value)}
@@ -140,7 +140,7 @@ export const PaymentTab = ({
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium text-gray-700">CVV</Label>
+                                <Label className="text-sm font-medium text-slate-300">CVV</Label>
                                 <Input
                                     value={cardForm.cardCvv}
                                     onChange={(e) => cardForm.handleCardCvvChange(e.target.value)}

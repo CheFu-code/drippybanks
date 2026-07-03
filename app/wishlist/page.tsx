@@ -11,11 +11,11 @@ export default function WishlistPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen p-5 bg-gray-100 font-sans text-gray-900 selection:bg-gray-900 selection:text-white">
+            <div className="min-h-screen p-5 bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
                 <Navbar />
-                <main className="pt-20 max-w-5xl mx-auto">
-                    <Card>
-                        <CardContent className="py-10 text-center text-muted-foreground">
+                <main className="pt-24 max-w-5xl mx-auto">
+                    <Card className="bg-slate-900/80 border-white/10">
+                        <CardContent className="py-10 text-center text-slate-300">
                             Loading wishlist...
                         </CardContent>
                     </Card>
@@ -26,15 +26,15 @@ export default function WishlistPage() {
 
     if (!user) {
         return (
-            <div className="min-h-screen p-5 bg-gray-100 font-sans text-gray-900 selection:bg-gray-900 selection:text-white">
+            <div className="min-h-screen p-5 bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
                 <Navbar />
-                <main className="pt-20 max-w-5xl mx-auto">
-                    <Card>
+                <main className="pt-24 max-w-5xl mx-auto">
+                    <Card className="bg-slate-900/80 border-white/10">
                         <CardHeader>
                             <CardTitle className="text-2xl">Sign in required</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                            <p className="text-muted-foreground">
+                            <p className="text-slate-400">
                                 Please log in to view and manage your wishlist.
                             </p>
                             <Button asChild>
@@ -49,15 +49,15 @@ export default function WishlistPage() {
 
     // TODO(wishlist): Fetch authenticated AppUser.wishlist and render saved items when backend wiring is ready.
     return (
-        <div className="min-h-screen p-5 bg-gray-100 font-sans text-gray-900 selection:bg-gray-900 selection:text-white">
+        <div className="min-h-screen p-5 bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
             <Navbar />
-            <main className="pt-20 max-w-5xl mx-auto">
-                <Card>
+            <main className="pt-24 max-w-5xl mx-auto">
+                <Card className="bg-slate-900/80 border-white/10">
                     <CardHeader>
                         <CardTitle className="text-2xl">Wishlist</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                        <p className="text-muted-foreground">Your wishlist is empty.</p>
+                        <p className="text-slate-400">Your wishlist is empty.</p>
                         <Button asChild>
                             <Link href="/shop">Browse products</Link>
                         </Button>
