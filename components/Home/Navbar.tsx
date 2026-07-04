@@ -3,6 +3,7 @@
 import UserDropdown from "@/app/(public)/_components/Userdropdown";
 import { useCart } from "@/context/CartContext";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { buildChefuLoginUrl } from "@/config/chefuAuth";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader, Menu, ShoppingBag, X } from "lucide-react";
 import Image from "next/image";
@@ -62,12 +63,12 @@ export function Navbar() {
                     ) : user ? (
                         <UserDropdown user={user} />
                     ) : (
-                        <Link
-                            href="/login"
+                        <a
+                            href={buildChefuLoginUrl('/')}
                             className={buttonVariants({ size: "sm", variant: "default", className: "rounded-full px-4 py-2" })}
                         >
                             Login
-                        </Link>
+                        </a>
                     )}
 
                     <Link

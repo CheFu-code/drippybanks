@@ -1,6 +1,3 @@
-import { doc, getDoc, Timestamp } from "firebase/firestore";
-import { auth, db } from "@/config/firebaseConfig";
-import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import type { AppUser } from "@/types/user";
 
@@ -9,96 +6,65 @@ export function useAuthUser() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
-            console.debug('[useAuthUser] onAuthStateChanged fired, user:', firebaseUser);
+        let canceled = false;
+
+        async function checkSession() {
+            console.debug('[useAuthUser] checking backend session via /auth/me');
             try {
-                if (!firebaseUser?.uid || !firebaseUser.email) {
-                    console.debug('[useAuthUser] no firebase user, clearing user state');
-                    setUser(null);
+                setLoading(true);
+                const baseUrl =
+                    process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.chefuinc.com";
+                const res = await fetch(`${baseUrl.replace(/\/$/, "")}/auth/me`, {
+                    credentials: "include",
+                });
+
+                if (!res.ok) {
+                    console.debug('[useAuthUser] /auth/me returned not ok', res.status);
+                    if (!canceled) setUser(null);
                     return;
                 }
 
-                const ref = doc(db, "drippy-banks-users", firebaseUser.uid); // ✅ ensure correct collection name
-                const snap = await getDoc(ref);
+                const data = (await res.json().catch(() => null)) as any;
+                const sessionUser = data?.user ?? data;
 
-                if (snap.exists()) {
-                    const data = snap.data();
-
-                    // ✅ Normalize dates if they are Firestore Timestamps
-
-                    const coerceDate = (v: unknown): Date | null => {
-                        if (v instanceof Timestamp) {
-                            return v.toDate();
-                        }
-
-                        if (v instanceof Date) {
-                            return v;
-                        }
-
-                        return null;
-                    };
-
-                    const appUser: AppUser = {
-                        id: ref.id, // ✅ inject the doc id
-                        email: data.email ?? firebaseUser.email, // fallback to auth email
-                        fullname:
-                            data.fullname ??
-                            firebaseUser.displayName ??
-                            firebaseUser.email.split("@")[0],
-                        role: (data.role as AppUser["role"]) ?? "customer",
-
-                        addressCity: data.addressCity ?? "",
-                        addressStreet: data.addressStreet ?? "",
-                        addressPostalCode: data.addressPostalCode ?? "",
-                        country: data.country ?? null,
-
-                        // Optional fields with safe mapping
-                        avatarUrl: data.avatarUrl ?? undefined,
-                        phone: data.phoneNumber ?? data.phone ?? undefined, // ✅ map phone → phoneNumber if needed
-                        isEmailVerified:
-                            data.isEmailVerified ?? firebaseUser.emailVerified ?? false,
-                        isPhoneVerified: data.isPhoneVerified ?? false,
-
-                        createdAt: coerceDate(data.createdAt) ?? new Date(),
-                        updatedAt: coerceDate(data.updatedAt) ?? undefined,
-                        lastLogin: coerceDate(data.lastLogin) ?? undefined,
-
-                        // Address / payments (if you store them)
-                        paymentMethods: data.paymentMethods ?? undefined,
-
-                        // Vendor fields
-                        storeName: data.storeName ?? undefined,
-                        storeDescription: data.storeDescription ?? undefined,
-                        storeLogoUrl: data.storeLogoUrl ?? undefined,
-
-                        // Customer fields
-                        wishlist: data.wishlist ?? undefined,
-                        cart: data.cart ?? undefined,
-
-                        metadata: data.metadata ?? undefined,
-                    };
-
-                    console.debug('[useAuthUser] set user from firestore:', appUser);
-                    setUser(appUser);
-                } else {
-                    // Fallback for brand-new users without a profile doc
-                    console.debug('[useAuthUser] no profile doc, setting minimal user');
-                    setUser({
-                        id: firebaseUser.uid,
-                        email: firebaseUser.email,
-                        fullname:
-                            firebaseUser.displayName ?? firebaseUser.email.split("@")[0],
-                        role: "guest",
-                        createdAt: new Date(),
-                    });
+                if (!sessionUser || !sessionUser.email) {
+                    console.debug('[useAuthUser] no session user in response');
+                    if (!canceled) setUser(null);
+                    return;
                 }
-            } finally {
-                console.debug('[useAuthUser] finished processing auth state, loading=false');
-                setLoading(false);
-            }
-        });
 
-        return () => unsub();
+                // Map backend user shape to AppUser where possible
+                const appUser: AppUser = {
+                    id: sessionUser.uid ?? sessionUser.id ?? sessionUser.userId,
+                    email: sessionUser.email,
+                    fullname: sessionUser.fullname ?? sessionUser.name ?? sessionUser.displayName ?? sessionUser.email.split("@")[0],
+                    role: sessionUser.role ?? "customer",
+                    addressCity: sessionUser.addressCity ?? "",
+                    addressStreet: sessionUser.addressStreet ?? "",
+                    addressPostalCode: sessionUser.addressPostalCode ?? "",
+                    country: sessionUser.country ?? null,
+                    avatarUrl: sessionUser.avatarUrl ?? undefined,
+                    phone: sessionUser.phone ?? sessionUser.phoneNumber ?? undefined,
+                    isEmailVerified: sessionUser.isEmailVerified ?? false,
+                    isPhoneVerified: sessionUser.isPhoneVerified ?? false,
+                    createdAt: sessionUser.createdAt ? new Date(sessionUser.createdAt) : new Date(),
+                } as AppUser;
+
+                console.debug('[useAuthUser] session user loaded', appUser);
+                if (!canceled) setUser(appUser);
+            } catch (err) {
+                console.error('[useAuthUser] error checking session', err);
+                if (!canceled) setUser(null);
+            } finally {
+                if (!canceled) setLoading(false);
+            }
+        }
+
+        void checkSession();
+
+        return () => {
+            canceled = true;
+        };
     }, []);
 
     return { user, loading };
