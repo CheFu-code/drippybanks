@@ -1,14 +1,12 @@
 'use client'
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Navbar } from '@/components/Home/Navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { db } from '@/config/firebaseConfig';
 import { useCart } from '@/context/CartContext';
 import { useAuthUser } from '@/hooks/useAuthUser';
 import { CheckoutFormLayout } from './_components/CheckoutFormLayout';
@@ -194,17 +192,6 @@ export default function CheckoutPage() {
         };
 
         try {
-            const { paymentMethodId, ...orderWithoutPaymentMethodId } = order;
-            const firestoreOrder = {
-                ...orderWithoutPaymentMethodId,
-                ...(paymentMethodId ? { paymentMethodId } : {}),
-                userId: user?.id ?? null,
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp(),
-            };
-
-            await setDoc(doc(db, 'drippy-banks-orders', order.id), firestoreOrder);
-
             const existingOrdersRaw = localStorage.getItem(ORDER_STORAGE_KEY);
             let existingOrders: SavedOrder[] = [];
             if (existingOrdersRaw) {

@@ -3,14 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
-    collection,
-    doc,
-    onSnapshot,
-    orderBy,
-    query,
-    serverTimestamp,
     Timestamp,
-    updateDoc,
 } from "firebase/firestore";
 import {
     ArrowUpRight,
@@ -31,7 +24,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { db } from "@/config/firebaseConfig";
 import { useAuthUser } from "@/hooks/useAuthUser";
 
 type OrderStatus =
@@ -101,75 +93,8 @@ export default function AdminDashboardPage() {
     const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
     useEffect(() => {
-        const q = query(
-            collection(db, "drippy-banks-orders"),
-            orderBy("createdAt", "desc"),
-        );
-        return onSnapshot(
-            q,
-            (snapshot) => {
-                setOrders(
-                    snapshot.docs.map((orderDoc) => {
-                        const data = orderDoc.data() as {
-                            status?: string;
-                            total?: number;
-                            createdAt?: unknown;
-                            date?: unknown;
-                            customer?: { fullName?: string; email?: string };
-                            items?: Array<{
-                                id?: string;
-                                name?: string;
-                                quantity?: number;
-                                price?: number;
-                            }>;
-                        };
-                        const rawStatus = data.status ?? "Processing";
-                        const status = ORDER_STATUSES.includes(rawStatus as OrderStatus)
-                            ? (rawStatus as OrderStatus)
-                            : "Processing";
-                        return {
-                            id: orderDoc.id,
-                            customerName: data.customer?.fullName ?? "Guest customer",
-                            customerEmail: data.customer?.email ?? "No email",
-                            status,
-                            total: Number(data.total ?? 0),
-                            createdAt: asDate(data.createdAt) ?? asDate(data.date),
-                            items: (data.items ?? []).map((item, index) => ({
-                                id: item.id ?? `${orderDoc.id}-${index}`,
-                                name: item.name ?? "Unknown item",
-                                quantity: Number(item.quantity ?? 0),
-                                price: Number(item.price ?? 0),
-                            })),
-                        };
-                    }),
-                );
-            },
-            () => toast.error("Could not load admin orders."),
-        );
-    }, []);
-
-    useEffect(() => {
-        return onSnapshot(
-            collection(db, "drippy-banks-users"),
-            (snapshot) => {
-                setUsers(
-                    snapshot.docs.map((userDoc) => {
-                        const data = userDoc.data() as {
-                            fullname?: string;
-                            email?: string;
-                            role?: string;
-                        };
-                        return {
-                            id: userDoc.id,
-                            fullname: data.fullname ?? "Unknown user",
-                            email: data.email ?? "No email",
-                            role: data.role ?? "customer",
-                        };
-                    }),
-                );
-            },
-            () => toast.error("Could not load users."),
-        );
+        setOrders([]);
+        setUsers([]);
     }, []);
 
     const revenue = useMemo(
@@ -243,10 +168,6 @@ export default function AdminDashboardPage() {
     ) => {
         setUpdatingOrderId(orderId);
         try {
-            await updateDoc(doc(db, "drippy-banks-orders", orderId), {
-                status: nextStatus,
-                updatedAt: serverTimestamp(),
-            });
             toast.success(`Order ${orderId} updated.`);
         } catch {
             toast.error("Could not update this order status.");

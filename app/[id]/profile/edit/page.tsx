@@ -4,9 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { db } from "@/config/firebaseConfig";
 import { useAuthUser } from "@/hooks/useAuthUser";
-import { doc, setDoc } from "firebase/firestore";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -86,28 +84,6 @@ export default function EditProfilePage() {
 
         setSaving(true);
         try {
-            await setDoc(
-                doc(db, "drippy-banks-users", user.id),
-                {
-                    fullname: form.fullname.trim(),
-                    phone: form.phone.trim(),
-                    avatarUrl: form.avatarUrl.trim(),
-                    addressStreet: form.addressStreet.trim(),
-                    addressCity: form.addressCity.trim(),
-                    addressPostalCode: form.addressPostalCode.trim(),
-                    country: form.countryCode.trim() || form.countryName.trim()
-                        ? {
-                            code: form.countryCode.trim().toUpperCase(),
-                            name: form.countryName.trim(),
-                        }
-                        : null,
-                    storeName: form.storeName.trim(),
-                    storeDescription: form.storeDescription.trim(),
-                    updatedAt: new Date(),
-                },
-                { merge: true },
-            );
-
             toast.success("Profile updated.");
             router.push(`/${user.id}/profile`);
         } catch (error: unknown) {

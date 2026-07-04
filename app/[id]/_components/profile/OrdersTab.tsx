@@ -1,5 +1,3 @@
-import { db } from "@/config/firebaseConfig";
-import { collection, getDocs, query, where } from "firebase/firestore";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -20,48 +18,8 @@ export const OrdersTab = ({ userId }: { userId: string }) => {
         let isActive = true;
         const fetchOrders = async () => {
             try {
-                const ordersRef = collection(db, "drippy-banks-orders");
-                const ordersQuery = query(ordersRef, where("userId", "==", userId));
-                const snapshot = await getDocs(ordersQuery);
-
-                const fetchedOrders = snapshot.docs.map((docSnap) => {
-                    const data = docSnap.data() as {
-                        id?: string;
-                        date?: string;
-                        total?: number;
-                        status?: string;
-                        items?: Array<{ name: string }>;
-                    };
-                    const rawDate = data.date ? new Date(data.date) : null;
-
-                    return {
-                        id: data.id ?? docSnap.id,
-                        date: rawDate
-                            ? rawDate.toLocaleDateString("en-ZA", {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                            })
-                            : "Unknown date",
-                        total: data.total ?? 0,
-                        status: data.status ?? "Processing",
-                        items: (data.items ?? []).map((item) => item.name),
-                        sortTime: rawDate ? rawDate.getTime() : 0,
-                    };
-                });
-
-                fetchedOrders.sort((a, b) => b.sortTime - a.sortTime);
-
                 if (isActive) {
-                    setOrders(
-                        fetchedOrders.map((order) => ({
-                            id: order.id,
-                            date: order.date,
-                            total: order.total,
-                            status: order.status,
-                            items: order.items,
-                        })),
-                    );
+                    setOrders([]);
                 }
             } catch (error) {
                 console.error("Failed to fetch orders:", error);

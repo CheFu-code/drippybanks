@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/config/firebaseConfig";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -42,10 +40,7 @@ export default function LoginForm() {
         setLoading(true);
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
-            toast.success("Logged in successfully!");
-
-            router.push(nextPath);
+            window.location.assign(`/login?next=${encodeURIComponent(nextPath)}`);
         } catch (error: unknown) {
             toast.error("Login failed", {
                 description: getLoginErrorMessage(error),

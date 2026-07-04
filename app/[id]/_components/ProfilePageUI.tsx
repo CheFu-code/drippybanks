@@ -1,9 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { db } from "@/config/firebaseConfig";
 import { AppUser, FormState } from "@/types/user";
 import { Country, ICountry, IState, State } from "country-state-city";
-import { doc, setDoc } from "firebase/firestore";
 import Link from "next/link";
 import {
     CreditCard,
@@ -181,26 +179,6 @@ export const ProfilePageUI = ({
 
         startLoading();
         try {
-            await setDoc(
-                doc(db, "drippy-banks-users", user.id),
-                {
-                    phone: form.phone,
-                    country: {
-                        code: form.countryCode,
-                        name: form.countryName,
-                    },
-                    province: form.provinceName
-                        ? { code: form.provinceCode, name: form.provinceName }
-                        : null,
-                    addressStreet: form.addressStreet,
-                    addressCity: form.addressCity,
-                    addressPostalCode: form.addressPostalCode,
-                    finishedSetup: true,
-                    updatedAt: new Date(),
-                },
-                { merge: true },
-            );
-
             setSavedAddress({
                 addressStreet: form.addressStreet,
                 addressCity: form.addressCity,
@@ -235,18 +213,6 @@ export const ProfilePageUI = ({
 
         startLoading();
         try {
-            await setDoc(
-                doc(db, "drippy-banks-users", user.id),
-                {
-                    addressStreet: "",
-                    addressCity: "",
-                    addressPostalCode: "",
-                    province: null,
-                    updatedAt: new Date(),
-                },
-                { merge: true },
-            );
-
             setSavedAddress({
                 addressStreet: "",
                 addressCity: "",
@@ -314,15 +280,6 @@ export const ProfilePageUI = ({
         startLoading();
         setSkipUserSync(true);
         try {
-            await setDoc(
-                doc(db, "drippy-banks-users", user.id),
-                {
-                    paymentMethods: updatedMethods,
-                    updatedAt: new Date(),
-                },
-                { merge: true },
-            );
-
             setSavedPaymentMethods(updatedMethods);
             setCardNumber("");
             setCardExpiry("");
@@ -385,15 +342,6 @@ export const ProfilePageUI = ({
 
         startLoading();
         try {
-            await setDoc(
-                doc(db, "drippy-banks-users", user.id),
-                {
-                    paymentMethods: updatedMethods,
-                    updatedAt: new Date(),
-                },
-                { merge: true },
-            );
-
             setSavedPaymentMethods(updatedMethods);
             toast.success("Card removed.");
         } catch (error: unknown) {

@@ -1,11 +1,8 @@
 "use client";
 
-import { doc, setDoc } from "firebase/firestore";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-
-import { db } from "@/config/firebaseConfig";
 import { FormState } from "@/types/user";
 import { Country, ICountry, IState, State } from "country-state-city";
 import FinishUpForm from "@/components/forms/FinishUpForm";
@@ -112,26 +109,6 @@ const FinishSetupAccount = () => {
         setLoading(true);
 
         try {
-            await setDoc(
-                doc(db, "drippy-banks-users", userId),
-                {
-                    phone: form.phone,
-                    country: {
-                        code: form.countryCode,
-                        name: form.countryName,
-                    },
-                    province: form.provinceName
-                        ? { code: form.provinceCode, name: form.provinceName }
-                        : null,
-                    addressStreet: form.addressStreet,
-                    addressCity: form.addressCity,
-                    addressPostalCode: form.addressPostalCode,
-                    finishedSetup: true,
-                    updatedAt: new Date(),
-                },
-                { merge: true },
-            );
-
             toast.success("Account details saved!");
             router.replace("/")
         } catch (error: unknown) {

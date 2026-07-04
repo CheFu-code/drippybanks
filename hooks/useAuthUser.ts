@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { AppUser } from "@/types/user";
+import { apiUrl } from "@/config/chefuAuth";
 
 export function useAuthUser() {
     const [user, setUser] = useState<AppUser | null>(null);
@@ -12,9 +13,7 @@ export function useAuthUser() {
             console.debug('[useAuthUser] checking backend session via /auth/me');
             try {
                 setLoading(true);
-                const baseUrl =
-                    process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.chefuinc.com";
-                const res = await fetch(`${baseUrl.replace(/\/$/, "")}/auth/me`, {
+                const res = await fetch(apiUrl("/auth/me"), {
                     credentials: "include",
                 });
 
