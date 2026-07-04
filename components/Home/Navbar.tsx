@@ -1,3 +1,5 @@
+"use client";
+
 import UserDropdown from "@/app/(public)/_components/Userdropdown";
 import { useCart } from "@/context/CartContext";
 import { useAuthUser } from "@/hooks/useAuthUser";

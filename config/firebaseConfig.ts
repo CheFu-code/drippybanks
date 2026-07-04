@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics, isSupported } from "firebase/analytics";
-import { getAuth } from "firebase/auth";
+import { getAuth, setPersistence, browserLocalPersistence, inMemoryPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 // const firebaseConfig = {
@@ -25,6 +25,17 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+
+// Configure auth persistence with a safe fallback when browser storage is blocked
+if (typeof window !== "undefined") {
+  setPersistence(auth, browserLocalPersistence).catch((err) => {
+    console.warn("Failed to use local persistence (storage may be blocked). Falling back to in-memory.", err);
+    // Fallback to in-memory persistence so the app can still sign in during this session
+    setPersistence(auth, inMemoryPersistence).catch(() => {
+      console.warn("Failed to set in-memory persistence for Firebase Auth.");
+    });
+  });
+}
 const db = getFirestore(app);
 
 // Only load analytics in the browser

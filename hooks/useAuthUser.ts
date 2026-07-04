@@ -10,8 +10,10 @@ export function useAuthUser() {
 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+            console.debug('[useAuthUser] onAuthStateChanged fired, user:', firebaseUser);
             try {
                 if (!firebaseUser?.uid || !firebaseUser.email) {
+                    console.debug('[useAuthUser] no firebase user, clearing user state');
                     setUser(null);
                     return;
                 }
@@ -76,9 +78,11 @@ export function useAuthUser() {
                         metadata: data.metadata ?? undefined,
                     };
 
+                    console.debug('[useAuthUser] set user from firestore:', appUser);
                     setUser(appUser);
                 } else {
                     // Fallback for brand-new users without a profile doc
+                    console.debug('[useAuthUser] no profile doc, setting minimal user');
                     setUser({
                         id: firebaseUser.uid,
                         email: firebaseUser.email,
@@ -89,6 +93,7 @@ export function useAuthUser() {
                     });
                 }
             } finally {
+                console.debug('[useAuthUser] finished processing auth state, loading=false');
                 setLoading(false);
             }
         });
