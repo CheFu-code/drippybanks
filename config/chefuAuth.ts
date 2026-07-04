@@ -6,34 +6,51 @@ const CHEFU_API_BASE_URL =
     "https://api.chefuinc.com";
 const CHEFU_ACCOUNT_APP_ID = "drippybanks";
 
-function buildChefuAuthUrl(path: "/login" | "/register" | "/logout", returnTo?: string) {
+function buildChefuAuthUrl(
+    path: "/login" | "/register" | "/logout",
+    returnTo?: string,
+    origin?: string,
+) {
     const params = new URLSearchParams({ app: CHEFU_ACCOUNT_APP_ID });
+    const resolvedReturnTo = resolveReturnTo(returnTo, origin);
 
-    if (returnTo) {
-        params.set("returnTo", returnTo);
+    if (resolvedReturnTo) {
+        params.set("returnTo", resolvedReturnTo);
     }
 
     return `${CHEFU_ACCOUNT_APP_URL}${path}?${params.toString()}`;
+}
+
+function resolveReturnTo(returnTo?: string, origin?: string) {
+    if (!returnTo) {
+        return undefined;
+    }
+
+    if (returnTo.startsWith("http://") || returnTo.startsWith("https://")) {
+        return returnTo;
+    }
+
+    return makeChefuReturnUrl(returnTo, origin);
 }
 
 export function apiUrl(path: string) {
     return `${CHEFU_API_BASE_URL.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
-export function buildChefuLoginUrl(returnTo?: string) {
-    return buildChefuAuthUrl("/login", returnTo);
+export function buildChefuLoginUrl(returnTo?: string, origin?: string) {
+    return buildChefuAuthUrl("/login", returnTo, origin);
 }
 
 export function buildChefuAuthRedirectUrl(path = "/", origin?: string) {
-    return buildChefuLoginUrl(makeChefuReturnUrl(path, origin));
+    return buildChefuLoginUrl(path, origin);
 }
 
-export function buildChefuRegisterUrl(returnTo?: string) {
-    return buildChefuAuthUrl("/register", returnTo);
+export function buildChefuRegisterUrl(returnTo?: string, origin?: string) {
+    return buildChefuAuthUrl("/register", returnTo, origin);
 }
 
-export function buildChefuLogoutUrl(returnTo?: string) {
-    return buildChefuAuthUrl("/logout", returnTo);
+export function buildChefuLogoutUrl(returnTo?: string, origin?: string) {
+    return buildChefuAuthUrl("/logout", returnTo, origin);
 }
 
 export function normalizeReturnPath(path: string) {

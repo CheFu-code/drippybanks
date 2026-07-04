@@ -3,13 +3,13 @@
 import UserDropdown from "@/app/(public)/_components/Userdropdown";
 import { useCart } from "@/context/CartContext";
 import { useAuthUser } from "@/hooks/useAuthUser";
-import { buildChefuLoginUrl } from "@/config/chefuAuth";
+import { buildChefuLoginUrl, makeChefuReturnUrl } from "@/config/chefuAuth";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader, Menu, ShoppingBag, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { buttonVariants } from "../ui/button";
 
 const NAV_ITEMS = [
@@ -25,6 +25,16 @@ export function Navbar() {
     const { user, loading } = useAuthUser();
     const { cartCount } = useCart();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [loginHref, setLoginHref] = useState("#");
+
+    useEffect(() => {
+        if (typeof window === "undefined") {
+            return;
+        }
+
+        const origin = window.location.origin;
+        setLoginHref(buildChefuLoginUrl(makeChefuReturnUrl("/", origin), origin));
+    }, []);
 
     return (
         <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-slate-950/90 backdrop-blur-xl shadow-lg shadow-slate-950/20">
@@ -64,7 +74,7 @@ export function Navbar() {
                         <UserDropdown user={user} />
                     ) : (
                         <a
-                            href={buildChefuLoginUrl('/')}
+                            href={loginHref}
                             className={buttonVariants({ size: "sm", variant: "default", className: "rounded-full px-4 py-2" })}
                         >
                             Login
