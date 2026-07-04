@@ -42,7 +42,7 @@ export function ProductCard({
                     type="button"
                     aria-label={`Add ${name} to cart`}
                     onClick={() => addToCart({ id, name, price, image, category })}
-                    className="absolute bottom-4 right-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-amber-300 text-slate-950 shadow-lg shadow-amber-300/20 opacity-0 transition-all duration-300 group-hover:opacity-100"
+                    className="absolute bottom-4 right-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-amber-300 text-slate-950 shadow-lg shadow-amber-300/20 transition-all duration-300 opacity-100 md:opacity-0 md:group-hover:opacity-100"
                 >
                     <Plus size={20} />
                 </button>

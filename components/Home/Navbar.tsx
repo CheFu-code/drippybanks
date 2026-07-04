@@ -38,7 +38,6 @@ export function Navbar() {
                         className="rounded-full"
                     />
                     <div className="text-left">
-                        <p className="text-sm uppercase tracking-[0.4em] text-slate-400">Drippy Banks</p>
                         <span className="text-base font-semibold tracking-tight">Premium streetwear</span>
                     </div>
                 </button>

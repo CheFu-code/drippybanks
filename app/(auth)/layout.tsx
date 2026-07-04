@@ -9,21 +9,37 @@ export default function AuthLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen bg-slate-950/95 flex items-center justify-center px-4 py-12">
-            <div className="w-full max-w-xl rounded-[2rem] border border-white/10 bg-slate-900/90 p-8 shadow-[0_30px_60px_-30px_rgba(15,23,42,0.8)] backdrop-blur-xl">
-                <div className="flex flex-col items-center gap-4 text-center">
-                    <Link
-                        className="flex items-center gap-3 text-white"
-                        href={'/'}
-                    >
-                        <Image src="/drippybanks.png" alt="Drippy Banks" width={56} height={56} />
-                        <span className="text-2xl font-semibold tracking-tight">Drippy Banks</span>
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center px-6 py-12">
+            <div className="w-full max-w-4xl rounded-3xl bg-white shadow-lg ring-1 ring-slate-200 overflow-hidden md:grid md:grid-cols-2">
+                <div className="hidden md:flex flex-col items-start justify-center gap-6 p-10 bg-gradient-to-b from-emerald-50 to-white">
+                    <Link href={'/'} className="flex items-center gap-3">
+                        <div className="w-14 h-14 rounded-xl bg-emerald-100 flex items-center justify-center">
+                            <Image src="/drippybanks.png" alt="App logo" width={44} height={44} />
+                        </div>
+                        <span className="text-2xl font-semibold text-slate-900">Drippy Banks</span>
                     </Link>
-                    <p className="max-w-md text-sm text-slate-400">
-                        One account across CheFu apps ensures a seamless premium experience while shopping Drippy Banks.
-                    </p>
+
+                    <div className="mt-2">
+                        <h2 className="text-3xl font-bold text-slate-900">Welcome back</h2>
+                        <p className="mt-2 text-sm text-slate-600 max-w-xs">One account for all your services — secure, fast, and simple.</p>
+                    </div>
+
+                    <p className="mt-auto text-xs text-slate-400">By continuing you agree to our Privacy Policy and Terms.</p>
                 </div>
-                <div className="mt-8">{children}</div>
+
+                <div className="p-8 md:p-12">
+                    <div className="flex items-center md:hidden gap-3 mb-6">
+                        <div className="w-12 h-12 rounded-lg bg-emerald-50 flex items-center justify-center">
+                            <Image src="/drippybanks.png" alt="App logo" width={40} height={40} />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-semibold">Drippy Banks</h3>
+                            <p className="text-sm text-slate-500">Sign in to continue</p>
+                        </div>
+                    </div>
+
+                    <div className="w-full max-w-md">{children}</div>
+                </div>
             </div>
         </div>
     );
