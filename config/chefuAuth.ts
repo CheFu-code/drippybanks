@@ -6,7 +6,7 @@ const CHEFU_API_BASE_URL =
     "https://api.chefuinc.com";
 const CHEFU_ACCOUNT_APP_ID = "drippybanks";
 
-function buildChefuAuthUrl(path: "/login" | "/register", returnTo?: string) {
+function buildChefuAuthUrl(path: "/login" | "/register" | "/logout", returnTo?: string) {
     const params = new URLSearchParams({ app: CHEFU_ACCOUNT_APP_ID });
 
     if (returnTo) {
@@ -24,8 +24,16 @@ export function buildChefuLoginUrl(returnTo?: string) {
     return buildChefuAuthUrl("/login", returnTo);
 }
 
+export function buildChefuAuthRedirectUrl(path = "/", origin?: string) {
+    return buildChefuLoginUrl(makeChefuReturnUrl(path, origin));
+}
+
 export function buildChefuRegisterUrl(returnTo?: string) {
     return buildChefuAuthUrl("/register", returnTo);
+}
+
+export function buildChefuLogoutUrl(returnTo?: string) {
+    return buildChefuAuthUrl("/logout", returnTo);
 }
 
 export function normalizeReturnPath(path: string) {

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCart } from '@/context/CartContext';
 import { useAuthUser } from '@/hooks/useAuthUser';
+import { buildChefuAuthRedirectUrl } from '@/config/chefuAuth';
 import { CheckoutFormLayout } from './_components/CheckoutFormLayout';
 import {
     EmptyCartCheckoutCard,
@@ -81,10 +82,10 @@ export default function CheckoutPage() {
     }, [user, form.fullName, form.email, form.phone, onFormFieldChange]);
 
     useEffect(() => {
-        if (!userLoading && !user) {
-            router.replace('/login?next=/checkout');
+        if (!userLoading && !user && typeof window !== 'undefined') {
+            window.location.assign(buildChefuAuthRedirectUrl('/checkout', window.location.origin));
         }
-    }, [userLoading, user, router]);
+    }, [userLoading, user]);
 
     const validateCheckout = () => {
         const fullName = form.fullName.trim() || user?.fullname?.trim() || '';

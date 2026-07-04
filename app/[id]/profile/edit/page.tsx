@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { buildChefuAuthRedirectUrl } from "@/config/chefuAuth";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -68,6 +69,11 @@ export default function EditProfilePage() {
     const isRouteOwner = useMemo(() => {
         return routeUserId === user?.id;
     }, [routeUserId, user?.id]);
+
+    const loginHref = useMemo(() => {
+        const targetPath = routeUserId ? `/${routeUserId}/profile/edit` : "/profile/edit";
+        return buildChefuAuthRedirectUrl(targetPath, typeof window !== "undefined" ? window.location.origin : "");
+    }, [routeUserId]);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -142,7 +148,7 @@ export default function EditProfilePage() {
                         </CardHeader>
                         <CardContent className="flex items-center gap-3">
                             <Button asChild>
-                                <Link href="/login">Go to Login</Link>
+                                <a href={loginHref}>Go to Login</a>
                             </Button>
                             <Button variant="outline" asChild>
                                 <Link href="/">Back to Home</Link>

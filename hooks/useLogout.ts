@@ -1,19 +1,21 @@
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { apiUrl, buildChefuLogoutUrl, makeChefuReturnUrl } from "@/config/chefuAuth";
 
 export const useLogout = () => {
-    const router = useRouter();
-
     const handleLogout = async (redirectTo?: string) => {
         try {
-            toast.success("Logged out successfully!");
-
-            if (redirectTo) {
-                router.replace(redirectTo);
-            }
+            await fetch(apiUrl("/auth/session"), {
+                method: "DELETE",
+                credentials: "include",
+            });
         } catch (error) {
-            console.error("Logout failed:", error);
-            toast.error("Logout failed. Please try again.");
+            console.warn("Shared session clear failed, continuing to central logout.", error);
+        } finally {
+            const origin = typeof window !== "undefined" ? window.location.origin : "";
+            const returnTo = redirectTo
+                ? makeChefuReturnUrl(redirectTo, origin)
+                : makeChefuReturnUrl("/", origin);
+
+            window.location.assign(buildChefuLogoutUrl(returnTo));
         }
     };
 

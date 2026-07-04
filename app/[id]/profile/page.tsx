@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { buildChefuAuthRedirectUrl } from "@/config/chefuAuth";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useLogout } from "@/hooks/useLogout";
 import Link from "next/link";
@@ -18,6 +19,10 @@ const ProfilePage = () => {
         "orders" | "addresses" | "payment"
     >("orders");
     const isRouteOwner = useMemo(() => routeUserId === user?.id, [routeUserId, user?.id]);
+    const loginHref = useMemo(() => {
+        const targetPath = routeUserId ? `/${routeUserId}/profile` : "/profile";
+        return buildChefuAuthRedirectUrl(targetPath, typeof window !== "undefined" ? window.location.origin : "");
+    }, [routeUserId]);
 
     if (loading) {
         return (
@@ -68,7 +73,7 @@ const ProfilePage = () => {
                     </CardHeader>
                     <CardContent className="flex items-center gap-3">
                         <Button asChild>
-                            <Link href="/login">Go to Login</Link>
+                            <a href={loginHref}>Go to Login</a>
                         </Button>
                         <Button variant="outline" asChild>
                             <Link href="/">Back to Home</Link>

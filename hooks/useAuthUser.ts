@@ -10,15 +10,16 @@ export function useAuthUser() {
         let canceled = false;
 
         async function checkSession() {
-            console.debug('[useAuthUser] checking backend session via /auth/me');
+            console.debug("[useAuthUser] checking backend session via /auth/me");
             try {
                 setLoading(true);
                 const res = await fetch(apiUrl("/auth/me"), {
                     credentials: "include",
+                    cache: "no-store",
                 });
 
                 if (!res.ok) {
-                    console.debug('[useAuthUser] /auth/me returned not ok', res.status);
+                    console.debug("[useAuthUser] /auth/me returned not ok", res.status);
                     if (!canceled) setUser(null);
                     return;
                 }
@@ -27,12 +28,11 @@ export function useAuthUser() {
                 const sessionUser = data?.user ?? data;
 
                 if (!sessionUser || !sessionUser.email) {
-                    console.debug('[useAuthUser] no session user in response');
+                    console.debug("[useAuthUser] no session user in response");
                     if (!canceled) setUser(null);
                     return;
                 }
 
-                // Map backend user shape to AppUser where possible
                 const appUser: AppUser = {
                     id: sessionUser.uid ?? sessionUser.id ?? sessionUser.userId,
                     email: sessionUser.email,
@@ -49,10 +49,10 @@ export function useAuthUser() {
                     createdAt: sessionUser.createdAt ? new Date(sessionUser.createdAt) : new Date(),
                 } as AppUser;
 
-                console.debug('[useAuthUser] session user loaded', appUser);
+                console.debug("[useAuthUser] session user loaded", appUser);
                 if (!canceled) setUser(appUser);
             } catch (err) {
-                console.error('[useAuthUser] error checking session', err);
+                console.error("[useAuthUser] error checking session", err);
                 if (!canceled) setUser(null);
             } finally {
                 if (!canceled) setLoading(false);
@@ -61,8 +61,23 @@ export function useAuthUser() {
 
         void checkSession();
 
+        const handleFocus = () => {
+            void checkSession();
+        };
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                void checkSession();
+            }
+        };
+
+        window.addEventListener("focus", handleFocus);
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
         return () => {
             canceled = true;
+            window.removeEventListener("focus", handleFocus);
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
         };
     }, []);
 
