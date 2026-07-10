@@ -118,7 +118,7 @@ const ShopPageContent = () => {
                             />
                             <button
                                 onClick={() => addToCart(product)}
-                                className="absolute bottom-4 right-4 cursor-pointer bg-amber-300 p-3 rounded-full shadow-lg text-slate-950 opacity-0 md:group-hover:opacity-100 transform translate-y-4 md:group-hover:translate-y-0 transition-all duration-300 hover:bg-amber-200"
+                                className="absolute bottom-4 right-4 cursor-pointer bg-amber-300 p-3 rounded-full shadow-lg text-slate-950 opacity-100 md:opacity-0 md:group-hover:opacity-100 transform translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-all duration-300 hover:bg-amber-200"
                             >
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm font-bold">+ Add</span>
