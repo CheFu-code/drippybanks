@@ -1,12 +1,14 @@
 'use client'
 
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
 import Image from 'next/image';
+import type { Product } from '@/context/CartContext';
 import { useCart } from '@/context/CartContext';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { PRODUCTS } from './products';
+import { loadStoredProducts } from '@/lib/product-store';
 
 const CATEGORIES = ['All', 'Tops', 'Caps', 'Bags', 'Hoodies'];
 
@@ -15,6 +17,8 @@ const ShopPageContent = () => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const [products, setProducts] = useState<Product[]>(() => loadStoredProducts());
+
     const normalizeCategory = (value: string | null) =>
         CATEGORIES.includes(value ?? '') ? (value as string) : 'All';
 
@@ -40,7 +44,7 @@ const ShopPageContent = () => {
         router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
     };
 
-    const filteredProducts = PRODUCTS.filter((product) => {
+    const filteredProducts = products.filter((product) => {
         const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
         const normalizedQuery = searchQuery.trim().toLowerCase();
         const matchesSearch =

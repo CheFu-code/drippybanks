@@ -240,6 +240,11 @@ export default function AdminDashboardPage() {
                             Oversee orders, track product velocity, and monitor customer activity
                             in one polished command surface.
                         </p>
+                        <div className="mt-6">
+                            <Button asChild>
+                                <Link href="/admin/products">Manage Shop Products</Link>
+                            </Button>
+                        </div>
                     </div>
                 </section>
 
