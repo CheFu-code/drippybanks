@@ -1,10 +1,11 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { Facebook, Twitter, Instagram } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthUser } from '@/hooks/useAuthUser';
 import { useNewsletterSubscription } from '@/hooks/useNewsletterSubscription';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const SHOP_LINKS = [
     { label: 'New Arrivals', href: '/shop' },
@@ -80,8 +81,13 @@ export function Footer() {
                             <a href="#" className="rounded-full border border-white/10 bg-white/5 p-3 text-slate-200 transition hover:border-amber-300/30 hover:bg-amber-400/10">
                                 <Facebook size={18} />
                             </a>
-                            <a href="#" className="rounded-full border border-white/10 bg-white/5 p-3 text-slate-200 transition hover:border-amber-300/30 hover:bg-amber-400/10">
-                                <Youtube size={18} />
+                            <a
+                                href="https://wa.me/27769349851?text=Hello%20Drippy%20Banks%2C%20I%20am%20contacting%20you%20from%20the%20Drippy%20Banks%20app%20and%20would%20like%20to%20know%20more%20about%20your%20products."
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="rounded-full border border-white/10 bg-white/5 p-3 text-slate-200 transition hover:border-amber-300/30 hover:bg-amber-400/10"
+                            >
+                                <FaWhatsapp size={18} />
                             </a>
                         </div>
                     </div>
