@@ -1,38 +1,17 @@
+'use client';
+
 import { ProductCard } from './ProductCard';
 import Link from 'next/link';
-
-const products = [
-    {
-        id: '1',
-        name: 'Classic White Tee',
-        price: 300.0,
-        category: 'Essentials',
-        image: '/blindManWhite.jpeg',
-    },
-    {
-        id: '2',
-        name: 'Women Classic Tee',
-        price: 300.0,
-        category: 'Women',
-        image: '/customerFive.jpeg',
-    },
-    {
-        id: '3',
-        name: 'Urban Skeleton Claw Graphic T-Shirt',
-        price: 300.0,
-        category: 'Unisex',
-        image: '/customerThree.jpeg',
-    },
-    {
-        id: '4',
-        name: 'Urban Streetwear Set',
-        price: 300.0,
-        category: 'Men',
-        image: '/customerFour.jpeg',
-    },
-];
+import { useStoredProducts } from '@/hooks/useStoredProducts';
 
 export function FeaturedProducts() {
+    const { products } = useStoredProducts();
+
+    const featured = products.filter((p) => p.featured && p.inStock !== false);
+    const displayProducts = featured.length >= 4 
+        ? featured.slice(0, 4) 
+        : products.filter((p) => p.inStock !== false).slice(0, 4);
+
     return (
         <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
             <div className="rounded-[2rem] border border-white/10 bg-slate-900/80 p-10 shadow-2xl shadow-slate-950/40">
@@ -53,7 +32,7 @@ export function FeaturedProducts() {
                 </div>
 
                 <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-                    {products.map((product) => (
+                    {displayProducts.map((product) => (
                         <ProductCard key={product.id} {...product} />
                     ))}
                 </div>

@@ -8,17 +8,29 @@ export type Product = {
     price: number;
     image: string;
     category: string;
+    originalPrice?: number;
+    sizes?: string[];
+    selectedSize?: string;
+    colors?: string[];
+    badge?: string;
+    description?: string;
+    fit?: string;
+    inStock?: boolean;
+    stock?: number;
+    featured?: boolean;
+    createdAt?: string;
 };
 
 export type CartItem = Product & {
     quantity: number;
+    selectedSize?: string;
 };
 
 type CartContextType = {
     cart: CartItem[];
-    addToCart: (product: Product) => void;
-    decreaseQuantity: (productId: string) => void;
-    removeFromCart: (productId: string) => void;
+    addToCart: (product: Product, selectedSize?: string) => void;
+    decreaseQuantity: (productId: string, selectedSize?: string) => void;
+    removeFromCart: (productId: string, selectedSize?: string) => void;
     clearCart: () => void;
     cartCount: number;
     cartTotal: number;
@@ -32,28 +44,39 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [isCartOpen, setIsCartOpen] = useState(false);
 
-    const addToCart = (product: Product) => {
+    const matchesItem = (item: CartItem, productId: string, size?: string) => {
+        if (item.id !== productId) return false;
+        if (size !== undefined) {
+            return (item.selectedSize ?? '') === size;
+        }
+        return true;
+    };
+
+    const addToCart = (product: Product, selectedSize?: string) => {
+        const effectiveSize = selectedSize ?? product.selectedSize ?? (product.sizes && product.sizes.length > 0 ? product.sizes[0] : undefined);
         setCart((prev) => {
-            const existing = prev.find((item) => item.id === product.id);
+            const existing = prev.find((item) => item.id === product.id && (item.selectedSize ?? '') === (effectiveSize ?? ''));
             if (existing) {
                 return prev.map((item) =>
-                    item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+                    item.id === product.id && (item.selectedSize ?? '') === (effectiveSize ?? '')
+                        ? { ...item, quantity: item.quantity + 1 }
+                        : item
                 );
             }
-            return [...prev, { ...product, quantity: 1 }];
+            return [...prev, { ...product, selectedSize: effectiveSize, quantity: 1 }];
         });
         setIsCartOpen(true);
     };
 
-    const removeFromCart = (productId: string) => {
-        setCart((prev) => prev.filter((item) => item.id !== productId));
+    const removeFromCart = (productId: string, size?: string) => {
+        setCart((prev) => prev.filter((item) => !matchesItem(item, productId, size)));
     };
 
-    const decreaseQuantity = (productId: string) => {
+    const decreaseQuantity = (productId: string, size?: string) => {
         setCart((prev) =>
             prev
                 .map((item) =>
-                    item.id === productId
+                    matchesItem(item, productId, size)
                         ? { ...item, quantity: item.quantity - 1 }
                         : item,
                 )

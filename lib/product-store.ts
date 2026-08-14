@@ -1,30 +1,257 @@
 import type { Product } from "@/context/CartContext";
-import { PRODUCTS } from "@/app/shop/products";
+import { PRODUCTS as INITIAL_PRODUCTS } from "@/app/shop/products";
 
-const STORAGE_KEY = "drippybanks_admin_products";
+export const PRODUCT_STORAGE_KEY = "drippybanks_admin_products";
+export const PRODUCTS_UPDATED_EVENT = "drippybanks:products-updated";
 
+export const PRODUCT_CATEGORIES = [
+    "Tops",
+    "Hoodies",
+    "Caps",
+    "Bags",
+    "Pants",
+    "Sets",
+    "Jackets",
+    "Accessories",
+] as const;
+
+export const STANDARD_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL"] as const;
+export const ACCESSORY_SIZES = ["One Size"] as const;
+
+export const PRODUCT_BADGES = [
+    "🔥 New Drop",
+    "⚡ Bestseller",
+    "💎 Limited Edition",
+    "🏷️ On Sale",
+    "✨ Staff Pick",
+    "🌟 Exclusive",
+] as const;
+
+export const PRESET_GALLERY_IMAGES = [
+    { name: "White Graphic Tee", path: "/blindManWhite.jpeg", category: "Tops" },
+    { name: "Black Thug Graphic Tee", path: "/thug.png", category: "Tops" },
+    { name: "Black Crop Tee", path: "/cropTop.jpeg", category: "Tops" },
+    { name: "Neon Pup Graphic Tee", path: "/dogGreen.jpeg", category: "Tops" },
+    { name: "Volt Pup Graphic Tee", path: "/dogGreen.png", category: "Tops" },
+    { name: "Pink Volt Pup Graphic", path: "/dogPink.png", category: "Tops" },
+    { name: "Skeleton Claw Graphic Tee", path: "/skeleton.jpeg", category: "Tops" },
+    { name: "Classic Street Tee", path: "/normal.jpeg", category: "Tops" },
+    { name: "Green Backprint Tee", path: "/greenBack.jpeg", category: "Tops" },
+    { name: "Angel Babies Tee (Front)", path: "/babiesFront.png", category: "Tops" },
+    { name: "Angel Babies Tee (Back)", path: "/babiesBack.png", category: "Tops" },
+    { name: "American Drip Tee (Front)", path: "/americanFront.png", category: "Tops" },
+    { name: "American Drip Tee (Back)", path: "/americanBack.png", category: "Tops" },
+    { name: "Midnight Mosaic Hoodie (Front)", path: "/hoodieBlackFront.png", category: "Hoodies" },
+    { name: "Midnight Mosaic Hoodie (Back)", path: "/hoodieBlackBack.png", category: "Hoodies" },
+    { name: "Azure Drip Hoodie (Front)", path: "/hoodieBlueFront.png", category: "Hoodies" },
+    { name: "Azure Drip Hoodie (Back)", path: "/hoodieBlueBack.jpg", category: "Hoodies" },
+    { name: "Crimson Street Art Hoodie (Front)", path: "/hoodieRedFront.png", category: "Hoodies" },
+    { name: "Crimson Street Art Hoodie (Back)", path: "/hoodieRedBack.png", category: "Hoodies" },
+    { name: "Drip Vision Hoodie (Front)", path: "/mainHoodieFront.png", category: "Hoodies" },
+    { name: "Drip Vision Hoodie", path: "/mainHoodie.jpeg", category: "Hoodies" },
+    { name: "Classic Black Cap", path: "/cap.jpeg", category: "Caps" },
+    { name: "Classic Blue Cap", path: "/capBlue.png", category: "Caps" },
+    { name: "Classic Red Cap", path: "/capRed.png", category: "Caps" },
+    { name: "Essential Black Tote", path: "/bag.jpeg", category: "Bags" },
+    { name: "Full Streetwear Set", path: "/fullset.jpeg", category: "Sets" },
+    { name: "Hoodie Full Set", path: "/hoodieFullSet.jpeg", category: "Sets" },
+    { name: "Editorial Street Style 1", path: "/newPic/ad-01.jpeg", category: "Tops" },
+    { name: "Editorial Street Style 2", path: "/newPic/ad-02.jpeg", category: "Hoodies" },
+    { name: "Editorial Street Style 3", path: "/newPic/ad-03.jpeg", category: "Tops" },
+    { name: "Editorial Street Style 4", path: "/newPic/ad-04.jpeg", category: "Hoodies" },
+    { name: "Editorial Street Style 5", path: "/newPic/ad-05.jpeg", category: "Sets" },
+    { name: "Editorial Street Style 6", path: "/newPic/ad-06.jpeg", category: "Tops" },
+];
+
+/**
+ * Normalizes a raw product object ensuring all optional fields have proper defaults
+ */
+export function normalizeProduct(raw: Partial<Product>, index = 0): Product {
+    const isCapOrBag = raw.category === "Caps" || raw.category === "Bags" || raw.category === "Accessories";
+    const defaultSizes = isCapOrBag ? ["One Size"] : ["S", "M", "L", "XL"];
+
+    return {
+        id: String(raw.id || `db_${Date.now()}_${index}`),
+        name: raw.name?.trim() || "Untitled Streetwear Piece",
+        price: typeof raw.price === "number" && raw.price >= 0 ? raw.price : 400,
+        originalPrice: typeof raw.originalPrice === "number" ? raw.originalPrice : undefined,
+        category: raw.category?.trim() || "Tops",
+        image: raw.image?.trim() || "/placeholder.png",
+        sizes: Array.isArray(raw.sizes) && raw.sizes.length > 0 ? raw.sizes : defaultSizes,
+        selectedSize: raw.selectedSize,
+        colors: Array.isArray(raw.colors) && raw.colors.length > 0 ? raw.colors : ["Midnight Black"],
+        badge: raw.badge ?? (index < 3 ? "🔥 New Drop" : undefined),
+        description: raw.description?.trim() || "Premium heavyweight cotton streetwear garment with signature Drippy Banks tailored fit and high-density detailing.",
+        fit: raw.fit?.trim() || (isCapOrBag ? "Adjustable fit" : "Boxy oversized streetwear fit"),
+        inStock: raw.inStock !== false,
+        stock: typeof raw.stock === "number" ? raw.stock : 45,
+        featured: raw.featured ?? (index < 4),
+        createdAt: raw.createdAt || new Date(Date.now() - index * 86400000).toISOString(),
+    };
+}
+
+export const BASE_SEED_PRODUCTS: Product[] = INITIAL_PRODUCTS.map((p, idx) => normalizeProduct(p, idx));
+
+/**
+ * Loads stored products from localStorage with automatic migration and normalization
+ */
 export function loadStoredProducts(): Product[] {
     if (typeof window === "undefined") {
-        return PRODUCTS;
+        return BASE_SEED_PRODUCTS;
     }
 
     try {
-        const raw = window.localStorage.getItem(STORAGE_KEY);
+        const raw = window.localStorage.getItem(PRODUCT_STORAGE_KEY);
         if (!raw) {
-            return PRODUCTS;
+            saveStoredProducts(BASE_SEED_PRODUCTS);
+            return BASE_SEED_PRODUCTS;
         }
 
-        const parsed = JSON.parse(raw) as Product[];
-        return Array.isArray(parsed) && parsed.length > 0 ? parsed : PRODUCTS;
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed.map((item, idx) => normalizeProduct(item, idx));
+        }
+
+        saveStoredProducts(BASE_SEED_PRODUCTS);
+        return BASE_SEED_PRODUCTS;
     } catch {
-        return PRODUCTS;
+        return BASE_SEED_PRODUCTS;
     }
 }
 
-export function saveStoredProducts(products: Product[]) {
+/**
+ * Saves products to localStorage and broadcasts the update across open windows/components
+ */
+export function saveStoredProducts(products: Product[]): void {
     if (typeof window === "undefined") {
         return;
     }
 
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+    try {
+        window.localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
+        window.dispatchEvent(new CustomEvent(PRODUCTS_UPDATED_EVENT, { detail: products }));
+    } catch (err) {
+        console.error("[product-store] Failed to save products to localStorage:", err);
+    }
+}
+
+/**
+ * Adds a new product to the beginning of the inventory
+ */
+export function addStoredProduct(product: Omit<Product, "id"> & { id?: string }): Product {
+    const products = loadStoredProducts();
+    
+    // Generate clean unique ID
+    const maxNumId = Math.max(0, ...products.map((p) => Number(p.id) || 0));
+    const nextId = product.id && product.id.trim().length > 0 ? product.id.trim() : String(maxNumId + 1);
+
+    const newProduct = normalizeProduct({
+        ...product,
+        id: nextId,
+        createdAt: new Date().toISOString(),
+    });
+
+    const nextProducts = [newProduct, ...products];
+    saveStoredProducts(nextProducts);
+    return newProduct;
+}
+
+/**
+ * Updates an existing product by ID
+ */
+export function updateStoredProduct(id: string, updates: Partial<Product>): Product[] {
+    const products = loadStoredProducts();
+    const nextProducts = products.map((item) => {
+        if (item.id === id) {
+            return normalizeProduct({ ...item, ...updates, id });
+        }
+        return item;
+    });
+
+    saveStoredProducts(nextProducts);
+    return nextProducts;
+}
+
+/**
+ * Deletes a product by ID
+ */
+export function deleteStoredProduct(id: string): Product[] {
+    const products = loadStoredProducts();
+    const nextProducts = products.filter((item) => item.id !== id);
+    saveStoredProducts(nextProducts);
+    return nextProducts;
+}
+
+/**
+ * Duplicates a product for rapid variant creation
+ */
+export function duplicateStoredProduct(id: string): Product | null {
+    const products = loadStoredProducts();
+    const target = products.find((p) => p.id === id);
+    if (!target) return null;
+
+    const maxNumId = Math.max(0, ...products.map((p) => Number(p.id) || 0));
+    const nextId = String(maxNumId + 1);
+
+    const duplicated: Product = {
+        ...target,
+        id: nextId,
+        name: `${target.name} (Copy)`,
+        createdAt: new Date().toISOString(),
+    };
+
+    const nextProducts = [duplicated, ...products];
+    saveStoredProducts(nextProducts);
+    return duplicated;
+}
+
+/**
+ * Toggles the inStock flag of a product
+ */
+export function toggleStoredProductStock(id: string): Product[] {
+    const products = loadStoredProducts();
+    const nextProducts = products.map((item) => {
+        if (item.id === id) {
+            return { ...item, inStock: !item.inStock };
+        }
+        return item;
+    });
+
+    saveStoredProducts(nextProducts);
+    return nextProducts;
+}
+
+/**
+ * Resets inventory back to the curated default collection
+ */
+export function resetStoredProductsToDefault(): Product[] {
+    saveStoredProducts(BASE_SEED_PRODUCTS);
+    return BASE_SEED_PRODUCTS;
+}
+
+/**
+ * Exports the current catalog as a formatted JSON string
+ */
+export function exportProductsToJson(): string {
+    const products = loadStoredProducts();
+    return JSON.stringify(products, null, 2);
+}
+
+/**
+ * Imports products from a JSON string with schema validation
+ */
+export function importProductsFromJson(jsonString: string): { success: boolean; count: number; error?: string } {
+    try {
+        const parsed = JSON.parse(jsonString);
+        if (!Array.isArray(parsed) || parsed.length === 0) {
+            return { success: false, count: 0, error: "Invalid JSON structure: Expected an array of products." };
+        }
+
+        const validProducts = parsed.map((item, idx) => normalizeProduct(item, idx));
+        saveStoredProducts(validProducts);
+        return { success: true, count: validProducts.length };
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Failed to parse JSON file.";
+        return { success: false, count: 0, error: message };
+    }
 }

@@ -45,9 +45,9 @@ export default function CartPage() {
                             </div>
                         ) : (
                             <>
-                                {cart.map((item) => (
-                                    <div key={item.id} className="flex items-center gap-4">
-                                        <div className="relative h-20 w-20 rounded-md overflow-hidden border border-white/10 bg-slate-900">
+                                {cart.map((item, idx) => (
+                                    <div key={`${item.id}-${item.selectedSize ?? idx}`} className="flex items-center gap-4">
+                                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border border-white/10 bg-slate-900 flex-shrink-0">
                                             <Image
                                                 fill
                                                 src={item.image}
@@ -57,32 +57,45 @@ export default function CartPage() {
                                             />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="font-medium truncate">{item.name}</p>
-                                            <p className="text-sm text-slate-400">{item.category}</p>
-                                            <div className="flex items-center gap-2">
-                                                <p className="text-sm text-slate-400">Qty: {item.quantity}</p>
+                                            <p className="font-bold text-white truncate">{item.name}</p>
+                                            <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
+                                                <span>{item.category}</span>
+                                                {item.selectedSize && (
+                                                    <>
+                                                        <span>•</span>
+                                                        <span className="px-1.5 py-0.5 rounded bg-white/10 font-bold text-amber-300">
+                                                            Size: {item.selectedSize}
+                                                        </span>
+                                                    </>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <p className="text-xs text-slate-400">Qty: {item.quantity}</p>
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    onClick={() => decreaseQuantity(item.id)}
+                                                    onClick={() => decreaseQuantity(item.id, item.selectedSize)}
+                                                    className="h-7 w-7 p-0 rounded-lg border-white/10"
                                                 >
                                                     -
                                                 </Button>
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    onClick={() => addToCart(item)}
+                                                    onClick={() => addToCart(item, item.selectedSize)}
+                                                    className="h-7 w-7 p-0 rounded-lg border-white/10"
                                                 >
                                                     +
                                                 </Button>
                                             </div>
                                         </div>
                                         <div className="text-right space-y-2">
-                                            <p className="font-medium">R{(item.price * item.quantity).toFixed(2)}</p>
+                                            <p className="font-bold text-amber-300">R{(item.price * item.quantity).toFixed(2)}</p>
                                             <Button
                                                 size="sm"
                                                 variant="destructive"
-                                                onClick={() => removeFromCart(item.id)}
+                                                onClick={() => removeFromCart(item.id, item.selectedSize)}
+                                                className="h-7 text-xs rounded-lg px-2.5"
                                             >
                                                 Remove
                                             </Button>

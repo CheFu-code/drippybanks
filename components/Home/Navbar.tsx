@@ -9,7 +9,7 @@ import { Loader, Menu, ShoppingBag, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { buttonVariants } from "../ui/button";
 
 const NAV_ITEMS = [
@@ -25,16 +25,9 @@ export function Navbar() {
     const { user, loading } = useAuthUser();
     const { cartCount } = useCart();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [loginHref, setLoginHref] = useState("#");
-
-    useEffect(() => {
-        if (typeof window === "undefined") {
-            return;
-        }
-
-        const origin = window.location.origin;
-        setLoginHref(buildChefuLoginUrl(makeChefuReturnUrl("/", origin), origin));
-    }, []);
+    const loginHref = typeof window !== "undefined"
+        ? buildChefuLoginUrl(makeChefuReturnUrl("/", window.location.origin), window.location.origin)
+        : "#";
 
     return (
         <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-slate-950/90 backdrop-blur-xl shadow-lg shadow-slate-950/20">

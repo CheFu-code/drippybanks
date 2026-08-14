@@ -9,7 +9,7 @@ export function useNewsletterSubscription() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState<SubscriptionMessage>(null);
 
-    const submit = async (email: string, source: string) => {
+    const submit = async (email: string, _source?: string) => {
         const normalizedEmail = email.trim().toLowerCase();
         const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
 

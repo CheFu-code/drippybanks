@@ -24,8 +24,8 @@ export function useAuthUser() {
                     return;
                 }
 
-                const data = (await res.json().catch(() => null)) as any;
-                const sessionUser = data?.user ?? data;
+                const data = (await res.json().catch(() => null)) as Record<string, unknown> | null;
+                const sessionUser = (data?.user ?? data) as Record<string, unknown> | null;
 
                 if (!sessionUser || !sessionUser.email) {
                     console.debug("[useAuthUser] no session user in response");
@@ -33,21 +33,22 @@ export function useAuthUser() {
                     return;
                 }
 
+                const email = String(sessionUser.email);
                 const appUser: AppUser = {
-                    id: sessionUser.uid ?? sessionUser.id ?? sessionUser.userId,
-                    email: sessionUser.email,
-                    fullname: sessionUser.fullname ?? sessionUser.name ?? sessionUser.displayName ?? sessionUser.email.split("@")[0],
-                    role: sessionUser.role ?? "customer",
-                    addressCity: sessionUser.addressCity ?? "",
-                    addressStreet: sessionUser.addressStreet ?? "",
-                    addressPostalCode: sessionUser.addressPostalCode ?? "",
-                    country: sessionUser.country ?? null,
-                    avatarUrl: sessionUser.avatarUrl ?? undefined,
-                    phone: sessionUser.phone ?? sessionUser.phoneNumber ?? undefined,
-                    isEmailVerified: sessionUser.isEmailVerified ?? false,
-                    isPhoneVerified: sessionUser.isPhoneVerified ?? false,
-                    createdAt: sessionUser.createdAt ? new Date(sessionUser.createdAt) : new Date(),
-                } as AppUser;
+                    id: String(sessionUser.uid || sessionUser.id || sessionUser.userId || email),
+                    email,
+                    fullname: String(sessionUser.fullname || sessionUser.name || sessionUser.displayName || email.split("@")[0]),
+                    role: (sessionUser.role as string) === "admin" ? "admin" : "customer",
+                    addressCity: String(sessionUser.addressCity || ""),
+                    addressStreet: String(sessionUser.addressStreet || ""),
+                    addressPostalCode: String(sessionUser.addressPostalCode || ""),
+                    country: (sessionUser.country as AppUser["country"]) || undefined,
+                    avatarUrl: sessionUser.avatarUrl ? String(sessionUser.avatarUrl) : undefined,
+                    phone: sessionUser.phone ? String(sessionUser.phone) : sessionUser.phoneNumber ? String(sessionUser.phoneNumber) : undefined,
+                    isEmailVerified: Boolean(sessionUser.isEmailVerified),
+                    isPhoneVerified: Boolean(sessionUser.isPhoneVerified),
+                    createdAt: sessionUser.createdAt ? new Date(sessionUser.createdAt as string | number) : new Date(),
+                };
 
                 console.debug("[useAuthUser] session user loaded", appUser);
                 if (!canceled) setUser(appUser);
