@@ -87,11 +87,6 @@ const ShopPageContent = () => {
             {/* Header and Filters */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-300/30 bg-amber-300/10 px-3 py-0.5 text-[10px] uppercase font-bold tracking-widest text-amber-300">
-                            <Sparkles className="h-3 w-3" /> Drops & Collection
-                        </span>
-                    </div>
                     <h1 className="text-3xl font-extrabold text-white mt-2">New Arrivals</h1>
                     <p className="text-slate-400 mt-1 text-sm">Discover the latest premium streetwear silhouettes & essentials.</p>
                 </div>
@@ -125,11 +120,10 @@ const ShopPageContent = () => {
                                 category: category === 'All' ? null : category,
                             })
                         }
-                        className={`px-4 py-2 rounded-2xl text-xs font-semibold transition-all ${
-                            selectedCategory === category
+                        className={`px-4 py-2 rounded-2xl text-xs font-semibold transition-all ${selectedCategory === category
                                 ? 'bg-amber-300 text-slate-950 font-bold shadow-lg shadow-amber-300/20'
                                 : 'bg-slate-900/80 text-slate-300 border border-white/10 hover:bg-slate-800'
-                        }`}
+                            }`}
                     >
                         {category}
                     </button>
@@ -214,11 +208,10 @@ const ShopPageContent = () => {
                                                         key={sz}
                                                         type="button"
                                                         onClick={(e) => handleSelectSize(product.id, sz, e)}
-                                                        className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-all ${
-                                                            currentSize === sz
+                                                        className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-all ${currentSize === sz
                                                                 ? 'bg-amber-300 text-slate-950 border-amber-300 font-extrabold shadow-sm'
                                                                 : 'bg-slate-950 text-slate-300 border-white/10 hover:border-white/30'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {sz}
                                                     </button>
@@ -251,10 +244,55 @@ const ShopPageContent = () => {
             </div>
 
             {filteredProducts.length === 0 && (
-                <div className="text-center py-24 border border-dashed border-white/10 rounded-3xl bg-slate-900/40">
-                    <p className="text-slate-400 text-sm">No streetwear pieces match your search or filter.</p>
-                </div>
+                <motion.div
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: 'easeOut' }}
+                    className="relative flex flex-col items-center justify-center py-32 px-8 overflow-hidden rounded-3xl border border-white/[0.06] bg-gradient-to-b from-slate-900/60 to-slate-950/80 backdrop-blur-sm"
+                >
+                    {/* Ambient glow */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="w-72 h-72 rounded-full bg-indigo-500/10 blur-3xl" />
+                    </div>
+
+                    {/* Animated icon ring */}
+                    <div className="relative mb-8">
+                        <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+                            className="absolute inset-0 rounded-full border border-dashed border-indigo-500/30"
+                            style={{ margin: '-10px' }}
+                        />
+                        <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 flex items-center justify-center shadow-xl">
+                            <Search className="w-6 h-6 text-slate-500" />
+                        </div>
+                    </div>
+
+                    {/* Text */}
+                    <h3 className="text-lg font-semibold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent mb-2 tracking-tight">
+                        No pieces found
+                    </h3>
+                    <p className="text-slate-500 text-sm text-center max-w-xs leading-relaxed">
+                        Nothing matches your current search or filters. Try broadening your search or clearing the filters.
+                    </p>
+
+                    {/* Clear filters CTA */}
+                    <motion.button
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => {
+                            const params = new URLSearchParams(searchParams.toString());
+                            params.delete('q');
+                            params.delete('category');
+                            router.push(`${pathname}?${params.toString()}`);
+                        }}
+                        className="mt-8 px-5 py-2.5 rounded-xl text-sm font-medium bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-slate-300 hover:text-white transition-all duration-200"
+                    >
+                        Clear filters
+                    </motion.button>
+                </motion.div>
             )}
+
         </div>
     );
 };
