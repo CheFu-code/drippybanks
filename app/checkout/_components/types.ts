@@ -14,7 +14,7 @@ export type CheckoutForm = {
     cardCvc: string;
 };
 
-export type PaymentChoice = 'saved' | 'new' | 'cash';
+export type PaymentChoice = 'saved' | 'new' | 'cash' | 'paypal';
 export type FulfillmentMethod = 'collect' | 'deliver';
 
 export type SavedPaymentMethod = NonNullable<AppUser['paymentMethods']>[number];
@@ -27,8 +27,10 @@ export type SavedOrder = {
     subtotal: number;
     shipping: number;
     tax: number;
-    paymentMethod: 'card' | 'cash';
+    paymentMethod: 'card' | 'cash' | 'paypal';
     paymentMethodId?: string;
+    paypalOrderId?: string;
+    paypalPayerEmail?: string;
     fulfillmentMethod: FulfillmentMethod;
     deliveryFee: number;
     items: Array<{ id: string; name: string; quantity: number; price: number; image: string }>;
@@ -40,6 +42,6 @@ export type SavedOrder = {
         city: string;
         postalCode: string;
         country: string;
-        paymentMethod: 'card' | 'cash';
+        paymentMethod: 'card' | 'cash' | 'paypal';
     };
 };

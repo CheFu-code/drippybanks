@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { CartItem } from '@/context/CartContext';
 import { CheckoutForm, FulfillmentMethod, PaymentChoice, SavedPaymentMethod } from './types';
 import { MapPin, ShoppingBag } from 'lucide-react';
+import { PayPalCheckoutSection } from './PayPalCheckoutSection';
 
 type CheckoutFormLayoutProps = {
     user: AppUser | null;
@@ -32,6 +33,8 @@ type CheckoutFormLayoutProps = {
     onSelectPaymentChoice: (choice: PaymentChoice) => void;
     onSelectSavedCard: (cardId: string) => void;
     onSelectFulfillment: (method: FulfillmentMethod) => void;
+    onValidate: () => string | null;
+    onPayPalSuccess: (details: { orderId: string; payerEmail?: string }) => void;
 };
 
 export function CheckoutFormLayout({
@@ -56,6 +59,8 @@ export function CheckoutFormLayout({
     onSelectPaymentChoice,
     onSelectSavedCard,
     onSelectFulfillment,
+    onValidate,
+    onPayPalSuccess,
 }: CheckoutFormLayoutProps) {
     return (
         <form className="grid gap-6 lg:grid-cols-[1.45fr_1fr]" onSubmit={onSubmit}>
@@ -288,13 +293,21 @@ export function CheckoutFormLayout({
                                         </button>
                                     ))}
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex flex-wrap gap-2">
                                     <Button
                                         type="button"
                                         variant={effectivePaymentChoice === 'new' ? 'default' : 'outline'}
                                         onClick={() => onSelectPaymentChoice('new')}
                                     >
                                         Use New Card
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant={effectivePaymentChoice === 'paypal' ? 'default' : 'outline'}
+                                        onClick={() => onSelectPaymentChoice('paypal')}
+                                        className={effectivePaymentChoice === 'paypal' ? 'bg-[#0070ba] hover:bg-[#005ea6] text-white' : ''}
+                                    >
+                                        PayPal
                                     </Button>
                                     <Button
                                         type="button"
@@ -313,30 +326,57 @@ export function CheckoutFormLayout({
                         )}
 
                         {savedCards.length === 0 && (
-                            <div className="grid gap-3 md:grid-cols-2">
+                            <div className="grid gap-3 sm:grid-cols-3">
                                 <button
                                     type="button"
                                     onClick={() => onSelectPaymentChoice('new')}
-                                    className={`rounded-lg border px-4 py-3 text-left transition-colors ${
+                                    className={`rounded-xl border px-4 py-3 text-left transition-all ${
                                         effectivePaymentChoice === 'new'
-                                            ? 'border-white/20 bg-slate-800 text-white'
+                                            ? 'border-amber-400/60 bg-amber-400/10 text-white shadow-[0_0_0_1px_rgba(251,191,36,0.3)]'
                                             : 'border-white/10 bg-slate-950/70 text-slate-100 hover:bg-slate-900'
                                     }`}
                                 >
-                                    Credit or debit card
+                                    <p className="font-semibold text-sm">Card</p>
+                                    <p className="text-xs text-slate-400 mt-0.5">Credit / Debit</p>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => onSelectPaymentChoice('paypal')}
+                                    className={`rounded-xl border px-4 py-3 text-left transition-all ${
+                                        effectivePaymentChoice === 'paypal'
+                                            ? 'border-sky-400/60 bg-sky-400/10 text-white shadow-[0_0_0_1px_rgba(56,189,248,0.3)]'
+                                            : 'border-white/10 bg-slate-950/70 text-slate-100 hover:bg-slate-900'
+                                    }`}
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <p className="font-semibold text-sm text-sky-400">PayPal</p>
+                                        <span className="text-[10px] bg-sky-500/20 text-sky-300 font-bold px-1.5 py-0.5 rounded">FAST</span>
+                                    </div>
+                                    <p className="text-xs text-slate-400 mt-0.5">Balance or Card</p>
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => onSelectPaymentChoice('cash')}
-                                    className={`rounded-lg border px-4 py-3 text-left transition-colors ${
+                                    className={`rounded-xl border px-4 py-3 text-left transition-all ${
                                         effectivePaymentChoice === 'cash'
-                                            ? 'border-white/20 bg-slate-800 text-white'
+                                            ? 'border-amber-400/60 bg-amber-400/10 text-white shadow-[0_0_0_1px_rgba(251,191,36,0.3)]'
                                             : 'border-white/10 bg-slate-950/70 text-slate-100 hover:bg-slate-900'
                                     }`}
                                 >
-                                    Cash on delivery
+                                    <p className="font-semibold text-sm">Cash</p>
+                                    <p className="text-xs text-slate-400 mt-0.5">Pay on delivery</p>
                                 </button>
                             </div>
+                        )}
+
+                        {effectivePaymentChoice === 'paypal' && (
+                            <PayPalCheckoutSection
+                                grandTotal={grandTotal}
+                                cart={cart}
+                                onValidate={onValidate}
+                                onSuccess={onPayPalSuccess}
+                                disabled={isSubmitting}
+                            />
                         )}
 
                         {effectivePaymentChoice === 'new' && (
@@ -456,9 +496,16 @@ export function CheckoutFormLayout({
                         <p className="text-lg font-semibold">R{grandTotal.toFixed(2)}</p>
                     </div>
 
-                    <Button className="w-full" type="submit" disabled={isSubmitting}>
-                        {isSubmitting ? 'Placing order...' : 'Place Order'}
-                    </Button>
+                    {effectivePaymentChoice !== 'paypal' && (
+                        <Button className="w-full" type="submit" disabled={isSubmitting}>
+                            {isSubmitting ? 'Placing order...' : 'Place Order'}
+                        </Button>
+                    )}
+                    {effectivePaymentChoice === 'paypal' && (
+                        <div className="text-center py-2 px-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-300 text-xs font-medium">
+                            Complete your payment using the yellow PayPal button above
+                        </div>
+                    )}
                     <Button className="w-full" variant="outline" type="button" asChild>
                         <Link href="/cart">Back to cart</Link>
                     </Button>

@@ -17,6 +17,7 @@ import {
     OrderConfirmationCard,
 } from './_components/CheckoutStates';
 import { CheckoutForm, FulfillmentMethod, PaymentChoice, SavedOrder, SavedPaymentMethod } from './_components/types';
+import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 
 const ORDER_STORAGE_KEY = 'drippybanks.orders';
 
@@ -214,67 +215,154 @@ export default function CheckoutPage() {
         }
     };
 
-    return (
-        <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
-            <Navbar />
-            <main className="max-w-6xl mx-auto px-5 pb-12 pt-24">
-                <div className="mb-6">
-                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Secure checkout</p>
-                    <h1 className="text-3xl font-semibold mt-2 text-white">Complete your order</h1>
-                </div>
+    const handlePayPalSuccess = async (details: { orderId: string; payerEmail?: string }) => {
+        if (!user) {
+            toast.error('Please sign in to place an order.');
+            return;
+        }
 
-                {userLoading && <LoadingCheckoutCard />}
-                {!userLoading && !user && (
-                    <Card className="border-white/10 bg-slate-900/80">
-                        <CardHeader>
-                            <CardTitle className="text-xl text-white">Sign in required</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3 text-slate-300">
-                            <p className="text-sm text-slate-400">
-                                You need an account to continue with checkout and place orders.
-                            </p>
-                            <div className="flex items-center gap-3">
-                                <Button asChild>
-                                    <Link href="/login?next=/checkout">Go to Login</Link>
-                                </Button>
-                                <Button variant="outline" asChild>
-                                    <Link href="/cart">Back to Cart</Link>
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
-                {!userLoading && placedOrder && <OrderConfirmationCard placedOrder={placedOrder} />}
-                {!userLoading && !placedOrder && cart.length === 0 && <EmptyCartCheckoutCard />}
-                {!userLoading && user && !placedOrder && cart.length > 0 && (
-                    <CheckoutFormLayout
-                        user={user}
-                        form={form}
-                        cart={cart}
-                        cartTotal={cartTotal}
-                        grandTotal={grandTotal}
-                        deliveryFee={deliveryFee}
-                        fulfillmentMethod={fulfillmentMethod}
-                        isSubmitting={isSubmitting}
-                        hasSavedAddress={hasSavedAddress}
-                        effectiveUseSavedAddress={effectiveUseSavedAddress}
-                        effectivePaymentChoice={effectivePaymentChoice}
-                        effectiveSelectedSavedCardId={effectiveSelectedSavedCardId}
-                        isCardPaymentSelected={isCardPaymentSelected}
-                        savedCards={savedCards}
-                        onSubmit={handlePlaceOrder}
-                        onFormFieldChange={onFormFieldChange}
-                        onUseSavedAddress={() => setUseSavedAddressOverride(true)}
-                        onUseDifferentAddress={() => setUseSavedAddressOverride(false)}
-                        onSelectPaymentChoice={(choice) => setPaymentChoiceOverride(choice)}
-                        onSelectSavedCard={(cardId) => {
-                            setPaymentChoiceOverride('saved');
-                            setSelectedSavedCardId(cardId);
-                        }}
-                        onSelectFulfillment={(method) => setFulfillmentMethod(method)}
-                    />
-                )}
-            </main>
-        </div>
+        const finalAddress = effectiveUseSavedAddress && hasSavedAddress
+            ? {
+                address: user?.addressStreet ?? '',
+                city: user?.addressCity ?? '',
+                postalCode: user?.addressPostalCode ?? '',
+                country: user?.country?.name ?? '',
+            }
+            : {
+                address: form.address,
+                city: form.city,
+                postalCode: form.postalCode,
+                country: form.country,
+            };
+
+        const fullName = form.fullName.trim() || user?.fullname?.trim() || '';
+        const email = details.payerEmail || form.email.trim() || user?.email?.trim() || '';
+        const phone = form.phone.trim() || user?.phone?.trim() || '';
+
+        const order: SavedOrder = {
+            id: `ORD-${crypto.randomUUID()}`,
+            date: new Date().toISOString(),
+            status: 'Processing',
+            total: Number(grandTotal.toFixed(2)),
+            subtotal: Number(cartTotal.toFixed(2)),
+            shipping: Number(shipping.toFixed(2)),
+            tax: Number(tax.toFixed(2)),
+            deliveryFee: Number(deliveryFee.toFixed(2)),
+            fulfillmentMethod,
+            paymentMethod: 'paypal',
+            paypalOrderId: details.orderId,
+            paypalPayerEmail: details.payerEmail,
+            items: cart.map((item) => ({
+                id: item.id,
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price,
+                image: item.image,
+            })),
+            customer: {
+                fullName,
+                email,
+                phone,
+                address: finalAddress.address,
+                city: finalAddress.city,
+                postalCode: finalAddress.postalCode,
+                country: finalAddress.country,
+                paymentMethod: 'paypal',
+            },
+        };
+
+        try {
+            const existingOrdersRaw = localStorage.getItem(ORDER_STORAGE_KEY);
+            let existingOrders: SavedOrder[] = [];
+            if (existingOrdersRaw) {
+                try {
+                    existingOrders = JSON.parse(existingOrdersRaw) as SavedOrder[];
+                } catch {
+                    existingOrders = [];
+                }
+            }
+
+            localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify([order, ...existingOrders]));
+            clearCart();
+            setPlacedOrder(order);
+            toast.success(`PayPal Order ${order.id} placed successfully.`);
+        } catch (error) {
+            console.error('Failed to save PayPal order:', error);
+            toast.error('Failed to save order details.');
+        }
+    };
+
+    return (
+        <PayPalScriptProvider
+            options={{
+                clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'test',
+                currency: 'USD',
+                intent: 'capture',
+            }}
+        >
+            <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
+                <Navbar />
+                <main className="max-w-6xl mx-auto px-5 pb-12 pt-24">
+                    <div className="mb-6">
+                        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Secure checkout</p>
+                        <h1 className="text-3xl font-semibold mt-2 text-white">Complete your order</h1>
+                    </div>
+
+                    {userLoading && <LoadingCheckoutCard />}
+                    {!userLoading && !user && (
+                        <Card className="border-white/10 bg-slate-900/80">
+                            <CardHeader>
+                                <CardTitle className="text-xl text-white">Sign in required</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3 text-slate-300">
+                                <p className="text-sm text-slate-400">
+                                    You need an account to continue with checkout and place orders.
+                                </p>
+                                <div className="flex items-center gap-3">
+                                    <Button asChild>
+                                        <Link href="/login?next=/checkout">Go to Login</Link>
+                                    </Button>
+                                    <Button variant="outline" asChild>
+                                        <Link href="/cart">Back to Cart</Link>
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+                    {!userLoading && placedOrder && <OrderConfirmationCard placedOrder={placedOrder} />}
+                    {!userLoading && !placedOrder && cart.length === 0 && <EmptyCartCheckoutCard />}
+                    {!userLoading && user && !placedOrder && cart.length > 0 && (
+                        <CheckoutFormLayout
+                            user={user}
+                            form={form}
+                            cart={cart}
+                            cartTotal={cartTotal}
+                            grandTotal={grandTotal}
+                            deliveryFee={deliveryFee}
+                            fulfillmentMethod={fulfillmentMethod}
+                            isSubmitting={isSubmitting}
+                            hasSavedAddress={hasSavedAddress}
+                            effectiveUseSavedAddress={effectiveUseSavedAddress}
+                            effectivePaymentChoice={effectivePaymentChoice}
+                            effectiveSelectedSavedCardId={effectiveSelectedSavedCardId}
+                            isCardPaymentSelected={isCardPaymentSelected}
+                            savedCards={savedCards}
+                            onSubmit={handlePlaceOrder}
+                            onFormFieldChange={onFormFieldChange}
+                            onUseSavedAddress={() => setUseSavedAddressOverride(true)}
+                            onUseDifferentAddress={() => setUseSavedAddressOverride(false)}
+                            onSelectPaymentChoice={(choice) => setPaymentChoiceOverride(choice)}
+                            onSelectSavedCard={(cardId) => {
+                                setPaymentChoiceOverride('saved');
+                                setSelectedSavedCardId(cardId);
+                            }}
+                            onSelectFulfillment={(method) => setFulfillmentMethod(method)}
+                            onValidate={validateCheckout}
+                            onPayPalSuccess={handlePayPalSuccess}
+                        />
+                    )}
+                </main>
+            </div>
+        </PayPalScriptProvider>
     );
 }
