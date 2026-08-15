@@ -121,12 +121,6 @@ export default function AdminDashboardPage() {
         }
 
         // Populate sample users if user is admin
-        setUsers([
-            { id: "usr_1", fullname: "Alex Sterling", email: "alex@chefu.co", role: "admin" },
-            { id: "usr_2", fullname: "Nandi Khumalo", email: "nandi@streetwear.za", role: "customer" },
-            { id: "usr_3", fullname: "Liam Van Der Merwe", email: "liam@urbanfit.co", role: "customer" },
-            { id: "usr_4", fullname: "Zola Dlamini", email: "zola@drippybanks.com", role: "customer" },
-        ]);
     }, []);
 
     const revenue = useMemo(
@@ -559,25 +553,34 @@ export default function AdminDashboardPage() {
                                     <CardTitle className="text-white">Customer Accounts</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-3">
-                                    {users.length === 0 && (
-                                        <p className="text-sm text-slate-400">No customer accounts found.</p>
-                                    )}
-                                    {users.map((account) => (
-                                        <div
-                                            key={account.id}
-                                            className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 flex items-center justify-between gap-3"
-                                        >
-                                            <div>
-                                                <p className="font-bold text-white text-sm">{account.fullname}</p>
-                                                <p className="text-xs text-slate-400">
-                                                    {account.email}
-                                                </p>
+                                    {users.length === 0 ? (
+                                        <div className="py-16 flex flex-col items-center gap-3 text-center">
+                                            <div className="w-12 h-12 rounded-2xl bg-slate-800 border border-white/10 flex items-center justify-center">
+                                                <BadgeCheck className="h-5 w-5 text-slate-500" />
                                             </div>
-                                            <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-300 px-2.5 py-1 rounded-lg bg-cyan-400/10 border border-cyan-400/20">
-                                                {account.role}
-                                            </span>
+                                            <p className="text-sm font-medium text-slate-300">No customer accounts yet</p>
+                                            <p className="text-xs text-slate-500 max-w-xs">
+                                                Customer accounts will appear here once users sign up and place orders.
+                                            </p>
                                         </div>
-                                    ))}
+                                    ) : (
+                                        users.map((account) => (
+                                            <div
+                                                key={account.id}
+                                                className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 flex items-center justify-between gap-3"
+                                            >
+                                                <div>
+                                                    <p className="font-bold text-white text-sm">{account.fullname}</p>
+                                                    <p className="text-xs text-slate-400">
+                                                        {account.email}
+                                                    </p>
+                                                </div>
+                                                <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-300 px-2.5 py-1 rounded-lg bg-cyan-400/10 border border-cyan-400/20">
+                                                    {account.role}
+                                                </span>
+                                            </div>
+                                        ))
+                                    )}
                                 </CardContent>
                             </Card>
                         </TabsContent>

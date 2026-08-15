@@ -9,6 +9,7 @@ import type { Product } from '@/context/CartContext';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useStoredProducts } from '@/hooks/useStoredProducts';
 import { toast } from 'sonner';
+import EmptyProduct from './_componets/ui/EmptyProduct';
 
 const ShopPageContent = () => {
     const { addToCart } = useCart();
@@ -121,8 +122,8 @@ const ShopPageContent = () => {
                             })
                         }
                         className={`px-4 py-2 rounded-2xl text-xs font-semibold transition-all ${selectedCategory === category
-                                ? 'bg-amber-300 text-slate-950 font-bold shadow-lg shadow-amber-300/20'
-                                : 'bg-slate-900/80 text-slate-300 border border-white/10 hover:bg-slate-800'
+                            ? 'bg-amber-300 text-slate-950 font-bold shadow-lg shadow-amber-300/20'
+                            : 'bg-slate-900/80 text-slate-300 border border-white/10 hover:bg-slate-800'
                             }`}
                     >
                         {category}
@@ -146,7 +147,7 @@ const ShopPageContent = () => {
                             className="group overflow-hidden rounded-3xl border border-white/10 bg-slate-900/80 shadow-xl shadow-slate-950/40 flex flex-col justify-between hover:border-amber-300/30 transition-all duration-300"
                         >
                             <div>
-                                <div className="aspect-[4/5] w-full overflow-hidden rounded-t-3xl relative bg-slate-950">
+                                <div className="aspect-4/5 w-full overflow-hidden rounded-t-3xl relative bg-slate-950">
                                     <Image
                                         fill
                                         priority={index < 4}
@@ -155,7 +156,7 @@ const ShopPageContent = () => {
                                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                                         className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/10 to-transparent" />
+                                    <div className="absolute inset-0 bg-linear-to-t from-slate-950/90 via-slate-950/10 to-transparent" />
 
                                     {/* Category Pill */}
                                     <span className="absolute left-3.5 top-3.5 rounded-full bg-slate-950/80 backdrop-blur-md px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-300 border border-white/10">
@@ -185,7 +186,7 @@ const ShopPageContent = () => {
                                             aria-label={`Add ${product.name} to cart`}
                                             className="absolute bottom-3.5 right-3.5 cursor-pointer bg-amber-300 hover:bg-amber-200 p-3 rounded-full shadow-lg text-slate-950 transition-all duration-300 transform translate-y-0 hover:scale-105 flex items-center justify-center font-bold"
                                         >
-                                            <Plus size={18} className="stroke-[3]" />
+                                            <Plus size={18} className="stroke-3" />
                                         </button>
                                     )}
                                 </div>
@@ -209,8 +210,8 @@ const ShopPageContent = () => {
                                                         type="button"
                                                         onClick={(e) => handleSelectSize(product.id, sz, e)}
                                                         className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-all ${currentSize === sz
-                                                                ? 'bg-amber-300 text-slate-950 border-amber-300 font-extrabold shadow-sm'
-                                                                : 'bg-slate-950 text-slate-300 border-white/10 hover:border-white/30'
+                                                            ? 'bg-amber-300 text-slate-950 border-amber-300 font-extrabold shadow-sm'
+                                                            : 'bg-slate-950 text-slate-300 border-white/10 hover:border-white/30'
                                                             }`}
                                                     >
                                                         {sz}
@@ -244,53 +245,7 @@ const ShopPageContent = () => {
             </div>
 
             {filteredProducts.length === 0 && (
-                <motion.div
-                    initial={{ opacity: 0, y: 24 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, ease: 'easeOut' }}
-                    className="relative flex flex-col items-center justify-center py-32 px-8 overflow-hidden rounded-3xl border border-white/[0.06] bg-gradient-to-b from-slate-900/60 to-slate-950/80 backdrop-blur-sm"
-                >
-                    {/* Ambient glow */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="w-72 h-72 rounded-full bg-indigo-500/10 blur-3xl" />
-                    </div>
-
-                    {/* Animated icon ring */}
-                    <div className="relative mb-8">
-                        <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-                            className="absolute inset-0 rounded-full border border-dashed border-indigo-500/30"
-                            style={{ margin: '-10px' }}
-                        />
-                        <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 flex items-center justify-center shadow-xl">
-                            <Search className="w-6 h-6 text-slate-500" />
-                        </div>
-                    </div>
-
-                    {/* Text */}
-                    <h3 className="text-lg font-semibold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent mb-2 tracking-tight">
-                        No pieces found
-                    </h3>
-                    <p className="text-slate-500 text-sm text-center max-w-xs leading-relaxed">
-                        Nothing matches your current search or filters. Try broadening your search or clearing the filters.
-                    </p>
-
-                    {/* Clear filters CTA */}
-                    <motion.button
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
-                        onClick={() => {
-                            const params = new URLSearchParams(searchParams.toString());
-                            params.delete('q');
-                            params.delete('category');
-                            router.push(`${pathname}?${params.toString()}`);
-                        }}
-                        className="mt-8 px-5 py-2.5 rounded-xl text-sm font-medium bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-slate-300 hover:text-white transition-all duration-200"
-                    >
-                        Clear filters
-                    </motion.button>
-                </motion.div>
+                <EmptyProduct router={router} searchParams={searchParams} pathname={pathname} />
             )}
 
         </div>
