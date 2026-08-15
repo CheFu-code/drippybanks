@@ -34,16 +34,30 @@ export function useAuthUser() {
                 }
 
                 const email = String(sessionUser.email);
+                const rawRoles = Array.isArray(sessionUser.roles)
+                    ? sessionUser.roles
+                    : typeof sessionUser.role === "string"
+                      ? [sessionUser.role]
+                      : [];
+                const profile = data?.profile as Record<string, unknown> | undefined;
+                const profileRoles = Array.isArray(profile?.roles)
+                    ? profile.roles
+                    : typeof profile?.role === "string"
+                      ? [profile.role]
+                      : [];
+                const allRoles = [...rawRoles, ...profileRoles].map((r) => String(r).toLowerCase());
+                const isAdminUser = allRoles.includes("admin");
+
                 const appUser: AppUser = {
                     id: String(sessionUser.uid || sessionUser.id || sessionUser.userId || email),
                     email,
-                    fullname: String(sessionUser.fullname || sessionUser.name || sessionUser.displayName || email.split("@")[0]),
-                    role: (sessionUser.role as string) === "admin" ? "admin" : "customer",
-                    addressCity: String(sessionUser.addressCity || ""),
-                    addressStreet: String(sessionUser.addressStreet || ""),
-                    addressPostalCode: String(sessionUser.addressPostalCode || ""),
-                    country: (sessionUser.country as AppUser["country"]) || undefined,
-                    avatarUrl: sessionUser.avatarUrl ? String(sessionUser.avatarUrl) : undefined,
+                    fullname: String(sessionUser.fullname || sessionUser.name || sessionUser.displayName || profile?.name || email.split("@")[0]),
+                    role: isAdminUser ? "admin" : "customer",
+                    addressCity: String(sessionUser.addressCity || profile?.addressCity || ""),
+                    addressStreet: String(sessionUser.addressStreet || profile?.addressStreet || ""),
+                    addressPostalCode: String(sessionUser.addressPostalCode || profile?.addressPostalCode || ""),
+                    country: (sessionUser.country as AppUser["country"]) || (profile?.country as AppUser["country"]) || undefined,
+                    avatarUrl: sessionUser.avatarUrl ? String(sessionUser.avatarUrl) : profile?.avatarUrl ? String(profile.avatarUrl) : undefined,
                     phone: sessionUser.phone ? String(sessionUser.phone) : sessionUser.phoneNumber ? String(sessionUser.phoneNumber) : undefined,
                     isEmailVerified: Boolean(sessionUser.isEmailVerified),
                     isPhoneVerified: Boolean(sessionUser.isPhoneVerified),
