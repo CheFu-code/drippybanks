@@ -6,6 +6,7 @@ import {
     PRODUCT_CATEGORIES
 } from '@/lib/product-store';
 import { AdminProductStudioModalProps, InnerStudioFormProps } from '@/types/studio';
+import { uploadProductImageApi } from '@/lib/api/products';
 import { toast } from 'sonner';
 import AdminProductStudioModalUI from '../UI/AdminProductStudioModalUI';
 
@@ -40,14 +41,16 @@ function InnerStudioForm({ initialProduct, onClose, onSaveProduct }: InnerStudio
     const [inStock, setInStock] = useState<boolean>(initialProduct?.inStock !== false);
     const [featured, setFeatured] = useState<boolean>(Boolean(initialProduct?.featured));
 
-    // Gallery picker modal state
+    // Gallery picker & upload modal state
     const [isGalleryOpen, setIsGalleryOpen] = useState(false);
     const [imageInputMode, setImageInputMode] = useState<'upload' | 'gallery' | 'url'>('upload');
     const [previewSize, setPreviewSize] = useState<string>('M');
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Handle file upload -> base64 Data URL
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Handle cloud file upload to CheFu Backend -> Firebase Storage
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -61,15 +64,22 @@ function InnerStudioForm({ initialProduct, onClose, onSaveProduct }: InnerStudio
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = (uploadEvent) => {
-            const result = uploadEvent.target?.result as string;
-            if (result) {
-                setImage(result);
-                toast.success('Image uploaded successfully.');
+        try {
+            setIsUploadingImage(true);
+            toast.loading('Uploading image to cloud storage…', { id: 'image-upload-toast' });
+            const result = await uploadProductImageApi(file);
+            setImage(result.url);
+            toast.success('Image uploaded to cloud storage!', { id: 'image-upload-toast' });
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Failed to upload image to cloud storage.';
+            console.error('[AdminProductStudioModal] Cloud image upload error:', err);
+            toast.error(message, { id: 'image-upload-toast' });
+        } finally {
+            setIsUploadingImage(false);
+            if (e.target) {
+                e.target.value = '';
             }
-        };
-        reader.readAsDataURL(file);
+        }
     };
 
     // Toggle size chip
@@ -106,8 +116,13 @@ function InnerStudioForm({ initialProduct, onClose, onSaveProduct }: InnerStudio
     };
 
     // Save product handler
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (isUploadingImage) {
+            toast.warning('Please wait for the image upload to complete.');
+            return;
+        }
 
         const trimmedName = name.trim();
         if (!trimmedName) {
@@ -149,9 +164,17 @@ function InnerStudioForm({ initialProduct, onClose, onSaveProduct }: InnerStudio
             featured,
         };
 
-        onSaveProduct(finalProductData);
-        toast.success(isEdit ? `Product "${trimmedName}" updated!` : `New piece "${trimmedName}" published to shop!`);
-        onClose();
+        try {
+            setIsSubmitting(true);
+            await onSaveProduct(finalProductData);
+            toast.success(isEdit ? `Product "${trimmedName}" updated!` : `New piece "${trimmedName}" published to shop!`);
+            onClose();
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Failed to save product.';
+            toast.error(message);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const effectiveCategory = category === 'Custom' ? customCategory || 'Custom Category' : category;
@@ -209,6 +232,8 @@ function InnerStudioForm({ initialProduct, onClose, onSaveProduct }: InnerStudio
             effectivePrice={effectivePrice}
             effectiveOrigPrice={effectiveOrigPrice}
             colors={colors}
+            isUploadingImage={isUploadingImage}
+            isSubmitting={isSubmitting}
         />
     );
 }

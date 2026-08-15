@@ -57,6 +57,8 @@ const AdminProductStudioModalUI = ({
     effectivePrice,
     effectiveOrigPrice,
     colors,
+    isUploadingImage,
+    isSubmitting,
 }: AdminProductStudioModalUIProps) => {
     const allProps = {
         onClose, isEdit, handleSubmit, handleToggleColor, handleToggleSize,
@@ -68,6 +70,7 @@ const AdminProductStudioModalUI = ({
         setImageInputMode, description, setDescription, image, setImage,
         isGalleryOpen, setIsGalleryOpen, previewSize, setPreviewSize,
         fileInputRef, discountPercent, effectivePrice, effectiveOrigPrice, colors,
+        isUploadingImage, isSubmitting,
     };
 
     return (
@@ -227,9 +230,16 @@ const AdminProductStudioModalUI = ({
                     <Button
                         type="submit"
                         form="product-studio-form"
-                        className="bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-bold px-8 rounded-xl shadow-lg shadow-amber-400/25 flex-1 sm:flex-none"
+                        disabled={isSubmitting || isUploadingImage}
+                        className="bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-bold px-8 rounded-xl shadow-lg shadow-amber-400/25 flex-1 sm:flex-none disabled:opacity-50"
                     >
-                        {isEdit ? "Save Changes" : "Publish to Shop"}
+                        {isSubmitting
+                            ? "Saving to Backend…"
+                            : isUploadingImage
+                              ? "Uploading Image…"
+                              : isEdit
+                                ? "Save Changes"
+                                : "Publish to Shop"}
                     </Button>
                 </div>
             </div>

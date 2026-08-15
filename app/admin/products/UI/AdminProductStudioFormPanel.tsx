@@ -11,6 +11,7 @@ import {
     Layers,
     DollarSign,
     Palette,
+    Loader2,
 } from "lucide-react";
 import {
     PRODUCT_CATEGORIES,
@@ -68,6 +69,7 @@ export function AdminProductStudioFormPanel({
     setIsGalleryOpen,
     fileInputRef,
     colors,
+    isUploadingImage,
 }: FormPanelProps) {
     return (
         <form
@@ -407,8 +409,16 @@ export function AdminProductStudioFormPanel({
 
                     {imageInputMode === "upload" && (
                         <div
-                            onClick={() => fileInputRef.current?.click()}
-                            className="cursor-pointer border-2 border-dashed border-white/15 hover:border-violet-400/60 rounded-2xl p-8 text-center bg-slate-950/40 hover:bg-slate-900/60 transition-all group"
+                            onClick={() => {
+                                if (!isUploadingImage) {
+                                    fileInputRef.current?.click();
+                                }
+                            }}
+                            className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all group ${
+                                isUploadingImage
+                                    ? "border-violet-400 bg-violet-950/20 cursor-wait"
+                                    : "cursor-pointer border-white/15 hover:border-violet-400/60 bg-slate-950/40 hover:bg-slate-900/60"
+                            }`}
                         >
                             <input
                                 ref={fileInputRef}
@@ -416,12 +426,25 @@ export function AdminProductStudioFormPanel({
                                 accept="image/*"
                                 onChange={handleFileUpload}
                                 className="hidden"
+                                disabled={isUploadingImage}
                             />
-                            <div className="h-14 w-14 rounded-2xl bg-violet-400/10 text-violet-300 mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <Upload className="h-7 w-7" />
-                            </div>
-                            <p className="mt-3 text-sm font-semibold text-white">Click or Drag & Drop</p>
-                            <p className="text-xs text-slate-400 mt-1">PNG, JPG, WEBP up to 5MB</p>
+                            {isUploadingImage ? (
+                                <>
+                                    <div className="h-14 w-14 rounded-2xl bg-violet-400/20 text-violet-300 mx-auto flex items-center justify-center animate-pulse">
+                                        <Loader2 className="h-7 w-7 animate-spin text-violet-400" />
+                                    </div>
+                                    <p className="mt-3 text-sm font-semibold text-violet-300">Uploading to Cloud Storage…</p>
+                                    <p className="text-xs text-slate-400 mt-1">Generating permanent CDN asset URL</p>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="h-14 w-14 rounded-2xl bg-violet-400/10 text-violet-300 mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <Upload className="h-7 w-7" />
+                                    </div>
+                                    <p className="mt-3 text-sm font-semibold text-white">Click or Drag & Drop</p>
+                                    <p className="text-xs text-slate-400 mt-1">PNG, JPG, WEBP up to 5MB (Saved to Cloud)</p>
+                                </>
+                            )}
                         </div>
                     )}
 

@@ -136,6 +136,18 @@ export function saveStoredProducts(products: Product[]): void {
 }
 
 /**
+ * Synchronizes products fetched from CheFu Backend into the local store
+ */
+export function syncProductsFromBackend(products: Product[]): Product[] {
+    if (!Array.isArray(products) || products.length === 0) {
+        return loadStoredProducts();
+    }
+    const normalized = products.map((item, idx) => normalizeProduct(item, idx));
+    saveStoredProducts(normalized);
+    return normalized;
+}
+
+/**
  * Adds a new product to the beginning of the inventory
  */
 export function addStoredProduct(product: Omit<Product, "id"> & { id?: string }): Product {

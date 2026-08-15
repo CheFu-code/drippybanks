@@ -110,22 +110,27 @@ export default function AdminProductsPage() {
         setIsStudioOpen(true);
     };
 
-    const handleSaveProduct = (
+    const handleSaveProduct = async (
         productData: Omit<Product, "id"> & { id?: string },
     ) => {
         if (productData.id) {
-            updateProduct(productData.id, productData);
+            await updateProduct(productData.id, productData);
         } else {
-            addProduct(productData);
+            await addProduct(productData);
         }
     };
 
-    const handleDelete = (id: string, name: string) => {
+    const handleDelete = async (id: string, name: string) => {
         if (
             confirm(`Are you sure you want to remove "${name}" from the catalog?`)
         ) {
-            deleteProduct(id);
-            toast.success(`Removed "${name}" from catalog.`);
+            try {
+                await deleteProduct(id);
+                toast.success(`Removed "${name}" from catalog.`);
+            } catch (err: unknown) {
+                const message = err instanceof Error ? err.message : 'Failed to delete product.';
+                toast.error(message);
+            }
         }
     };
 

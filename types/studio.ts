@@ -5,13 +5,13 @@ export interface AdminProductStudioModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialProduct?: Product | null;
-  onSaveProduct: (productData: Omit<Product, "id"> & { id?: string }) => void;
+  onSaveProduct: (productData: Omit<Product, "id"> & { id?: string }) => void | Promise<void>;
 }
 
 export interface InnerStudioFormProps {
   initialProduct?: Product | null;
   onClose: () => void;
-  onSaveProduct: (productData: Omit<Product, "id"> & { id?: string }) => void;
+  onSaveProduct: (productData: Omit<Product, "id"> & { id?: string }) => void | Promise<void>;
 }
 
 export interface AdminProductStudioModalUIProps {
@@ -64,6 +64,8 @@ export interface AdminProductStudioModalUIProps {
   effectivePrice: number;
   effectiveOrigPrice: number | null;
   colors: string[];
+  isUploadingImage?: boolean;
+  isSubmitting?: boolean;
 }
 
 export interface AdminProductsPageUIProps {
@@ -93,13 +95,13 @@ export interface AdminProductsPageUIProps {
   selectedCategory: string;
   setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
   filteredProducts: Product[];
-  toggleStock: (id: string) => Product[];
-  handleDelete: (id: string, name: string) => void;
+  toggleStock: (id: string) => Product[] | Promise<Product[]>;
+  handleDelete: (id: string, name: string) => void | Promise<void>;
   handleSaveProduct: (
     productData: Omit<Product, "id"> & {
       id?: string;
     },
-  ) => void;
+  ) => void | Promise<void>;
   categoryCounts: Record<string, number>;
   isStudioOpen: boolean;
   setIsStudioOpen: React.Dispatch<React.SetStateAction<boolean>>;
