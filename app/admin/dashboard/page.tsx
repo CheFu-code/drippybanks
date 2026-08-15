@@ -272,16 +272,7 @@ export default function AdminDashboardPage() {
                     <div className="pointer-events-none absolute -bottom-24 -left-12 h-56 w-56 rounded-full bg-cyan-500/15 blur-3xl" />
                     <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                         <div>
-                            <div className="flex flex-wrap items-center gap-2">
-                                <span className="inline-flex items-center gap-1 rounded-full border border-amber-300/30 bg-amber-300/10 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-amber-200">
-                                    <Sparkles className="h-3 w-3" />
-                                    Admin Command
-                                </span>
-                                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/30 bg-emerald-300/10 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-emerald-200">
-                                    <BadgeCheck className="h-3 w-3" />
-                                    Live Storefront Synced
-                                </span>
-                            </div>
+                            
                             <h1 className="mt-4 text-3xl md:text-4xl font-extrabold text-white">
                                 Drippy Banks Control Center
                             </h1>

@@ -90,32 +90,30 @@ export function normalizeProduct(raw: Partial<Product>, index = 0): Product {
     };
 }
 
-export const BASE_SEED_PRODUCTS: Product[] = INITIAL_PRODUCTS.map((p, idx) => normalizeProduct(p, idx));
+export const BASE_SEED_PRODUCTS: Product[] = [];
 
 /**
  * Loads stored products from localStorage with automatic migration and normalization
  */
 export function loadStoredProducts(): Product[] {
     if (typeof window === "undefined") {
-        return BASE_SEED_PRODUCTS;
+        return [];
     }
 
     try {
         const raw = window.localStorage.getItem(PRODUCT_STORAGE_KEY);
         if (!raw) {
-            saveStoredProducts(BASE_SEED_PRODUCTS);
-            return BASE_SEED_PRODUCTS;
+            return [];
         }
 
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed)) {
             return parsed.map((item, idx) => normalizeProduct(item, idx));
         }
 
-        saveStoredProducts(BASE_SEED_PRODUCTS);
-        return BASE_SEED_PRODUCTS;
+        return [];
     } catch {
-        return BASE_SEED_PRODUCTS;
+        return [];
     }
 }
 
@@ -139,7 +137,7 @@ export function saveStoredProducts(products: Product[]): void {
  * Synchronizes products fetched from CheFu Backend into the local store
  */
 export function syncProductsFromBackend(products: Product[]): Product[] {
-    if (!Array.isArray(products) || products.length === 0) {
+    if (!Array.isArray(products)) {
         return loadStoredProducts();
     }
     const normalized = products.map((item, idx) => normalizeProduct(item, idx));

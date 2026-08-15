@@ -67,7 +67,7 @@ export function useStoredProducts() {
         try {
             setIsLoading(true);
             const remoteProducts = await fetchProductsApi();
-            if (Array.isArray(remoteProducts) && remoteProducts.length > 0) {
+            if (Array.isArray(remoteProducts)) {
                 cachedProducts = syncProductsFromBackend(remoteProducts);
             }
         } catch (err) {
