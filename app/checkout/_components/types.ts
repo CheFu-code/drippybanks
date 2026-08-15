@@ -10,7 +10,7 @@ export type CheckoutForm = {
     country: string;
 };
 
-export type PaymentChoice = 'paypal';
+export type PaymentChoice = 'payfast';
 export type FulfillmentMethod = 'collect' | 'deliver';
 
 export type SavedOrder = {
@@ -21,9 +21,8 @@ export type SavedOrder = {
     subtotal: number;
     shipping: number;
     tax: number;
-    paymentMethod: 'paypal';
-    paypalOrderId?: string;
-    paypalPayerEmail?: string;
+    paymentMethod: 'payfast';
+    payfastPaymentId?: string;
     fulfillmentMethod: FulfillmentMethod;
     deliveryFee: number;
     items: Array<{ id: string; name: string; quantity: number; price: number; image: string }>;
@@ -35,7 +34,8 @@ export type SavedOrder = {
         city: string;
         postalCode: string;
         country: string;
-        paymentMethod: 'paypal';
+        paymentMethod: 'payfast';
     };
 };
+
 

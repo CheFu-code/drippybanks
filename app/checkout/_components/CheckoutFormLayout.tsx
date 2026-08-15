@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { CartItem } from '@/context/CartContext';
 import { CheckoutForm, FulfillmentMethod } from './types';
 import { MapPin, ShoppingBag } from 'lucide-react';
-import { PayPalCheckoutSection } from './PayPalCheckoutSection';
+import { PayFastCheckoutSection } from './PayFastCheckoutSection';
 
 type CheckoutFormLayoutProps = {
     user: AppUser | null;
@@ -26,8 +26,7 @@ type CheckoutFormLayoutProps = {
     onUseSavedAddress: () => void;
     onUseDifferentAddress: () => void;
     onSelectFulfillment: (method: FulfillmentMethod) => void;
-    onValidate: () => string | null;
-    onPayPalSuccess: (details: { orderId: string; payerEmail?: string }) => void;
+    onPayFastSubmit: () => void;
 };
 
 export function CheckoutFormLayout({
@@ -45,8 +44,7 @@ export function CheckoutFormLayout({
     onUseSavedAddress,
     onUseDifferentAddress,
     onSelectFulfillment,
-    onValidate,
-    onPayPalSuccess,
+    onPayFastSubmit,
 }: CheckoutFormLayoutProps) {
     return (
         <div className="grid gap-6 lg:grid-cols-[1.45fr_1fr]">
@@ -153,7 +151,7 @@ export function CheckoutFormLayout({
                                 id="phone"
                                 value={form.phone}
                                 onChange={(e) => onFormFieldChange('phone', e.target.value)}
-                                placeholder="+1 555 000 0000"
+                                placeholder="+27 82 000 0000"
                                 required
                             />
                         </div>
@@ -208,7 +206,7 @@ export function CheckoutFormLayout({
                                             id="city"
                                             value={form.city}
                                             onChange={(e) => onFormFieldChange('city', e.target.value)}
-                                            placeholder="Los Angeles"
+                                            placeholder="Johannesburg"
                                             required={!effectiveUseSavedAddress}
                                         />
                                     </div>
@@ -218,7 +216,7 @@ export function CheckoutFormLayout({
                                             id="postalCode"
                                             value={form.postalCode}
                                             onChange={(e) => onFormFieldChange('postalCode', e.target.value)}
-                                            placeholder="90001"
+                                            placeholder="2000"
                                             required={!effectiveUseSavedAddress}
                                         />
                                     </div>
@@ -228,7 +226,7 @@ export function CheckoutFormLayout({
                                             id="country"
                                             value={form.country}
                                             onChange={(e) => onFormFieldChange('country', e.target.value)}
-                                            placeholder="United States"
+                                            placeholder="South Africa"
                                             required={!effectiveUseSavedAddress}
                                         />
                                     </div>
@@ -252,18 +250,16 @@ export function CheckoutFormLayout({
                     </Card>
                 )}
 
-                {/* ── PayPal Payment Section ── */}
+                {/* ── PayFast Payment Section ── */}
                 <Card className="border-white/10 bg-slate-900/80">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-xl">Payment Method</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <PayPalCheckoutSection
+                        <PayFastCheckoutSection
                             grandTotal={grandTotal}
-                            cart={cart}
-                            onValidate={onValidate}
-                            onSuccess={onPayPalSuccess}
-                            disabled={isSubmitting}
+                            isSubmitting={isSubmitting}
+                            onPayFastSubmit={onPayFastSubmit}
                         />
                     </CardContent>
                 </Card>
@@ -319,8 +315,8 @@ export function CheckoutFormLayout({
                         <p className="text-lg font-semibold">R{grandTotal.toFixed(2)}</p>
                     </div>
 
-                    <div className="text-center py-2.5 px-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-300 text-xs font-medium">
-                        Complete your payment using the yellow PayPal button
+                    <div className="text-center py-2.5 px-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-xs font-medium">
+                        Complete your payment using PayFast
                     </div>
 
                     <Button className="w-full" variant="outline" type="button" asChild>
@@ -331,3 +327,4 @@ export function CheckoutFormLayout({
         </div>
     );
 }
+

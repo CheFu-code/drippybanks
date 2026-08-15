@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { Navbar } from '@/components/Home/Navbar';
 import { Button } from '@/components/ui/button';
@@ -17,12 +17,13 @@ import {
     OrderConfirmationCard,
 } from './_components/CheckoutStates';
 import { CheckoutForm, FulfillmentMethod, SavedOrder } from './_components/types';
-import { PayPalScriptProvider } from '@paypal/react-paypal-js';
+import { generatePayFastPaymentApi, submitPayFastForm } from '@/lib/api/payfast';
 
 const ORDER_STORAGE_KEY = 'drippybanks.orders';
 
 export default function CheckoutPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { user, loading: userLoading } = useAuthUser();
     const { cart, cartTotal, clearCart } = useCart();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,7 +35,7 @@ export default function CheckoutPage() {
         address: '',
         city: '',
         postalCode: '',
-        country: '',
+        country: 'South Africa',
     });
     const [useSavedAddressOverride, setUseSavedAddressOverride] = useState<boolean | null>(null);
     const [fulfillmentMethod, setFulfillmentMethod] = useState<FulfillmentMethod>('collect');
@@ -53,6 +54,7 @@ export default function CheckoutPage() {
         setForm((prev) => ({ ...prev, [field]: value }));
     }, []);
 
+    // Prefill form from authenticated user
     useEffect(() => {
         if (!user) return;
 
@@ -66,6 +68,32 @@ export default function CheckoutPage() {
             onFormFieldChange('phone', user.phone);
         }
     }, [user, form.fullName, form.email, form.phone, onFormFieldChange]);
+
+    // Handle PayFast return redirects
+    useEffect(() => {
+        const isSuccess = searchParams.get('payfast_success');
+        const orderId = searchParams.get('order_id');
+        const isCancelled = searchParams.get('cancelled');
+
+        if (isSuccess === 'true' && orderId) {
+            try {
+                const existing = localStorage.getItem(ORDER_STORAGE_KEY);
+                if (existing) {
+                    const parsed = JSON.parse(existing) as SavedOrder[];
+                    const found = parsed.find((o) => o.id === orderId);
+                    if (found) {
+                        setPlacedOrder(found);
+                        clearCart();
+                        toast.success(`Payment confirmed! Order ${orderId} received.`);
+                    }
+                }
+            } catch {
+                toast.success('Payment completed successfully!');
+            }
+        } else if (isCancelled === 'true') {
+            toast.info('PayFast payment was cancelled. You can try again when ready.');
+        }
+    }, [searchParams, clearCart]);
 
     useEffect(() => {
         if (!userLoading && !user && typeof window !== 'undefined') {
@@ -92,10 +120,21 @@ export default function CheckoutPage() {
         return null;
     };
 
-    const handlePayPalSuccess = async (details: { orderId: string; payerEmail?: string }) => {
+    const handlePayFastSubmit = async () => {
         if (!user) {
             toast.error('Please sign in to place an order.');
             router.push('/login?next=/checkout');
+            return;
+        }
+
+        if (cart.length === 0) {
+            toast.error('Your cart is empty.');
+            return;
+        }
+
+        const validationError = validateCheckout();
+        if (validationError) {
+            toast.error(validationError);
             return;
         }
 
@@ -106,21 +145,23 @@ export default function CheckoutPage() {
                 address: user?.addressStreet ?? '',
                 city: user?.addressCity ?? '',
                 postalCode: user?.addressPostalCode ?? '',
-                country: user?.country?.name ?? '',
+                country: user?.country?.name ?? 'South Africa',
             }
             : {
                 address: form.address,
                 city: form.city,
                 postalCode: form.postalCode,
-                country: form.country,
+                country: form.country || 'South Africa',
             };
 
-        const fullName = form.fullName.trim() || user?.fullname?.trim() || '';
-        const email = details.payerEmail || form.email.trim() || user?.email?.trim() || '';
+        const fullName = form.fullName.trim() || user?.fullname?.trim() || 'Valued Customer';
+        const email = form.email.trim() || user?.email?.trim() || 'customer@drippybanks.com';
         const phone = form.phone.trim() || user?.phone?.trim() || '';
 
+        const orderId = `ORD-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+
         const order: SavedOrder = {
-            id: `ORD-${crypto.randomUUID()}`,
+            id: orderId,
             date: new Date().toISOString(),
             status: 'Processing',
             total: Number(grandTotal.toFixed(2)),
@@ -129,9 +170,7 @@ export default function CheckoutPage() {
             tax: Number(tax.toFixed(2)),
             deliveryFee: Number(deliveryFee.toFixed(2)),
             fulfillmentMethod,
-            paymentMethod: 'paypal',
-            paypalOrderId: details.orderId,
-            paypalPayerEmail: details.payerEmail,
+            paymentMethod: 'payfast',
             items: cart.map((item) => ({
                 id: item.id,
                 name: item.name,
@@ -147,11 +186,12 @@ export default function CheckoutPage() {
                 city: finalAddress.city,
                 postalCode: finalAddress.postalCode,
                 country: finalAddress.country,
-                paymentMethod: 'paypal',
+                paymentMethod: 'payfast',
             },
         };
 
         try {
+            // Save pending order to local storage
             const existingOrdersRaw = localStorage.getItem(ORDER_STORAGE_KEY);
             let existingOrders: SavedOrder[] = [];
             if (existingOrdersRaw) {
@@ -161,81 +201,90 @@ export default function CheckoutPage() {
                     existingOrders = [];
                 }
             }
-
             localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify([order, ...existingOrders]));
-            clearCart();
-            setPlacedOrder(order);
-            toast.success(`PayPal Order ${order.id} placed successfully.`);
+
+            const currentOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://drippybanks.chefuinc.com';
+            const returnUrl = `${currentOrigin}/checkout?payfast_success=true&order_id=${orderId}`;
+            const cancelUrl = `${currentOrigin}/checkout?cancelled=true`;
+
+            // Request signed payment parameters from backend
+            const paymentData = await generatePayFastPaymentApi({
+                orderId,
+                amount: grandTotal,
+                itemName: `DrippyBanks Order #${orderId}`,
+                customer: {
+                    fullName,
+                    email,
+                    phone,
+                },
+                returnUrl,
+                cancelUrl,
+            });
+
+            // Redirect customer to PayFast payment screen
+            submitPayFastForm(paymentData);
         } catch (error) {
-            console.error('Failed to save PayPal order:', error);
-            toast.error('Failed to save order details.');
-        } finally {
+            console.error('Failed to initiate PayFast payment:', error);
+            const msg = error instanceof Error ? error.message : 'Failed to initialize payment.';
+            toast.error(msg);
             setIsSubmitting(false);
         }
     };
 
     return (
-        <PayPalScriptProvider
-            options={{
-                clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'test',
-                currency: 'USD',
-                intent: 'capture',
-            }}
-        >
-            <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
-                <Navbar />
-                <main className="max-w-6xl mx-auto px-5 pb-12 pt-24">
-                    <div className="mb-6">
-                        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Secure checkout</p>
-                        <h1 className="text-3xl font-semibold mt-2 text-white">Complete your order</h1>
-                    </div>
+        <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
+            <Navbar />
+            <main className="max-w-6xl mx-auto px-5 pb-12 pt-24">
+                <div className="mb-6">
+                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Secure checkout</p>
+                    <h1 className="text-3xl font-semibold mt-2 text-white">Complete your order</h1>
+                </div>
 
-                    {userLoading && <LoadingCheckoutCard />}
-                    {!userLoading && !user && (
-                        <Card className="border-white/10 bg-slate-900/80">
-                            <CardHeader>
-                                <CardTitle className="text-xl text-white">Sign in required</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-3 text-slate-300">
-                                <p className="text-sm text-slate-400">
-                                    You need an account to continue with checkout and place orders.
-                                </p>
-                                <div className="flex items-center gap-3">
-                                    <Button asChild>
-                                        <Link href="/login?next=/checkout">Go to Login</Link>
-                                    </Button>
-                                    <Button variant="outline" asChild>
-                                        <Link href="/cart">Back to Cart</Link>
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
-                    {!userLoading && placedOrder && <OrderConfirmationCard placedOrder={placedOrder} />}
-                    {!userLoading && !placedOrder && cart.length === 0 && <EmptyCartCheckoutCard />}
-                    {!userLoading && user && !placedOrder && cart.length > 0 && (
-                        <CheckoutFormLayout
-                            user={user}
-                            form={form}
-                            cart={cart}
-                            cartTotal={cartTotal}
-                            grandTotal={grandTotal}
-                            deliveryFee={deliveryFee}
-                            fulfillmentMethod={fulfillmentMethod}
-                            isSubmitting={isSubmitting}
-                            hasSavedAddress={hasSavedAddress}
-                            effectiveUseSavedAddress={effectiveUseSavedAddress}
-                            onFormFieldChange={onFormFieldChange}
-                            onUseSavedAddress={() => setUseSavedAddressOverride(true)}
-                            onUseDifferentAddress={() => setUseSavedAddressOverride(false)}
-                            onSelectFulfillment={(method) => setFulfillmentMethod(method)}
-                            onValidate={validateCheckout}
-                            onPayPalSuccess={handlePayPalSuccess}
-                        />
-                    )}
-                </main>
-            </div>
-        </PayPalScriptProvider>
+                {userLoading && <LoadingCheckoutCard />}
+                {!userLoading && !user && (
+                    <Card className="border-white/10 bg-slate-900/80">
+                        <CardHeader>
+                            <CardTitle className="text-xl text-white">Sign in required</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3 text-slate-300">
+                            <p className="text-sm text-slate-400">
+                                You need an account to continue with checkout and place orders.
+                            </p>
+                            <div className="flex items-center gap-3">
+                                <Button asChild>
+                                    <Link href="/login?next=/checkout">Go to Login</Link>
+                                </Button>
+                                <Button variant="outline" asChild>
+                                    <Link href="/cart">Back to Cart</Link>
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+                {!userLoading && placedOrder && <OrderConfirmationCard placedOrder={placedOrder} />}
+                {!userLoading && !placedOrder && cart.length === 0 && <EmptyCartCheckoutCard />}
+                {!userLoading && user && !placedOrder && cart.length > 0 && (
+                    <CheckoutFormLayout
+                        user={user}
+                        form={form}
+                        cart={cart}
+                        cartTotal={cartTotal}
+                        grandTotal={grandTotal}
+                        deliveryFee={deliveryFee}
+                        fulfillmentMethod={fulfillmentMethod}
+                        isSubmitting={isSubmitting}
+                        hasSavedAddress={hasSavedAddress}
+                        effectiveUseSavedAddress={effectiveUseSavedAddress}
+                        onFormFieldChange={onFormFieldChange}
+                        onUseSavedAddress={() => setUseSavedAddressOverride(true)}
+                        onUseDifferentAddress={() => setUseSavedAddressOverride(false)}
+                        onSelectFulfillment={(method) => setFulfillmentMethod(method)}
+                        onPayFastSubmit={handlePayFastSubmit}
+                    />
+                )}
+            </main>
+        </div>
     );
 }
+
 
