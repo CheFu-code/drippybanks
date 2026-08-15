@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -16,7 +16,7 @@ import {
     LoadingCheckoutCard,
     OrderConfirmationCard,
 } from './_components/CheckoutStates';
-import { CheckoutForm, FulfillmentMethod, PaymentChoice, SavedOrder, SavedPaymentMethod } from './_components/types';
+import { CheckoutForm, FulfillmentMethod, SavedOrder } from './_components/types';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 
 const ORDER_STORAGE_KEY = 'drippybanks.orders';
@@ -35,31 +35,14 @@ export default function CheckoutPage() {
         city: '',
         postalCode: '',
         country: '',
-        cardNumber: '',
-        cardName: '',
-        cardExpiry: '',
-        cardCvc: '',
     });
-    const [selectedSavedCardId, setSelectedSavedCardId] = useState('');
     const [useSavedAddressOverride, setUseSavedAddressOverride] = useState<boolean | null>(null);
-    const [paymentChoiceOverride, setPaymentChoiceOverride] = useState<PaymentChoice | null>(null);
     const [fulfillmentMethod, setFulfillmentMethod] = useState<FulfillmentMethod>('collect');
 
-    const savedCards = useMemo<SavedPaymentMethod[]>(
-        () => (user?.paymentMethods ?? []).filter((method) => method.type === 'card'),
-        [user?.paymentMethods],
-    );
-    const defaultSavedCard = useMemo(
-        () => savedCards.find((method) => method.isDefault) ?? savedCards[0] ?? null,
-        [savedCards],
-    );
     const hasSavedAddress = Boolean(
         user?.addressStreet && user?.addressCity && user?.addressPostalCode && user?.country?.name,
     );
     const effectiveUseSavedAddress = useSavedAddressOverride ?? hasSavedAddress;
-    const effectivePaymentChoice = paymentChoiceOverride ?? (savedCards.length > 0 ? 'saved' : 'new');
-    const effectiveSelectedSavedCardId = selectedSavedCardId || defaultSavedCard?.id || '';
-    const isCardPaymentSelected = effectivePaymentChoice !== 'cash';
 
     const shipping = 0;
     const tax = 0;
@@ -100,126 +83,23 @@ export default function CheckoutPage() {
         if (!phone) return 'Phone number is required.';
 
         if (!effectiveUseSavedAddress && fulfillmentMethod === 'deliver') {
-            if (!form.address.trim()) return 'Address is required.';
-            if (!form.city.trim()) return 'City is required.';
-            if (!form.postalCode.trim()) return 'Postal code is required.';
-            if (!form.country.trim()) return 'Country is required.';
-        }
-
-        if (effectivePaymentChoice === 'saved' && !effectiveSelectedSavedCardId) {
-            return 'Please select a saved card.';
-        }
-
-        if (effectivePaymentChoice === 'new') {
-            if (!/^\d{12,19}$/.test(form.cardNumber.replace(/\s/g, ''))) return 'Enter a valid card number.';
-            if (!form.cardName.trim()) return 'Cardholder name is required.';
-            if (!/^\d{2}\/\d{2}$/.test(form.cardExpiry)) return 'Use card expiry format MM/YY.';
-            if (!/^\d{3,4}$/.test(form.cardCvc)) return 'Enter a valid CVC.';
+            if (!form.address.trim()) return 'Address is required for delivery.';
+            if (!form.city.trim()) return 'City is required for delivery.';
+            if (!form.postalCode.trim()) return 'Postal code is required for delivery.';
+            if (!form.country.trim()) return 'Country is required for delivery.';
         }
 
         return null;
     };
 
-    const handlePlaceOrder = async (event: FormEvent) => {
-        event.preventDefault();
-
+    const handlePayPalSuccess = async (details: { orderId: string; payerEmail?: string }) => {
         if (!user) {
             toast.error('Please sign in to place an order.');
             router.push('/login?next=/checkout');
             return;
         }
 
-        if (cart.length === 0) {
-            toast.error('Your cart is empty.');
-            return;
-        }
-
-        const finalPaymentMethod = effectivePaymentChoice === 'cash' ? 'cash' : 'card';
-        const validationError = validateCheckout();
-        if (validationError) {
-            toast.error(validationError);
-            return;
-        }
-
         setIsSubmitting(true);
-
-        const finalAddress = effectiveUseSavedAddress && hasSavedAddress
-            ? {
-                address: user?.addressStreet ?? '',
-                city: user?.addressCity ?? '',
-                postalCode: user?.addressPostalCode ?? '',
-                country: user?.country?.name ?? '',
-            }
-            : {
-                address: form.address,
-                city: form.city,
-                postalCode: form.postalCode,
-                country: form.country,
-            };
-
-        const fullName = form.fullName.trim() || user?.fullname?.trim() || '';
-        const email = form.email.trim() || user?.email?.trim() || '';
-        const phone = form.phone.trim() || user?.phone?.trim() || '';
-
-        const order: SavedOrder = {
-            id: `ORD-${crypto.randomUUID()}`,
-            date: new Date().toISOString(),
-            status: 'Processing',
-            total: Number(grandTotal.toFixed(2)),
-            subtotal: Number(cartTotal.toFixed(2)),
-            shipping: Number(shipping.toFixed(2)),
-            tax: Number(tax.toFixed(2)),
-            deliveryFee: Number(deliveryFee.toFixed(2)),
-            fulfillmentMethod,
-            paymentMethod: finalPaymentMethod,
-            paymentMethodId: effectivePaymentChoice === 'saved' ? effectiveSelectedSavedCardId : undefined,
-            items: cart.map((item) => ({
-                id: item.id,
-                name: item.name,
-                quantity: item.quantity,
-                price: item.price,
-                image: item.image,
-            })),
-            customer: {
-                fullName,
-                email,
-                phone,
-                address: finalAddress.address,
-                city: finalAddress.city,
-                postalCode: finalAddress.postalCode,
-                country: finalAddress.country,
-                paymentMethod: finalPaymentMethod,
-            },
-        };
-
-        try {
-            const existingOrdersRaw = localStorage.getItem(ORDER_STORAGE_KEY);
-            let existingOrders: SavedOrder[] = [];
-            if (existingOrdersRaw) {
-                try {
-                    existingOrders = JSON.parse(existingOrdersRaw) as SavedOrder[];
-                } catch {
-                    existingOrders = [];
-                }
-            }
-
-            localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify([order, ...existingOrders]));
-            clearCart();
-            setPlacedOrder(order);
-            toast.success(`Order ${order.id} placed successfully.`);
-        } catch (error) {
-            console.error('Failed to place order:', error);
-            toast.error('Failed to place order. Please try again.');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const handlePayPalSuccess = async (details: { orderId: string; payerEmail?: string }) => {
-        if (!user) {
-            toast.error('Please sign in to place an order.');
-            return;
-        }
 
         const finalAddress = effectiveUseSavedAddress && hasSavedAddress
             ? {
@@ -289,6 +169,8 @@ export default function CheckoutPage() {
         } catch (error) {
             console.error('Failed to save PayPal order:', error);
             toast.error('Failed to save order details.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -343,19 +225,9 @@ export default function CheckoutPage() {
                             isSubmitting={isSubmitting}
                             hasSavedAddress={hasSavedAddress}
                             effectiveUseSavedAddress={effectiveUseSavedAddress}
-                            effectivePaymentChoice={effectivePaymentChoice}
-                            effectiveSelectedSavedCardId={effectiveSelectedSavedCardId}
-                            isCardPaymentSelected={isCardPaymentSelected}
-                            savedCards={savedCards}
-                            onSubmit={handlePlaceOrder}
                             onFormFieldChange={onFormFieldChange}
                             onUseSavedAddress={() => setUseSavedAddressOverride(true)}
                             onUseDifferentAddress={() => setUseSavedAddressOverride(false)}
-                            onSelectPaymentChoice={(choice) => setPaymentChoiceOverride(choice)}
-                            onSelectSavedCard={(cardId) => {
-                                setPaymentChoiceOverride('saved');
-                                setSelectedSavedCardId(cardId);
-                            }}
                             onSelectFulfillment={(method) => setFulfillmentMethod(method)}
                             onValidate={validateCheckout}
                             onPayPalSuccess={handlePayPalSuccess}
@@ -366,3 +238,4 @@ export default function CheckoutPage() {
         </PayPalScriptProvider>
     );
 }
+

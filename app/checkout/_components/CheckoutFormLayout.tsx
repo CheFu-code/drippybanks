@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { CartItem } from '@/context/CartContext';
-import { CheckoutForm, FulfillmentMethod, PaymentChoice, SavedPaymentMethod } from './types';
+import { CheckoutForm, FulfillmentMethod } from './types';
 import { MapPin, ShoppingBag } from 'lucide-react';
 import { PayPalCheckoutSection } from './PayPalCheckoutSection';
 
@@ -22,16 +22,9 @@ type CheckoutFormLayoutProps = {
     isSubmitting: boolean;
     hasSavedAddress: boolean;
     effectiveUseSavedAddress: boolean;
-    effectivePaymentChoice: PaymentChoice;
-    effectiveSelectedSavedCardId: string;
-    isCardPaymentSelected: boolean;
-    savedCards: SavedPaymentMethod[];
-    onSubmit: React.FormEventHandler<HTMLFormElement>;
     onFormFieldChange: (field: keyof CheckoutForm, value: string) => void;
     onUseSavedAddress: () => void;
     onUseDifferentAddress: () => void;
-    onSelectPaymentChoice: (choice: PaymentChoice) => void;
-    onSelectSavedCard: (cardId: string) => void;
     onSelectFulfillment: (method: FulfillmentMethod) => void;
     onValidate: () => string | null;
     onPayPalSuccess: (details: { orderId: string; payerEmail?: string }) => void;
@@ -48,22 +41,15 @@ export function CheckoutFormLayout({
     isSubmitting,
     hasSavedAddress,
     effectiveUseSavedAddress,
-    effectivePaymentChoice,
-    effectiveSelectedSavedCardId,
-    isCardPaymentSelected,
-    savedCards,
-    onSubmit,
     onFormFieldChange,
     onUseSavedAddress,
     onUseDifferentAddress,
-    onSelectPaymentChoice,
-    onSelectSavedCard,
     onSelectFulfillment,
     onValidate,
     onPayPalSuccess,
 }: CheckoutFormLayoutProps) {
     return (
-        <form className="grid gap-6 lg:grid-cols-[1.45fr_1fr]" onSubmit={onSubmit}>
+        <div className="grid gap-6 lg:grid-cols-[1.45fr_1fr]">
             <div className="space-y-6">
 
                 {/* ── Fulfillment picker ── */}
@@ -133,6 +119,8 @@ export function CheckoutFormLayout({
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* ── Contact information ── */}
                 <Card className="border-white/10 bg-slate-900/80">
                     <CardHeader>
                         <CardTitle className="text-xl">Contact information</CardTitle>
@@ -172,281 +160,116 @@ export function CheckoutFormLayout({
                     </CardContent>
                 </Card>
 
-                {/* ── Shipping address — only shown for delivery ── */}
+                {/* ── Delivery address — only shown for delivery ── */}
                 {fulfillmentMethod === 'deliver' && (
-                <Card className="border-white/10 bg-slate-900/80">
-                    <CardHeader>
-                        <CardTitle className="text-xl">Delivery address</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        {hasSavedAddress && effectiveUseSavedAddress ? (
-                            <div className="rounded-lg border border-white/10 bg-slate-950/80 p-4">
-                                <p className="text-sm font-medium">Using your saved address</p>
-                                <p className="text-sm text-slate-400 mt-2">{user?.addressStreet}</p>
-                                <p className="text-sm text-slate-400">
-                                    {user?.addressCity} {user?.addressPostalCode}
-                                </p>
-                                <p className="text-sm text-slate-400">{user?.country?.name}</p>
-                                <div className="flex gap-2 mt-3">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={onUseDifferentAddress}
-                                    >
-                                        Use Different Address
-                                    </Button>
-                                    {user?.id && (
-                                        <Button type="button" variant="ghost" asChild>
-                                            <Link href={`/${user.id}/profile`}>Manage in Profile</Link>
+                    <Card className="border-white/10 bg-slate-900/80">
+                        <CardHeader>
+                            <CardTitle className="text-xl">Delivery address</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            {hasSavedAddress && effectiveUseSavedAddress ? (
+                                <div className="rounded-lg border border-white/10 bg-slate-950/80 p-4">
+                                    <p className="text-sm font-medium">Using your saved address</p>
+                                    <p className="text-sm text-slate-400 mt-2">{user?.addressStreet}</p>
+                                    <p className="text-sm text-slate-400">
+                                        {user?.addressCity} {user?.addressPostalCode}
+                                    </p>
+                                    <p className="text-sm text-slate-400">{user?.country?.name}</p>
+                                    <div className="flex gap-2 mt-3">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={onUseDifferentAddress}
+                                        >
+                                            Use Different Address
+                                        </Button>
+                                        {user?.id && (
+                                            <Button type="button" variant="ghost" asChild>
+                                                <Link href={`/${user.id}/profile`}>Manage in Profile</Link>
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="grid gap-4 md:grid-cols-2">
+                                    <div className="space-y-2 md:col-span-2">
+                                        <Label htmlFor="address">Street address</Label>
+                                        <Input
+                                            id="address"
+                                            value={form.address}
+                                            onChange={(e) => onFormFieldChange('address', e.target.value)}
+                                            placeholder="123 Main Street"
+                                            required={!effectiveUseSavedAddress}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="city">City</Label>
+                                        <Input
+                                            id="city"
+                                            value={form.city}
+                                            onChange={(e) => onFormFieldChange('city', e.target.value)}
+                                            placeholder="Los Angeles"
+                                            required={!effectiveUseSavedAddress}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="postalCode">Postal code</Label>
+                                        <Input
+                                            id="postalCode"
+                                            value={form.postalCode}
+                                            onChange={(e) => onFormFieldChange('postalCode', e.target.value)}
+                                            placeholder="90001"
+                                            required={!effectiveUseSavedAddress}
+                                        />
+                                    </div>
+                                    <div className="space-y-2 md:col-span-2">
+                                        <Label htmlFor="country">Country</Label>
+                                        <Input
+                                            id="country"
+                                            value={form.country}
+                                            onChange={(e) => onFormFieldChange('country', e.target.value)}
+                                            placeholder="United States"
+                                            required={!effectiveUseSavedAddress}
+                                        />
+                                    </div>
+                                    {hasSavedAddress && (
+                                        <Button type="button" variant="outline" onClick={onUseSavedAddress}>
+                                            Use Saved Address
                                         </Button>
                                     )}
                                 </div>
-                            </div>
-                        ) : (
-                            <div className="grid gap-4 md:grid-cols-2">
-                                <div className="space-y-2 md:col-span-2">
-                                    <Label htmlFor="address">Street address</Label>
-                                    <Input
-                                        id="address"
-                                        value={form.address}
-                                        onChange={(e) => onFormFieldChange('address', e.target.value)}
-                                        placeholder="123 Main Street"
-                                        required={!effectiveUseSavedAddress}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="city">City</Label>
-                                    <Input
-                                        id="city"
-                                        value={form.city}
-                                        onChange={(e) => onFormFieldChange('city', e.target.value)}
-                                        placeholder="Los Angeles"
-                                        required={!effectiveUseSavedAddress}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="postalCode">Postal code</Label>
-                                    <Input
-                                        id="postalCode"
-                                        value={form.postalCode}
-                                        onChange={(e) => onFormFieldChange('postalCode', e.target.value)}
-                                        placeholder="90001"
-                                        required={!effectiveUseSavedAddress}
-                                    />
-                                </div>
-                                <div className="space-y-2 md:col-span-2">
-                                    <Label htmlFor="country">Country</Label>
-                                    <Input
-                                        id="country"
-                                        value={form.country}
-                                        onChange={(e) => onFormFieldChange('country', e.target.value)}
-                                        placeholder="United States"
-                                        required={!effectiveUseSavedAddress}
-                                    />
-                                </div>
-                                {hasSavedAddress && (
-                                    <Button type="button" variant="outline" onClick={onUseSavedAddress}>
-                                        Use Saved Address
-                                    </Button>
-                                )}
-                            </div>
-                        )}
-                        {!hasSavedAddress && user?.id && (
-                            <p className="text-xs text-slate-400">
-                                No saved address found on your profile. Add one in{' '}
-                                <Link href={`/${user.id}/profile`} className="underline text-amber-200 hover:text-white">
-                                    profile settings
-                                </Link>{' '}
-                                or fill it in here.
-                            </p>
-                        )}
-                    </CardContent>
-                </Card>
+                            )}
+                            {!hasSavedAddress && user?.id && (
+                                <p className="text-xs text-slate-400">
+                                    No saved address found on your profile. Add one in{' '}
+                                    <Link href={`/${user.id}/profile`} className="underline text-amber-200 hover:text-white">
+                                        profile settings
+                                    </Link>{' '}
+                                    or fill it in here.
+                                </p>
+                            )}
+                        </CardContent>
+                    </Card>
                 )}
 
+                {/* ── PayPal Payment Section ── */}
                 <Card className="border-white/10 bg-slate-900/80">
-                    <CardHeader>
-                        <CardTitle className="text-xl">Payment</CardTitle>
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-xl">Payment Method</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {savedCards.length > 0 && (
-                            <div className="space-y-2">
-                                <Label className="text-sm">Saved cards</Label>
-                                <div className="space-y-2">
-                                    {savedCards.map((card) => (
-                                        <button
-                                            key={card.id}
-                                            type="button"
-                                            onClick={() => onSelectSavedCard(card.id)}
-                                            className={`w-full rounded-lg border p-3 text-left transition-colors ${
-                                                effectivePaymentChoice === 'saved' && effectiveSelectedSavedCardId === card.id
-                                                    ? 'border-white/10 bg-slate-900 text-white'
-                                                    : 'border-slate-700 bg-slate-950 hover:bg-slate-900'
-                                            }`}
-                                        >
-                                            <p className="font-medium">
-                                                {card.brand ?? 'Card'} ending in {card.last4}
-                                            </p>
-                                            <p className="text-xs opacity-80">
-                                                {card.holderName} | Expires {card.expiry}
-                                            </p>
-                                        </button>
-                                    ))}
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    <Button
-                                        type="button"
-                                        variant={effectivePaymentChoice === 'new' ? 'default' : 'outline'}
-                                        onClick={() => onSelectPaymentChoice('new')}
-                                    >
-                                        Use New Card
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant={effectivePaymentChoice === 'paypal' ? 'default' : 'outline'}
-                                        onClick={() => onSelectPaymentChoice('paypal')}
-                                        className={effectivePaymentChoice === 'paypal' ? 'bg-[#0070ba] hover:bg-[#005ea6] text-white' : ''}
-                                    >
-                                        PayPal
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant={effectivePaymentChoice === 'cash' ? 'default' : 'outline'}
-                                        onClick={() => onSelectPaymentChoice('cash')}
-                                    >
-                                        Cash on Delivery
-                                    </Button>
-                                    {user?.id && (
-                                        <Button type="button" variant="ghost" asChild>
-                                            <Link href={`/${user.id}/profile`}>Manage Cards</Link>
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-                        {savedCards.length === 0 && (
-                            <div className="grid gap-3 sm:grid-cols-3">
-                                <button
-                                    type="button"
-                                    onClick={() => onSelectPaymentChoice('new')}
-                                    className={`rounded-xl border px-4 py-3 text-left transition-all ${
-                                        effectivePaymentChoice === 'new'
-                                            ? 'border-amber-400/60 bg-amber-400/10 text-white shadow-[0_0_0_1px_rgba(251,191,36,0.3)]'
-                                            : 'border-white/10 bg-slate-950/70 text-slate-100 hover:bg-slate-900'
-                                    }`}
-                                >
-                                    <p className="font-semibold text-sm">Card</p>
-                                    <p className="text-xs text-slate-400 mt-0.5">Credit / Debit</p>
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => onSelectPaymentChoice('paypal')}
-                                    className={`rounded-xl border px-4 py-3 text-left transition-all ${
-                                        effectivePaymentChoice === 'paypal'
-                                            ? 'border-sky-400/60 bg-sky-400/10 text-white shadow-[0_0_0_1px_rgba(56,189,248,0.3)]'
-                                            : 'border-white/10 bg-slate-950/70 text-slate-100 hover:bg-slate-900'
-                                    }`}
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <p className="font-semibold text-sm text-sky-400">PayPal</p>
-                                        <span className="text-[10px] bg-sky-500/20 text-sky-300 font-bold px-1.5 py-0.5 rounded">FAST</span>
-                                    </div>
-                                    <p className="text-xs text-slate-400 mt-0.5">Balance or Card</p>
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => onSelectPaymentChoice('cash')}
-                                    className={`rounded-xl border px-4 py-3 text-left transition-all ${
-                                        effectivePaymentChoice === 'cash'
-                                            ? 'border-amber-400/60 bg-amber-400/10 text-white shadow-[0_0_0_1px_rgba(251,191,36,0.3)]'
-                                            : 'border-white/10 bg-slate-950/70 text-slate-100 hover:bg-slate-900'
-                                    }`}
-                                >
-                                    <p className="font-semibold text-sm">Cash</p>
-                                    <p className="text-xs text-slate-400 mt-0.5">Pay on delivery</p>
-                                </button>
-                            </div>
-                        )}
-
-                        {effectivePaymentChoice === 'paypal' && (
-                            <PayPalCheckoutSection
-                                grandTotal={grandTotal}
-                                cart={cart}
-                                onValidate={onValidate}
-                                onSuccess={onPayPalSuccess}
-                                disabled={isSubmitting}
-                            />
-                        )}
-
-                        {effectivePaymentChoice === 'new' && (
-                            <div className="grid gap-4 md:grid-cols-2">
-                                <div className="space-y-2 md:col-span-2">
-                                    <Label htmlFor="cardNumber">Card number</Label>
-                                    <Input
-                                        id="cardNumber"
-                                        inputMode="numeric"
-                                        maxLength={19}
-                                        value={form.cardNumber}
-                                        onChange={(e) => onFormFieldChange('cardNumber', e.target.value)}
-                                        placeholder="4242 4242 4242 4242"
-                                        required={effectivePaymentChoice === 'new'}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="cardName">Cardholder name</Label>
-                                    <Input
-                                        id="cardName"
-                                        value={form.cardName}
-                                        onChange={(e) => onFormFieldChange('cardName', e.target.value)}
-                                        placeholder="Jane Doe"
-                                        required={effectivePaymentChoice === 'new'}
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="cardExpiry">Expiry</Label>
-                                        <Input
-                                            id="cardExpiry"
-                                            maxLength={5}
-                                            value={form.cardExpiry}
-                                            onChange={(e) => onFormFieldChange('cardExpiry', e.target.value)}
-                                            placeholder="MM/YY"
-                                            required={effectivePaymentChoice === 'new'}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="cardCvc">CVC</Label>
-                                        <Input
-                                            id="cardCvc"
-                                            maxLength={4}
-                                            inputMode="numeric"
-                                            value={form.cardCvc}
-                                            onChange={(e) => onFormFieldChange('cardCvc', e.target.value)}
-                                            placeholder="123"
-                                            required={effectivePaymentChoice === 'new'}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                        {effectivePaymentChoice === 'cash' && (
-                            <p className="text-sm text-slate-400">
-                                {fulfillmentMethod === 'collect'
-                                    ? 'You will pay in cash when collecting your order at our store.'
-                                    : 'You will pay in cash when your order is delivered to your address.'}
-                            </p>
-                        )}
-                        {effectivePaymentChoice !== 'cash' && (
-                            <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-2">
-                                <span className="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
-                                End-to-end 256-bit encrypted card checkout
-                            </p>
-                        )}
+                        <PayPalCheckoutSection
+                            grandTotal={grandTotal}
+                            cart={cart}
+                            onValidate={onValidate}
+                            onSuccess={onPayPalSuccess}
+                            disabled={isSubmitting}
+                        />
                     </CardContent>
                 </Card>
             </div>
 
+            {/* ── Order Summary ── */}
             <Card className="border-white/10 bg-slate-900/80 h-fit lg:sticky lg:top-24">
                 <CardHeader>
                     <CardTitle className="text-xl">Order summary</CardTitle>
@@ -496,21 +319,15 @@ export function CheckoutFormLayout({
                         <p className="text-lg font-semibold">R{grandTotal.toFixed(2)}</p>
                     </div>
 
-                    {effectivePaymentChoice !== 'paypal' && (
-                        <Button className="w-full" type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? 'Placing order...' : 'Place Order'}
-                        </Button>
-                    )}
-                    {effectivePaymentChoice === 'paypal' && (
-                        <div className="text-center py-2 px-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-300 text-xs font-medium">
-                            Complete your payment using the yellow PayPal button above
-                        </div>
-                    )}
+                    <div className="text-center py-2.5 px-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-300 text-xs font-medium">
+                        Complete your payment using the yellow PayPal button
+                    </div>
+
                     <Button className="w-full" variant="outline" type="button" asChild>
                         <Link href="/cart">Back to cart</Link>
                     </Button>
                 </CardContent>
             </Card>
-        </form>
+        </div>
     );
 }
