@@ -72,7 +72,7 @@ export function normalizeProduct(raw: Partial<Product>, index = 0): Product {
 
     return {
         id: String(raw.id || `db_${Date.now()}_${index}`),
-        name: raw.name?.trim() || "Untitled Streetwear Piece",
+        name: raw.name?.trim() || "Untitled...",
         price: typeof raw.price === "number" && raw.price >= 0 ? raw.price : 400,
         originalPrice: typeof raw.originalPrice === "number" ? raw.originalPrice : undefined,
         category: raw.category?.trim() || "Tops",

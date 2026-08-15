@@ -42,7 +42,6 @@ const AdminProductsPageUI = ({
     selectedCategory,
     setSelectedCategory,
     filteredProducts,
-    handleDuplicate,
     toggleStock,
     handleDelete,
     handleSaveProduct,
@@ -457,15 +456,7 @@ const AdminProductsPageUI = ({
                                             <Edit3 size={13} /> Edit
                                         </Button>
 
-                                        <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() => handleDuplicate(product.id)}
-                                            title="Duplicate Variant"
-                                            className="h-8 w-8 p-0 rounded-xl text-slate-400 hover:text-white hover:bg-white/10"
-                                        >
-                                            <Copy size={14} />
-                                        </Button>
+                                       
 
                                         <Button
                                             size="sm"
@@ -595,15 +586,7 @@ const AdminProductsPageUI = ({
                                                     >
                                                         <Edit3 size={13} className="mr-1" /> Edit
                                                     </Button>
-                                                    <Button
-                                                        size="sm"
-                                                        variant="ghost"
-                                                        onClick={() => handleDuplicate(product.id)}
-                                                        title="Duplicate"
-                                                        className="h-8 w-8 p-0 text-slate-400 hover:text-white rounded-lg hover:bg-white/10"
-                                                    >
-                                                        <Copy size={13} />
-                                                    </Button>
+                                                   
                                                     <Button
                                                         size="sm"
                                                         variant="ghost"

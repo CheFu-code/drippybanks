@@ -30,12 +30,12 @@ function InnerStudioForm({ initialProduct, onClose, onSaveProduct }: InnerStudio
     const [colors, setColors] = useState<string[]>(
         initialProduct?.colors && initialProduct.colors.length > 0 ? initialProduct.colors : ['Midnight Black']
     );
-    const [badge, setBadge] = useState<string>(initialProduct?.badge ?? (isEdit ? '' : '🔥 New Drop'));
-    const [image, setImage] = useState<string>(initialProduct?.image || '/blindManWhite.jpeg');
+    const [badge, setBadge] = useState<string>(initialProduct?.badge ?? (isEdit ? '' : 'New Drop'));
+    const [image, setImage] = useState<string>(initialProduct?.image || '');
     const [description, setDescription] = useState<string>(
-        initialProduct?.description || 'Premium heavyweight cotton streetwear piece engineered with custom silhouette, double-needle stitching, and high-density branding.'
+        initialProduct?.description || ''
     );
-    const [fit, setFit] = useState<string>(initialProduct?.fit || 'Boxy oversized streetwear fit');
+    const [fit, setFit] = useState<string>(initialProduct?.fit || '');
     const [stock, setStock] = useState<number | ''>(initialProduct?.stock ?? 50);
     const [inStock, setInStock] = useState<boolean>(initialProduct?.inStock !== false);
     const [featured, setFeatured] = useState<boolean>(Boolean(initialProduct?.featured));
@@ -221,7 +221,7 @@ export function AdminProductStudioModal({
 }: AdminProductStudioModalProps) {
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="max-w-7xl w-[98vw] bg-slate-950/98 border border-white/15 text-white p-0 overflow-hidden max-h-[96vh] flex flex-col shadow-2xl shadow-black/60 rounded-3xl">
+            <DialogContent showCloseButton={false} className="!max-w-7xl !w-[98vw] bg-slate-950/98 border border-white/15 text-white p-0 overflow-hidden !max-h-[96vh] h-[96vh] flex flex-col shadow-2xl shadow-black/60 rounded-3xl gap-0">
                 {isOpen && (
                     <InnerStudioForm
                         key={initialProduct?.id ?? 'create-new-product'}

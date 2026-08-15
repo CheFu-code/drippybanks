@@ -93,7 +93,6 @@ export interface AdminProductsPageUIProps {
   selectedCategory: string;
   setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
   filteredProducts: Product[];
-  handleDuplicate: (id: string) => void;
   toggleStock: (id: string) => Product[];
   handleDelete: (id: string, name: string) => void;
   handleSaveProduct: (

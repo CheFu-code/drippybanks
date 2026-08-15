@@ -89,24 +89,17 @@ const AdminProductStudioModalUI = ({
             </div>
 
             {/* ── Two-column body ───────────────────────────────────── */}
-            <div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+            <div className="flex-1 min-h-0 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
 
                 {/* LEFT — Form */}
-                <div className="lg:col-span-7 border-b lg:border-b-0 lg:border-r border-white/10 overflow-y-auto max-h-[calc(92vh-130px)]">
+                <div className="lg:col-span-7 border-b lg:border-b-0 lg:border-r border-white/10 overflow-y-auto custom-scrollbar">
                     <AdminProductStudioFormPanel {...allProps} />
                 </div>
 
                 {/* RIGHT — Live Preview */}
-                <div className="lg:col-span-5 flex flex-col bg-gradient-to-b from-slate-900/60 to-slate-950 overflow-y-auto max-h-[calc(92vh-130px)]">
-                    {/* Preview header */}
-                    <div className="px-6 pt-5 pb-3 border-b border-white/10 flex items-center gap-2 shrink-0">
-                        <Eye className="h-3.5 w-3.5 text-cyan-400" />
-                        <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400">
-                            Live Storefront Preview
-                        </span>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto p-5 space-y-5">
+                <div className="lg:col-span-5 flex flex-col bg-gradient-to-b from-slate-900/60 to-slate-950 overflow-y-auto custom-scrollbar">
+                    
+                    <div className="flex-1 overflow-y-auto p-5 space-y-5 custom-scrollbar">
                         {/* Product card mock */}
                         <div className="mx-auto w-full max-w-[300px] rounded-[1.75rem] border border-white/15 bg-slate-900/95 overflow-hidden shadow-2xl shadow-slate-950/60 group">
                             {/* Image area */}
@@ -163,7 +156,7 @@ const AdminProductStudioModalUI = ({
                             <div className="p-5 space-y-3">
                                 <div>
                                     <h3 className="text-base font-bold text-white leading-tight">
-                                        {name || "Untitled Streetwear Piece"}
+                                        {name || "Untitled..."}
                                     </h3>
                                     {fit && <p className="text-xs text-slate-400 mt-0.5">{fit}</p>}
                                 </div>
@@ -210,18 +203,6 @@ const AdminProductStudioModalUI = ({
                                     )}
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Studio tips */}
-                        <div className="rounded-2xl bg-white/[0.02] border border-white/8 p-4 space-y-2">
-                            <p className="text-xs font-bold text-slate-300 flex items-center gap-2">
-                                <Zap className="h-3.5 w-3.5 text-amber-300" /> Studio Tips
-                            </p>
-                            <ul className="space-y-1.5 text-[11px] text-slate-400">
-                                <li className="flex gap-2"><span className="text-amber-300">→</span> Changes sync instantly in real time to this preview.</li>
-                                <li className="flex gap-2"><span className="text-amber-300">→</span> Hover the card to see the quick-add animation.</li>
-                                <li className="flex gap-2"><span className="text-amber-300">→</span> Published products appear across the entire shop immediately.</li>
-                            </ul>
                         </div>
                     </div>
                 </div>

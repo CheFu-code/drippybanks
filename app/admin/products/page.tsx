@@ -129,12 +129,7 @@ export default function AdminProductsPage() {
         }
     };
 
-    const handleDuplicate = (id: string) => {
-        const dup = duplicateProduct(id);
-        if (dup) {
-            toast.success(`Created duplicate variant: "${dup.name}"`);
-        }
-    };
+   
 
     const handleExport = () => {
         const json = exportCatalog();
@@ -186,7 +181,6 @@ export default function AdminProductsPage() {
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
             filteredProducts={filteredProducts}
-            handleDuplicate={handleDuplicate}
             toggleStock={toggleStock}
             handleDelete={handleDelete}
             handleSaveProduct={handleSaveProduct}

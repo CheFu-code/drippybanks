@@ -73,10 +73,10 @@ export function AdminProductStudioFormPanel({
         <form
             onSubmit={handleSubmit}
             id="product-studio-form"
-            className="lg:col-span-7 flex flex-col overflow-hidden"
+            className="lg:col-span-7 flex flex-col h-full"
         >
             {/* Scrollable content */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-5">
+            <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
 
                 {/* 1. Product Identity */}
                 <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900/80 to-slate-900/40 p-5 space-y-4">
@@ -271,7 +271,7 @@ export function AdminProductStudioFormPanel({
                                 <div className="h-5 w-9 rounded-full bg-slate-700 peer-checked:bg-amber-400 transition-colors" />
                                 <div className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-4" />
                             </div>
-                            <span className="text-xs font-semibold text-slate-300">⭐ Feature on Homepage</span>
+                            <span className="text-xs font-semibold text-slate-300">Feature on Homepage</span>
                         </label>
                     </div>
                 </section>
@@ -446,7 +446,7 @@ export function AdminProductStudioFormPanel({
                             <Input
                                 value={image}
                                 onChange={(e) => setImage(e.target.value)}
-                                placeholder="e.g. /hoodieFront.png or https://…"
+                                placeholder="e.g. https://…"
                                 className="bg-slate-950/80 border-white/10 text-white rounded-xl text-xs"
                             />
                         </div>
