@@ -221,7 +221,7 @@ export function AdminProductStudioModal({
 }: AdminProductStudioModalProps) {
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="max-w-6xl w-[95vw] bg-slate-950/98 border border-white/15 text-white p-0 overflow-hidden max-h-[92vh] flex flex-col shadow-2xl rounded-3xl">
+            <DialogContent className="max-w-7xl w-[98vw] bg-slate-950/98 border border-white/15 text-white p-0 overflow-hidden max-h-[96vh] flex flex-col shadow-2xl shadow-black/60 rounded-3xl">
                 {isOpen && (
                     <InnerStudioForm
                         key={initialProduct?.id ?? 'create-new-product'}
