@@ -23,6 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { fetchAdminUsersApi } from "@/lib/api/users";
 
 type OrderStatus =
     | "Processing"
@@ -41,7 +42,7 @@ type AdminOrder = {
     items: Array<{ id: string; name: string; quantity: number; price: number }>;
 };
 
-type AdminUser = { id: string; fullname: string; email: string; role: string };
+type AdminUser = { id: string; fullname: string; email: string; roles: string[] };
 
 const ORDER_STATUSES: OrderStatus[] = [
     "Processing",
@@ -81,6 +82,8 @@ export default function AdminDashboardPage() {
     const { products } = useStoredProducts();
     const [orders, setOrders] = useState<AdminOrder[]>([]);
     const [users, setUsers] = useState<AdminUser[]>([]);
+    const [usersLoading, setUsersLoading] = useState(false);
+    const [usersError, setUsersError] = useState<string | null>(null);
     const [tab, setTab] = useState("overview");
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState<"all" | OrderStatus>("all");
@@ -122,6 +125,20 @@ export default function AdminDashboardPage() {
 
         // Populate sample users if user is admin
     }, []);
+
+    // Fetch real users from backend
+    useEffect(() => {
+        if (!user || user.role !== 'admin') return;
+        setUsersLoading(true);
+        setUsersError(null);
+        fetchAdminUsersApi()
+            .then((fetched) => setUsers(fetched))
+            .catch((err: unknown) => {
+                const msg = err instanceof Error ? err.message : 'Failed to load users';
+                setUsersError(msg);
+            })
+            .finally(() => setUsersLoading(false));
+    }, [user]);
 
     const revenue = useMemo(
         () => orders.reduce((acc, order) => acc + order.total, 0),
@@ -553,7 +570,31 @@ export default function AdminDashboardPage() {
                                     <CardTitle className="text-white">Customer Accounts</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-3">
-                                    {users.length === 0 ? (
+                                    {usersLoading && (
+                                        <div className="py-12 flex items-center justify-center gap-3">
+                                            <Loader2 className="h-5 w-5 animate-spin text-amber-300" />
+                                            <span className="text-sm text-slate-400">Loading accounts...</span>
+                                        </div>
+                                    )}
+                                    {!usersLoading && usersError && (
+                                        <div className="py-10 text-center space-y-2">
+                                            <p className="text-sm text-red-400">{usersError}</p>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => {
+                                                    if (!user) return;
+                                                    setUsersLoading(true);
+                                                    setUsersError(null);
+                                                    fetchAdminUsersApi()
+                                                        .then(setUsers)
+                                                        .catch((e: unknown) => setUsersError(e instanceof Error ? e.message : 'Error'))
+                                                        .finally(() => setUsersLoading(false));
+                                                }}
+                                            >Retry</Button>
+                                        </div>
+                                    )}
+                                    {!usersLoading && !usersError && users.length === 0 ? (
                                         <div className="py-16 flex flex-col items-center gap-3 text-center">
                                             <div className="w-12 h-12 rounded-2xl bg-slate-800 border border-white/10 flex items-center justify-center">
                                                 <BadgeCheck className="h-5 w-5 text-slate-500" />
@@ -571,13 +612,15 @@ export default function AdminDashboardPage() {
                                             >
                                                 <div>
                                                     <p className="font-bold text-white text-sm">{account.fullname}</p>
-                                                    <p className="text-xs text-slate-400">
-                                                        {account.email}
-                                                    </p>
+                                                    <p className="text-xs text-slate-400">{account.email}</p>
                                                 </div>
-                                                <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-300 px-2.5 py-1 rounded-lg bg-cyan-400/10 border border-cyan-400/20">
-                                                    {account.role}
-                                                </span>
+                                                <div className="flex gap-1.5 flex-wrap justify-end">
+                                                    {account.roles.map((role) => (
+                                                        <span key={role} className="text-[11px] font-bold uppercase tracking-wider text-cyan-300 px-2.5 py-1 rounded-lg bg-cyan-400/10 border border-cyan-400/20">
+                                                            {role}
+                                                        </span>
+                                                    ))}
+                                                </div>
                                             </div>
                                         ))
                                     )}

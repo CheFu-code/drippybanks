@@ -16,7 +16,7 @@ import {
     LoadingCheckoutCard,
     OrderConfirmationCard,
 } from './_components/CheckoutStates';
-import { CheckoutForm, PaymentChoice, SavedOrder, SavedPaymentMethod } from './_components/types';
+import { CheckoutForm, FulfillmentMethod, PaymentChoice, SavedOrder, SavedPaymentMethod } from './_components/types';
 
 const ORDER_STORAGE_KEY = 'drippybanks.orders';
 
@@ -42,6 +42,7 @@ export default function CheckoutPage() {
     const [selectedSavedCardId, setSelectedSavedCardId] = useState('');
     const [useSavedAddressOverride, setUseSavedAddressOverride] = useState<boolean | null>(null);
     const [paymentChoiceOverride, setPaymentChoiceOverride] = useState<PaymentChoice | null>(null);
+    const [fulfillmentMethod, setFulfillmentMethod] = useState<FulfillmentMethod>('collect');
 
     const savedCards = useMemo<SavedPaymentMethod[]>(
         () => (user?.paymentMethods ?? []).filter((method) => method.type === 'card'),
@@ -61,7 +62,8 @@ export default function CheckoutPage() {
 
     const shipping = 0;
     const tax = 0;
-    const grandTotal = cartTotal + shipping + tax;
+    const deliveryFee = fulfillmentMethod === 'deliver' ? 60 : 0;
+    const grandTotal = cartTotal + shipping + tax + deliveryFee;
 
     const onFormFieldChange = useCallback((field: keyof CheckoutForm, value: string) => {
         setForm((prev) => ({ ...prev, [field]: value }));
@@ -96,7 +98,7 @@ export default function CheckoutPage() {
         if (!/\S+@\S+\.\S+/.test(email)) return 'Please enter a valid email address.';
         if (!phone) return 'Phone number is required.';
 
-        if (!effectiveUseSavedAddress) {
+        if (!effectiveUseSavedAddress && fulfillmentMethod === 'deliver') {
             if (!form.address.trim()) return 'Address is required.';
             if (!form.city.trim()) return 'City is required.';
             if (!form.postalCode.trim()) return 'Postal code is required.';
@@ -171,6 +173,8 @@ export default function CheckoutPage() {
             subtotal: Number(cartTotal.toFixed(2)),
             shipping: Number(shipping.toFixed(2)),
             tax: Number(tax.toFixed(2)),
+            deliveryFee: Number(deliveryFee.toFixed(2)),
+            fulfillmentMethod,
             paymentMethod: finalPaymentMethod,
             paymentMethodId: effectivePaymentChoice === 'saved' ? effectiveSelectedSavedCardId : undefined,
             items: cart.map((item) => ({
@@ -254,6 +258,8 @@ export default function CheckoutPage() {
                         cart={cart}
                         cartTotal={cartTotal}
                         grandTotal={grandTotal}
+                        deliveryFee={deliveryFee}
+                        fulfillmentMethod={fulfillmentMethod}
                         isSubmitting={isSubmitting}
                         hasSavedAddress={hasSavedAddress}
                         effectiveUseSavedAddress={effectiveUseSavedAddress}
@@ -270,6 +276,7 @@ export default function CheckoutPage() {
                             setPaymentChoiceOverride('saved');
                             setSelectedSavedCardId(cardId);
                         }}
+                        onSelectFulfillment={(method) => setFulfillmentMethod(method)}
                     />
                 )}
             </main>

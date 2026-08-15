@@ -15,6 +15,7 @@ export type CheckoutForm = {
 };
 
 export type PaymentChoice = 'saved' | 'new' | 'cash';
+export type FulfillmentMethod = 'collect' | 'deliver';
 
 export type SavedPaymentMethod = NonNullable<AppUser['paymentMethods']>[number];
 
@@ -28,6 +29,8 @@ export type SavedOrder = {
     tax: number;
     paymentMethod: 'card' | 'cash';
     paymentMethodId?: string;
+    fulfillmentMethod: FulfillmentMethod;
+    deliveryFee: number;
     items: Array<{ id: string; name: string; quantity: number; price: number; image: string }>;
     customer: {
         fullName: string;

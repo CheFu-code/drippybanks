@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { CartItem } from '@/context/CartContext';
-import { CheckoutForm, PaymentChoice, SavedPaymentMethod } from './types';
+import { CheckoutForm, FulfillmentMethod, PaymentChoice, SavedPaymentMethod } from './types';
+import { MapPin, ShoppingBag } from 'lucide-react';
 
 type CheckoutFormLayoutProps = {
     user: AppUser | null;
@@ -15,6 +16,8 @@ type CheckoutFormLayoutProps = {
     cart: CartItem[];
     cartTotal: number;
     grandTotal: number;
+    deliveryFee: number;
+    fulfillmentMethod: FulfillmentMethod;
     isSubmitting: boolean;
     hasSavedAddress: boolean;
     effectiveUseSavedAddress: boolean;
@@ -28,6 +31,7 @@ type CheckoutFormLayoutProps = {
     onUseDifferentAddress: () => void;
     onSelectPaymentChoice: (choice: PaymentChoice) => void;
     onSelectSavedCard: (cardId: string) => void;
+    onSelectFulfillment: (method: FulfillmentMethod) => void;
 };
 
 export function CheckoutFormLayout({
@@ -36,6 +40,8 @@ export function CheckoutFormLayout({
     cart,
     cartTotal,
     grandTotal,
+    deliveryFee,
+    fulfillmentMethod,
     isSubmitting,
     hasSavedAddress,
     effectiveUseSavedAddress,
@@ -49,10 +55,79 @@ export function CheckoutFormLayout({
     onUseDifferentAddress,
     onSelectPaymentChoice,
     onSelectSavedCard,
+    onSelectFulfillment,
 }: CheckoutFormLayoutProps) {
     return (
         <form className="grid gap-6 lg:grid-cols-[1.45fr_1fr]" onSubmit={onSubmit}>
             <div className="space-y-6">
+
+                {/* ── Fulfillment picker ── */}
+                <Card className="border-white/10 bg-slate-900/80 overflow-hidden">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-xl">How would you like to receive your order?</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                type="button"
+                                onClick={() => onSelectFulfillment('collect')}
+                                className={`relative flex flex-col items-start gap-2 rounded-2xl border p-4 text-left transition-all duration-200 ${
+                                    fulfillmentMethod === 'collect'
+                                        ? 'border-amber-400/60 bg-amber-400/10 shadow-[0_0_0_1px_rgba(251,191,36,0.3)]'
+                                        : 'border-white/10 bg-slate-950/60 hover:bg-slate-800/60'
+                                }`}
+                            >
+                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                                    fulfillmentMethod === 'collect' ? 'bg-amber-400/20' : 'bg-slate-800'
+                                }`}>
+                                    <ShoppingBag className={`w-4 h-4 ${
+                                        fulfillmentMethod === 'collect' ? 'text-amber-300' : 'text-slate-400'
+                                    }`} />
+                                </div>
+                                <div>
+                                    <p className={`font-semibold text-sm ${
+                                        fulfillmentMethod === 'collect' ? 'text-amber-300' : 'text-white'
+                                    }`}>Collect in store</p>
+                                    <p className="text-xs text-slate-400 mt-0.5">Pick up at our location</p>
+                                </div>
+                                <span className={`absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full ${
+                                    fulfillmentMethod === 'collect'
+                                        ? 'bg-amber-400/20 text-amber-300'
+                                        : 'bg-emerald-500/10 text-emerald-400'
+                                }`}>Free</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => onSelectFulfillment('deliver')}
+                                className={`relative flex flex-col items-start gap-2 rounded-2xl border p-4 text-left transition-all duration-200 ${
+                                    fulfillmentMethod === 'deliver'
+                                        ? 'border-amber-400/60 bg-amber-400/10 shadow-[0_0_0_1px_rgba(251,191,36,0.3)]'
+                                        : 'border-white/10 bg-slate-950/60 hover:bg-slate-800/60'
+                                }`}
+                            >
+                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                                    fulfillmentMethod === 'deliver' ? 'bg-amber-400/20' : 'bg-slate-800'
+                                }`}>
+                                    <MapPin className={`w-4 h-4 ${
+                                        fulfillmentMethod === 'deliver' ? 'text-amber-300' : 'text-slate-400'
+                                    }`} />
+                                </div>
+                                <div>
+                                    <p className={`font-semibold text-sm ${
+                                        fulfillmentMethod === 'deliver' ? 'text-amber-300' : 'text-white'
+                                    }`}>Home delivery</p>
+                                    <p className="text-xs text-slate-400 mt-0.5">Delivered to your door</p>
+                                </div>
+                                <span className={`absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full ${
+                                    fulfillmentMethod === 'deliver'
+                                        ? 'bg-amber-400/20 text-amber-300'
+                                        : 'bg-slate-700 text-slate-300'
+                                }`}>+ R60</span>
+                            </button>
+                        </div>
+                    </CardContent>
+                </Card>
                 <Card className="border-white/10 bg-slate-900/80">
                     <CardHeader>
                         <CardTitle className="text-xl">Contact information</CardTitle>
@@ -92,9 +167,11 @@ export function CheckoutFormLayout({
                     </CardContent>
                 </Card>
 
+                {/* ── Shipping address — only shown for delivery ── */}
+                {fulfillmentMethod === 'deliver' && (
                 <Card className="border-white/10 bg-slate-900/80">
                     <CardHeader>
-                        <CardTitle className="text-xl">Shipping address</CardTitle>
+                        <CardTitle className="text-xl">Delivery address</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {hasSavedAddress && effectiveUseSavedAddress ? (
@@ -180,6 +257,7 @@ export function CheckoutFormLayout({
                         )}
                     </CardContent>
                 </Card>
+                )}
 
                 <Card className="border-white/10 bg-slate-900/80">
                     <CardHeader>
@@ -314,12 +392,15 @@ export function CheckoutFormLayout({
                         )}
                         {effectivePaymentChoice === 'cash' && (
                             <p className="text-sm text-slate-400">
-                                You will pay in cash when your order is delivered.
+                                {fulfillmentMethod === 'collect'
+                                    ? 'You will pay in cash when collecting your order at our store.'
+                                    : 'You will pay in cash when your order is delivered to your address.'}
                             </p>
                         )}
-                        {isCardPaymentSelected && (
-                            <p className="text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
-                                Card payment is coming soon. Please select Cash on Delivery to place your order.
+                        {effectivePaymentChoice !== 'cash' && (
+                            <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-2">
+                                <span className="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+                                End-to-end 256-bit encrypted card checkout
                             </p>
                         )}
                     </CardContent>
@@ -361,12 +442,12 @@ export function CheckoutFormLayout({
                             <span>R{cartTotal.toFixed(2)}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                            <span className="text-slate-400">Shipping</span>
-                            <span>Free</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <span className="text-slate-400">Tax</span>
-                            <span>Free</span>
+                            <span className="text-slate-400">Delivery</span>
+                            {deliveryFee === 0 ? (
+                                <span className="text-emerald-400 font-medium">Free</span>
+                            ) : (
+                                <span>R{deliveryFee.toFixed(2)}</span>
+                            )}
                         </div>
                     </div>
                     <Separator />
