@@ -19,12 +19,12 @@ export const STANDARD_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL"] as const
 export const ACCESSORY_SIZES = ["One Size"] as const;
 
 export const PRODUCT_BADGES = [
-    "🔥 New Drop",
-    "⚡ Bestseller",
-    "💎 Limited Edition",
+    "New Drop",
+    "Bestseller",
+    "Limited Edition",
     "🏷️ On Sale",
-    "✨ Staff Pick",
-    "🌟 Exclusive",
+    "Staff Pick",
+    "Exclusive",
 ] as const;
 
 export const PRESET_GALLERY_IMAGES = [
@@ -80,7 +80,7 @@ export function normalizeProduct(raw: Partial<Product>, index = 0): Product {
         sizes: Array.isArray(raw.sizes) && raw.sizes.length > 0 ? raw.sizes : defaultSizes,
         selectedSize: raw.selectedSize,
         colors: Array.isArray(raw.colors) && raw.colors.length > 0 ? raw.colors : ["Midnight Black"],
-        badge: raw.badge ?? (index < 3 ? "🔥 New Drop" : undefined),
+        badge: raw.badge ?? (index < 3 ? "New Drop" : undefined),
         description: raw.description?.trim() || "Premium heavyweight cotton streetwear garment with signature Drippy Banks tailored fit and high-density detailing.",
         fit: raw.fit?.trim() || (isCapOrBag ? "Adjustable fit" : "Boxy oversized streetwear fit"),
         inStock: raw.inStock !== false,
