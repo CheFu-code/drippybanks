@@ -456,7 +456,7 @@ export function CheckoutFormLayout({
                         <p className="text-lg font-semibold">R{grandTotal.toFixed(2)}</p>
                     </div>
 
-                    <Button className="w-full" type="submit" disabled={isSubmitting || isCardPaymentSelected}>
+                    <Button className="w-full" type="submit" disabled={isSubmitting}>
                         {isSubmitting ? 'Placing order...' : 'Place Order'}
                     </Button>
                     <Button className="w-full" variant="outline" type="button" asChild>

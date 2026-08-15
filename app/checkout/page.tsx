@@ -134,11 +134,6 @@ export default function CheckoutPage() {
         }
 
         const finalPaymentMethod = effectivePaymentChoice === 'cash' ? 'cash' : 'card';
-        if (finalPaymentMethod === 'card') {
-            toast.info('Card payment is coming soon. Please use Cash on Delivery for now.');
-            return;
-        }
-
         const validationError = validateCheckout();
         if (validationError) {
             toast.error(validationError);
