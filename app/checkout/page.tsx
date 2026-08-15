@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
@@ -21,7 +21,7 @@ import { generatePayFastPaymentApi, submitPayFastForm } from '@/lib/api/payfast'
 
 const ORDER_STORAGE_KEY = 'drippybanks.orders';
 
-export default function CheckoutPage() {
+function CheckoutContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { user, loading: userLoading } = useAuthUser();
@@ -286,5 +286,23 @@ export default function CheckoutPage() {
         </div>
     );
 }
+
+export default function CheckoutPage() {
+    return (
+        <Suspense
+            fallback={
+                <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
+                    <Navbar />
+                    <main className="max-w-6xl mx-auto px-5 pb-12 pt-24">
+                        <LoadingCheckoutCard />
+                    </main>
+                </div>
+            }
+        >
+            <CheckoutContent />
+        </Suspense>
+    );
+}
+
 
 

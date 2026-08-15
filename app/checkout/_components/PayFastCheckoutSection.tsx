@@ -87,7 +87,7 @@ export function PayFastCheckoutSection({
                     type="button"
                     onClick={onPayFastSubmit}
                     disabled={isSubmitting}
-                    className="w-full rounded-2xl bg-gradient-to-r from-red-600 via-red-500 to-amber-500 hover:from-red-500 hover:to-amber-400 text-white font-bold text-sm h-12 shadow-[0_0_30px_rgba(239,68,68,0.25)] transition-all active:scale-[0.99] flex items-center justify-center gap-2"
+                    className="w-full rounded-2xl bg-gradient-to-r from-red-600 via-red-500 to-amber-500 hover:from-red-500 hover:to-amber-400 text-white font-bold text-sm h-12 shadow-[0_0_30px_rgba(239,68,68,0.25)] transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
                 >
                     {isSubmitting ? (
                         <>
@@ -97,7 +97,7 @@ export function PayFastCheckoutSection({
                     ) : (
                         <>
                             <span>Pay with PayFast</span>
-                            <span className="opacity-90">• R{grandTotal.toFixed(2)}</span>
+                            <span className="opacity-90">â€¢ R{grandTotal.toFixed(2)}</span>
                             <ArrowRight className="w-4 h-4" />
                         </>
                     )}
