@@ -6,6 +6,7 @@ import { Footer } from '@/components/Home/Footer';
 import { Hero } from '@/components/Home/Hero';
 import { Navbar } from '@/components/Home/Navbar';
 import { AdvertisingSection } from '@/components/Home/AdvertisingSection';
+import { UpcomingGigModal } from '@/components/Home/UpcomingGigModal';
 import { Input } from '@/components/ui/input';
 import { useNewsletterSubscription } from '@/hooks/useNewsletterSubscription';
 import { useState } from 'react';
@@ -24,6 +25,7 @@ function App() {
 
     return (
         <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-amber-300 selection:text-slate-950">
+            <UpcomingGigModal />
             <Navbar />
             <main className="pt-24">
                 <Hero />
