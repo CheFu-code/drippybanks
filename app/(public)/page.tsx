@@ -43,7 +43,7 @@ function App() {
                                 Join the Club
                             </h2>
                             <p className="text-slate-300 mb-8 text-lg">
-                                Get 15% off your first order and early access to new drops, VIP launches, and exclusive events.
+                                Get 10% off your first order and early access to new drops, VIP launches, and exclusive events.
                             </p>
                             <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
                                 <Input
