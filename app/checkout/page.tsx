@@ -51,11 +51,9 @@ function CheckoutContent() {
     const tax = 0;
     const deliveryFee = fulfillmentMethod === 'deliver' ? 60 : 0;
     const welcomePromoDiscountPercent = user?.welcomePromo?.discountPercent ?? 10;
-    const welcomePromoCode = user?.welcomePromo?.code ?? '';
-    const effectivePromoDiscount = promoApplied || (welcomePromoCode && !promoCodeInput && user?.welcomePromo?.code)
-        ? welcomePromoDiscountPercent
-        : 0;
-    const subtotalAfterPromo = Math.max(0, cartTotal - (cartTotal * effectivePromoDiscount) / 100);
+    const effectivePromoDiscount = promoApplied ? welcomePromoDiscountPercent : 0;
+    const promoDiscountAmount = Number(((cartTotal * effectivePromoDiscount) / 100).toFixed(2));
+    const subtotalAfterPromo = Math.max(0, Number((cartTotal - promoDiscountAmount).toFixed(2)));
     const grandTotal = subtotalAfterPromo + shipping + tax + deliveryFee;
 
     const onFormFieldChange = useCallback((field: keyof CheckoutForm, value: string) => {
@@ -75,11 +73,7 @@ function CheckoutContent() {
         if (!form.phone && user.phone) {
             onFormFieldChange('phone', user.phone);
         }
-        if (user.welcomePromo?.code && !promoCodeInput) {
-            setPromoCodeInput(user.welcomePromo.code);
-            setPromoApplied(true);
-        }
-    }, [user, form.fullName, form.email, form.phone, promoCodeInput, onFormFieldChange]);
+    }, [user, form.fullName, form.email, form.phone, onFormFieldChange]);
 
     const applyWelcomePromo = useCallback(() => {
         if (!user?.welcomePromo?.code) {
@@ -94,7 +88,7 @@ function CheckoutContent() {
         }
 
         if (entered !== user.welcomePromo.code.toUpperCase()) {
-            setPromoCodeError('That promo code does not match your welcome offer.');
+            setPromoCodeError('This welcome code is not assigned to your account.');
             return false;
         }
 
@@ -323,7 +317,14 @@ function CheckoutContent() {
                         promoCodeInput={promoCodeInput}
                         promoCodeError={promoCodeError}
                         promoApplied={promoApplied}
-                        onPromoCodeChange={setPromoCodeInput}
+                        promoDiscountAmount={promoDiscountAmount}
+                        onPromoCodeChange={(value) => {
+                            setPromoCodeInput(value);
+                            setPromoApplied(false);
+                            if (promoCodeError) {
+                                setPromoCodeError(null);
+                            }
+                        }}
                         onApplyPromoCode={() => {
                             if (promoCodeInput.trim()) {
                                 const valid = applyWelcomePromo();
