@@ -1,30 +1,27 @@
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { PRESET_COLORS } from "@/lib/constants";
 import {
-    Sparkles,
-    Upload,
-    Image as ImageIcon,
-    Plus,
-    X,
-    Check,
-    Tag,
-    Layers,
-    DollarSign,
-    Palette,
-    Loader2,
-} from "lucide-react";
-import {
+    PRODUCT_BADGES,
     PRODUCT_CATEGORIES,
     STANDARD_SIZES,
-    PRODUCT_BADGES,
 } from "@/lib/product-store";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import { PRESET_COLORS } from "@/lib/constants";
-import { AdminImageGalleryPicker } from "../_components/AdminImageGalleryPicker";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
 import { AdminProductStudioModalUIProps } from "@/types/studio";
+import {
+    Check,
+    DollarSign,
+    Image as ImageIcon,
+    Layers,
+    Loader2,
+    Palette,
+    Plus,
+    Tag,
+    Upload,
+    X
+} from "lucide-react";
+import Image from "next/image";
 
 type FormPanelProps = AdminProductStudioModalUIProps;
 
@@ -65,8 +62,6 @@ export function AdminProductStudioFormPanel({
     setDescription,
     image,
     setImage,
-    isGalleryOpen,
-    setIsGalleryOpen,
     fileInputRef,
     colors,
     isUploadingImage,
@@ -390,7 +385,7 @@ export function AdminProductStudioFormPanel({
                             </span>
                         </div>
                         <div className="flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-white/10">
-                            {(["upload", "gallery", "url"] as const).map((mode) => (
+                            {(["upload", "url"] as const).map((mode) => (
                                 <button
                                     key={mode}
                                     type="button"
@@ -401,7 +396,7 @@ export function AdminProductStudioFormPanel({
                                             : "text-slate-400 hover:text-white"
                                     }`}
                                 >
-                                    {mode === "url" ? "URL" : mode.charAt(0).toUpperCase() + mode.slice(1)}
+                                    {mode === "url" ? "URL" : "Upload"}
                                 </button>
                             ))}
                         </div>
@@ -448,21 +443,6 @@ export function AdminProductStudioFormPanel({
                         </div>
                     )}
 
-                    {imageInputMode === "gallery" && (
-                        <div className="space-y-3">
-                            <Button
-                                type="button"
-                                onClick={() => setIsGalleryOpen(true)}
-                                className="w-full bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 text-white font-bold py-7 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-violet-500/20"
-                            >
-                                <Sparkles className="h-4 w-4" /> Open Brand Gallery
-                            </Button>
-                            <p className="text-xs text-slate-400 text-center">
-                                Browse official Drippy Banks catalog — tees, caps, hoodies, bags.
-                            </p>
-                        </div>
-                    )}
-
                     {imageInputMode === "url" && (
                         <div className="space-y-2">
                             <Label className="text-xs text-slate-300 font-semibold">Public Path or Web URL</Label>
@@ -486,15 +466,6 @@ export function AdminProductStudioFormPanel({
                                     {image.startsWith("data:") ? "Uploaded Image Data" : image}
                                 </p>
                             </div>
-                            <Button
-                                type="button"
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => setIsGalleryOpen(true)}
-                                className="text-xs text-violet-300 hover:text-violet-200 shrink-0"
-                            >
-                                Change
-                            </Button>
                         </div>
                     )}
                 </section>
@@ -550,16 +521,6 @@ export function AdminProductStudioFormPanel({
                 </section>
             </div>
 
-            {/* Gallery Picker */}
-            <AdminImageGalleryPicker
-                isOpen={isGalleryOpen}
-                onClose={() => setIsGalleryOpen(false)}
-                onSelectImage={(selectedPath) => {
-                    setImage(selectedPath);
-                    toast.success("Gallery asset selected.");
-                }}
-                currentImage={image}
-            />
         </form>
     );
 }

@@ -47,16 +47,14 @@ export interface AdminProductStudioModalUIProps {
   setInStock: React.Dispatch<React.SetStateAction<boolean>>;
   featured: boolean;
   setFeatured: React.Dispatch<React.SetStateAction<boolean>>;
-  imageInputMode: "upload" | "gallery" | "url";
+  imageInputMode: "upload" | "url";
   setImageInputMode: React.Dispatch<
-    React.SetStateAction<"upload" | "gallery" | "url">
+    React.SetStateAction<"upload" | "url">
   >;
   description: string;
   setDescription: React.Dispatch<React.SetStateAction<string>>;
   image: string;
   setImage: React.Dispatch<React.SetStateAction<string>>;
-  isGalleryOpen: boolean;
-  setIsGalleryOpen: React.Dispatch<React.SetStateAction<boolean>>;
   previewSize: string;
   setPreviewSize: React.Dispatch<React.SetStateAction<string>>;
   fileInputRef: React.RefObject<HTMLInputElement | null>;

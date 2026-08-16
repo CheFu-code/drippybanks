@@ -42,8 +42,7 @@ function InnerStudioForm({ initialProduct, onClose, onSaveProduct }: InnerStudio
     const [featured, setFeatured] = useState<boolean>(Boolean(initialProduct?.featured));
 
     // Gallery picker & upload modal state
-    const [isGalleryOpen, setIsGalleryOpen] = useState(false);
-    const [imageInputMode, setImageInputMode] = useState<'upload' | 'gallery' | 'url'>('upload');
+    const [imageInputMode, setImageInputMode] = useState<'upload' | 'url'>('upload');
     const [previewSize, setPreviewSize] = useState<string>('M');
     const [isUploadingImage, setIsUploadingImage] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -223,8 +222,6 @@ function InnerStudioForm({ initialProduct, onClose, onSaveProduct }: InnerStudio
             setDescription={setDescription}
             image={image}
             setImage={setImage}
-            isGalleryOpen={isGalleryOpen}
-            setIsGalleryOpen={setIsGalleryOpen}
             previewSize={previewSize}
             setPreviewSize={setPreviewSize}
             fileInputRef={fileInputRef}

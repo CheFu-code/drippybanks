@@ -48,8 +48,6 @@ const AdminProductStudioModalUI = ({
     setDescription,
     image,
     setImage,
-    isGalleryOpen,
-    setIsGalleryOpen,
     previewSize,
     setPreviewSize,
     fileInputRef,
@@ -68,7 +66,7 @@ const AdminProductStudioModalUI = ({
         price, setPrice, originalPrice, setOriginalPrice, stock, setStock,
         inStock, setInStock, featured, setFeatured, imageInputMode,
         setImageInputMode, description, setDescription, image, setImage,
-        isGalleryOpen, setIsGalleryOpen, previewSize, setPreviewSize,
+        previewSize, setPreviewSize,
         fileInputRef, discountPercent, effectivePrice, effectiveOrigPrice, colors,
         isUploadingImage, isSubmitting,
     };

@@ -27,42 +27,6 @@ export const PRODUCT_BADGES = [
     "Exclusive",
 ] as const;
 
-export const PRESET_GALLERY_IMAGES = [
-    { name: "White Graphic Tee", path: "/blindManWhite.jpeg", category: "Tops" },
-    { name: "Black Thug Graphic Tee", path: "/thug.png", category: "Tops" },
-    { name: "Black Crop Tee", path: "/cropTop.jpeg", category: "Tops" },
-    { name: "Neon Pup Graphic Tee", path: "/dogGreen.jpeg", category: "Tops" },
-    { name: "Volt Pup Graphic Tee", path: "/dogGreen.png", category: "Tops" },
-    { name: "Pink Volt Pup Graphic", path: "/dogPink.png", category: "Tops" },
-    { name: "Skeleton Claw Graphic Tee", path: "/skeleton.jpeg", category: "Tops" },
-    { name: "Classic Street Tee", path: "/normal.jpeg", category: "Tops" },
-    { name: "Green Backprint Tee", path: "/greenBack.jpeg", category: "Tops" },
-    { name: "Angel Babies Tee (Front)", path: "/babiesFront.png", category: "Tops" },
-    { name: "Angel Babies Tee (Back)", path: "/babiesBack.png", category: "Tops" },
-    { name: "American Drip Tee (Front)", path: "/americanFront.png", category: "Tops" },
-    { name: "American Drip Tee (Back)", path: "/americanBack.png", category: "Tops" },
-    { name: "Midnight Mosaic Hoodie (Front)", path: "/hoodieBlackFront.png", category: "Hoodies" },
-    { name: "Midnight Mosaic Hoodie (Back)", path: "/hoodieBlackBack.png", category: "Hoodies" },
-    { name: "Azure Drip Hoodie (Front)", path: "/hoodieBlueFront.png", category: "Hoodies" },
-    { name: "Azure Drip Hoodie (Back)", path: "/hoodieBlueBack.jpg", category: "Hoodies" },
-    { name: "Crimson Street Art Hoodie (Front)", path: "/hoodieRedFront.png", category: "Hoodies" },
-    { name: "Crimson Street Art Hoodie (Back)", path: "/hoodieRedBack.png", category: "Hoodies" },
-    { name: "Drip Vision Hoodie (Front)", path: "/mainHoodieFront.png", category: "Hoodies" },
-    { name: "Drip Vision Hoodie", path: "/mainHoodie.jpeg", category: "Hoodies" },
-    { name: "Classic Black Cap", path: "/cap.jpeg", category: "Caps" },
-    { name: "Classic Blue Cap", path: "/capBlue.png", category: "Caps" },
-    { name: "Classic Red Cap", path: "/capRed.png", category: "Caps" },
-    { name: "Essential Black Tote", path: "/bag.jpeg", category: "Bags" },
-    { name: "Full Streetwear Set", path: "/fullset.jpeg", category: "Sets" },
-    { name: "Hoodie Full Set", path: "/hoodieFullSet.jpeg", category: "Sets" },
-    { name: "Editorial Street Style 1", path: "/newPic/ad-01.jpeg", category: "Tops" },
-    { name: "Editorial Street Style 2", path: "/newPic/ad-02.jpeg", category: "Hoodies" },
-    { name: "Editorial Street Style 3", path: "/newPic/ad-03.jpeg", category: "Tops" },
-    { name: "Editorial Street Style 4", path: "/newPic/ad-04.jpeg", category: "Hoodies" },
-    { name: "Editorial Street Style 5", path: "/newPic/ad-05.jpeg", category: "Sets" },
-    { name: "Editorial Street Style 6", path: "/newPic/ad-06.jpeg", category: "Tops" },
-];
-
 /**
  * Normalizes a raw product object ensuring all optional fields have proper defaults
  */
