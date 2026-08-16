@@ -9,7 +9,7 @@ export interface AdminUser {
 }
 
 export async function fetchAdminUsersApi(): Promise<AdminUser[]> {
-    const res = await fetch(`${apiUrl}/admin/users`, {
+    const res = await fetch(apiUrl("/admin/users"), {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
     });

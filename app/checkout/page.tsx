@@ -18,8 +18,7 @@ import {
 } from './_components/CheckoutStates';
 import { CheckoutForm, FulfillmentMethod, SavedOrder } from './_components/types';
 import { generatePayFastPaymentApi, submitPayFastForm } from '@/lib/api/payfast';
-
-const ORDER_STORAGE_KEY = 'drippybanks.orders';
+import { createOrderApi, fetchOrderByIdApi } from '@/lib/api/orders';
 
 function CheckoutContent() {
     const router = useRouter();
@@ -106,29 +105,33 @@ function CheckoutContent() {
 
     // Handle PayFast return redirects
     useEffect(() => {
+        let isActive = true;
         const isSuccess = searchParams.get('payfast_success');
         const orderId = searchParams.get('order_id');
         const isCancelled = searchParams.get('cancelled');
 
-        if (isSuccess === 'true' && orderId) {
-            try {
-                const existing = localStorage.getItem(ORDER_STORAGE_KEY);
-                if (existing) {
-                    const parsed = JSON.parse(existing) as SavedOrder[];
-                    const found = parsed.find((o) => o.id === orderId);
-                    if (found) {
-                        setPlacedOrder(found);
-                        clearCart();
-                        toast.success(`Payment confirmed! Order ${orderId} received.`);
-                    }
+        if (isSuccess === 'true' && orderId && user) {
+            const loadOrder = async () => {
+                try {
+                    const order = await fetchOrderByIdApi(orderId);
+                    if (!isActive) return;
+                    setPlacedOrder(order as SavedOrder);
+                    clearCart();
+                    toast.success(`Payment confirmed! Order ${orderId} received.`);
+                } catch {
+                    if (!isActive) return;
+                    toast.success('Payment completed successfully!');
                 }
-            } catch {
-                toast.success('Payment completed successfully!');
-            }
+            };
+            void loadOrder();
         } else if (isCancelled === 'true') {
             toast.info('PayFast payment was cancelled. You can try again when ready.');
         }
-    }, [searchParams, clearCart]);
+
+        return () => {
+            isActive = false;
+        };
+    }, [searchParams, clearCart, user]);
 
     useEffect(() => {
         if (!userLoading && !user && typeof window !== 'undefined') {
@@ -234,17 +237,11 @@ function CheckoutContent() {
         };
 
         try {
-            // Save pending order to local storage
-            const existingOrdersRaw = localStorage.getItem(ORDER_STORAGE_KEY);
-            let existingOrders: SavedOrder[] = [];
-            if (existingOrdersRaw) {
-                try {
-                    existingOrders = JSON.parse(existingOrdersRaw) as SavedOrder[];
-                } catch {
-                    existingOrders = [];
-                }
-            }
-            localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify([order, ...existingOrders]));
+            await createOrderApi({
+                ...order,
+                promoCode: promoApplied ? promoCodeInput.trim().toUpperCase() : undefined,
+                promoDiscountPercent: promoApplied ? effectivePromoDiscount : undefined,
+            });
 
             const currentOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://drippybanks.chefuinc.com';
             const returnUrl = `${currentOrigin}/checkout?payfast_success=true&order_id=${orderId}`;

@@ -21,9 +21,6 @@ export function PayFastCheckoutSection({
                 <div>
                     <div className="flex items-center gap-2">
                         <h4 className="font-bold text-white text-base tracking-tight">PayFast</h4>
-                        <span className="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-red-500/20 border border-red-500/30 text-red-400">
-                            payfast.io
-                        </span>
                     </div>
                     <p className="text-xs text-slate-400 mt-1">
                         Secure South African payment gateway. Pay directly in ZAR.

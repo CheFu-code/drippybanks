@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
+import { fetchMyOrdersApi, type StoredOrder } from "@/lib/api/orders";
 
 type Order = {
     id: string;
@@ -18,8 +19,19 @@ export const OrdersTab = ({ userId }: { userId: string }) => {
         let isActive = true;
         const fetchOrders = async () => {
             try {
+                const result: StoredOrder[] = await fetchMyOrdersApi();
                 if (isActive) {
-                    setOrders([]);
+                    setOrders(
+                        result.map((order) => ({
+                            id: order.id,
+                            date: order.date ? new Date(order.date).toLocaleDateString("en-ZA") : "Unknown date",
+                            total: Number(order.total) || 0,
+                            status: order.status,
+                            items: Array.isArray(order.items)
+                                ? order.items.map((item) => item.name)
+                                : [],
+                        })),
+                    );
                 }
             } catch (error) {
                 console.error("Failed to fetch orders:", error);

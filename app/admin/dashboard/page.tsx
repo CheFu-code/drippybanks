@@ -24,13 +24,11 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { fetchAdminUsersApi } from "@/lib/api/users";
-
-type OrderStatus =
-    | "Processing"
-    | "Packed"
-    | "Shipped"
-    | "Delivered"
-    | "Cancelled";
+import {
+    fetchAdminOrdersApi,
+    type OrderStatus,
+    updateAdminOrderStatusApi,
+} from "@/lib/api/orders";
 
 type AdminOrder = {
     id: string;
@@ -81,6 +79,8 @@ export default function AdminDashboardPage() {
     const { user, loading } = useAuthUser();
     const { products } = useStoredProducts();
     const [orders, setOrders] = useState<AdminOrder[]>([]);
+    const [ordersLoading, setOrdersLoading] = useState(false);
+    const [ordersError, setOrdersError] = useState<string | null>(null);
     const [users, setUsers] = useState<AdminUser[]>([]);
     const [usersLoading, setUsersLoading] = useState(false);
     const [usersError, setUsersError] = useState<string | null>(null);
@@ -90,41 +90,37 @@ export default function AdminDashboardPage() {
     const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
     useEffect(() => {
-        // Load orders from checkout storage
-        if (typeof window !== "undefined") {
-            try {
-                const raw = localStorage.getItem("drippybanks.orders");
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (Array.isArray(parsed)) {
-                        const mapped: AdminOrder[] = parsed.map((item: Record<string, unknown>) => {
-                            const cust = (item.customer as Record<string, unknown>) || {};
-                            const rawItems = Array.isArray(item.items) ? (item.items as Record<string, unknown>[]) : [];
-                            return {
-                                id: String(item.id || "ORD-000"),
-                                customerName: String(cust.fullName || "Guest Customer"),
-                                customerEmail: String(cust.email || "customer@drippybanks.com"),
-                                status: (item.status as OrderStatus) || "Processing",
-                                total: Number(item.total) || 0,
-                                createdAt: item.date ? new Date(String(item.date)) : new Date(),
-                                items: rawItems.map((i) => ({
-                                    id: String(i.id),
-                                    name: String(i.name),
-                                    quantity: Number(i.quantity) || 1,
-                                    price: Number(i.price) || 0,
-                                })),
-                            };
-                        });
-                        setOrders(mapped);
-                    }
-                }
-            } catch (err) {
-                console.error("Failed to load stored orders", err);
-            }
-        }
+        if (!user || user.role !== "admin") return;
 
-        // Populate sample users if user is admin
-    }, []);
+        setOrdersLoading(true);
+        setOrdersError(null);
+
+        fetchAdminOrdersApi()
+            .then((fetched) => {
+                const mapped: AdminOrder[] = fetched.map((item) => ({
+                    id: item.id,
+                    customerName: item.customer.fullName || "Guest Customer",
+                    customerEmail: item.customer.email || "customer@drippybanks.com",
+                    status: item.status || "Processing",
+                    total: Number(item.total) || 0,
+                    createdAt: item.date ? new Date(item.date) : item.createdAt ? new Date(item.createdAt) : new Date(),
+                    items: Array.isArray(item.items)
+                        ? item.items.map((i) => ({
+                            id: String(i.id),
+                            name: String(i.name),
+                            quantity: Number(i.quantity) || 1,
+                            price: Number(i.price) || 0,
+                        }))
+                        : [],
+                }));
+                setOrders(mapped);
+            })
+            .catch((err: unknown) => {
+                const msg = err instanceof Error ? err.message : "Failed to load orders";
+                setOrdersError(msg);
+            })
+            .finally(() => setOrdersLoading(false));
+    }, [user]);
 
     // Fetch real users from backend
     useEffect(() => {
@@ -214,21 +210,14 @@ export default function AdminDashboardPage() {
     ) => {
         setUpdatingOrderId(orderId);
         try {
-            const updated = orders.map((o) => (o.id === orderId ? { ...o, status: nextStatus } : o));
-            setOrders(updated);
-            if (typeof window !== "undefined") {
-                const raw = localStorage.getItem("drippybanks.orders");
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    const modified = parsed.map((item: Record<string, unknown>) =>
-                        item.id === orderId ? { ...item, status: nextStatus } : item,
-                    );
-                    localStorage.setItem("drippybanks.orders", JSON.stringify(modified));
-                }
-            }
+            await updateAdminOrderStatusApi(orderId, nextStatus);
+            setOrders((current) =>
+                current.map((o) => (o.id === orderId ? { ...o, status: nextStatus } : o)),
+            );
             toast.success(`Order ${orderId} updated to ${nextStatus}.`);
-        } catch {
-            toast.error("Could not update this order status.");
+        } catch (error: unknown) {
+            const msg = error instanceof Error ? error.message : "Could not update this order status.";
+            toast.error(msg);
         } finally {
             setUpdatingOrderId(null);
         }
@@ -360,13 +349,24 @@ export default function AdminDashboardPage() {
                                     <span className="text-xs text-slate-400">Real-time sync</span>
                                 </CardHeader>
                                 <CardContent className="space-y-3">
-                                    {orders.length === 0 && (
+                                    {ordersLoading && (
+                                        <div className="py-12 text-center text-slate-400 space-y-2">
+                                            <Loader2 className="mx-auto h-8 w-8 animate-spin text-slate-500" />
+                                            <p className="text-sm">Loading orders...</p>
+                                        </div>
+                                    )}
+                                    {!ordersLoading && ordersError && (
+                                        <div className="py-12 text-center text-red-400 space-y-2">
+                                            <p className="text-sm">{ordersError}</p>
+                                        </div>
+                                    )}
+                                    {!ordersLoading && !ordersError && orders.length === 0 && (
                                         <div className="py-12 text-center text-slate-400 space-y-2">
                                             <ShoppingBag className="mx-auto h-8 w-8 text-slate-600" />
                                             <p className="text-sm">No checkout orders placed yet.</p>
                                         </div>
                                     )}
-                                    {orders.slice(0, 6).map((order) => (
+                                    {!ordersLoading && !ordersError && orders.slice(0, 6).map((order) => (
                                         <div
                                             key={order.id}
                                             className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2"

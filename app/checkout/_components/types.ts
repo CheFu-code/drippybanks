@@ -16,7 +16,7 @@ export type FulfillmentMethod = 'collect' | 'deliver';
 export type SavedOrder = {
     id: string;
     date: string;
-    status: 'Processing';
+    status: 'Processing' | 'Packed' | 'Shipped' | 'Delivered' | 'Cancelled';
     total: number;
     subtotal: number;
     shipping: number;
