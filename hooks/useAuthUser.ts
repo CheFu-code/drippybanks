@@ -48,6 +48,7 @@ export function useAuthUser() {
                 const allRoles = [...rawRoles, ...profileRoles].map((r) => String(r).toLowerCase());
                 const isAdminUser = allRoles.includes("admin");
 
+                const profileCountry = (profile?.country as AppUser["country"]) || undefined;
                 const appUser: AppUser = {
                     id: String(sessionUser.uid || sessionUser.id || sessionUser.userId || email),
                     email,
@@ -56,12 +57,14 @@ export function useAuthUser() {
                     addressCity: String(sessionUser.addressCity || profile?.addressCity || ""),
                     addressStreet: String(sessionUser.addressStreet || profile?.addressStreet || ""),
                     addressPostalCode: String(sessionUser.addressPostalCode || profile?.addressPostalCode || ""),
-                    country: (sessionUser.country as AppUser["country"]) || (profile?.country as AppUser["country"]) || undefined,
+                    country: (sessionUser.country as AppUser["country"]) || profileCountry || undefined,
                     avatarUrl: sessionUser.avatarUrl ? String(sessionUser.avatarUrl) : profile?.avatarUrl ? String(profile.avatarUrl) : undefined,
-                    phone: sessionUser.phone ? String(sessionUser.phone) : sessionUser.phoneNumber ? String(sessionUser.phoneNumber) : undefined,
+                    phone: sessionUser.phone ? String(sessionUser.phone) : sessionUser.phoneNumber ? String(sessionUser.phoneNumber) : profile?.phone ? String(profile.phone) : undefined,
                     isEmailVerified: Boolean(sessionUser.isEmailVerified),
                     isPhoneVerified: Boolean(sessionUser.isPhoneVerified),
                     createdAt: sessionUser.createdAt ? new Date(sessionUser.createdAt as string | number) : new Date(),
+                    storeName: profile?.storeName ? String(profile.storeName) : undefined,
+                    storeDescription: profile?.storeDescription ? String(profile.storeDescription) : undefined,
                 };
 
                 console.debug("[useAuthUser] session user loaded", appUser);

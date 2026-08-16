@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { apiUrl } from "@/config/chefuAuth";
 import { AppUser, FormState } from "@/types/user";
 import { Country, ICountry, IState, State } from "country-state-city";
 import Link from "next/link";
@@ -179,17 +180,42 @@ export const ProfilePageUI = ({
 
         startLoading();
         try {
-            setSavedAddress({
-                addressStreet: form.addressStreet,
-                addressCity: form.addressCity,
-                addressPostalCode: form.addressPostalCode,
-                country: {
-                    code: form.countryCode,
-                    name: form.countryName,
+            const res = await fetch(apiUrl("/auth/profile"), {
+                method: "PATCH",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
                 },
+                body: JSON.stringify({
+                    phone: form.phone.trim(),
+                    countryCode: form.countryCode.trim().toUpperCase(),
+                    countryName: form.countryName.trim(),
+                    addressStreet: form.addressStreet.trim(),
+                    addressCity: form.addressCity.trim(),
+                    addressPostalCode: form.addressPostalCode.trim(),
+                }),
+            });
+
+            const data = await res.json().catch(() => null);
+            if (!res.ok) {
+                throw new Error(data?.message || "Failed to save address.");
+            }
+
+            const nextCountry = {
+                code: form.countryCode.trim().toUpperCase(),
+                name: form.countryName.trim(),
+            };
+
+            setSavedAddress({
+                addressStreet: form.addressStreet.trim(),
+                addressCity: form.addressCity.trim(),
+                addressPostalCode: form.addressPostalCode.trim(),
+                country: nextCountry,
             });
             setIsAddressFormOpen(false);
             toast.success("Address saved.");
+
+            window.location.reload();
         } catch (error: unknown) {
             const err = error as Error;
             toast.error("Failed to save address.", {

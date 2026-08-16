@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { buildChefuAuthRedirectUrl } from "@/config/chefuAuth";
+import { apiUrl, buildChefuAuthRedirectUrl } from "@/config/chefuAuth";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -90,6 +90,33 @@ export default function EditProfilePage() {
 
         setSaving(true);
         try {
+            const body = {
+                name: form.fullname.trim(),
+                phone: form.phone.trim(),
+                avatarUrl: form.avatarUrl.trim(),
+                addressStreet: form.addressStreet.trim(),
+                addressCity: form.addressCity.trim(),
+                addressPostalCode: form.addressPostalCode.trim(),
+                countryName: form.countryName.trim(),
+                countryCode: form.countryCode.trim().toUpperCase(),
+                storeName: form.storeName.trim(),
+                storeDescription: form.storeDescription.trim(),
+            };
+
+            const res = await fetch(apiUrl("/auth/profile"), {
+                method: "PATCH",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body),
+            });
+
+            const data = await res.json().catch(() => null);
+            if (!res.ok) {
+                throw new Error(data?.message || "Failed to update profile.");
+            }
+
             toast.success("Profile updated.");
             router.push(`/${user.id}/profile`);
         } catch (error: unknown) {
