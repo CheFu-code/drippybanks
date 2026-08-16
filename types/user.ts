@@ -40,6 +40,16 @@ export type AppUser = {
         code: string;
     };
 
+    welcomePromo?: {
+        code: string;
+        discountPercent: number;
+        status?: string;
+        issuedAt?: string | Date;
+        expiresAt?: string | Date;
+        redeemedAt?: string | Date | null;
+        source?: string;
+    };
+
     // Payment info (optional, can store tokens or last used method)
     paymentMethods?: Array<{
         id: string;

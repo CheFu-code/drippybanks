@@ -49,6 +49,9 @@ export function useAuthUser() {
                 const isAdminUser = allRoles.includes("admin");
 
                 const profileCountry = (profile?.country as AppUser["country"]) || undefined;
+                const welcomePromo = (profile?.welcomePromo as AppUser["welcomePromo"]) ||
+                    ((profile?.promoCodes as Record<string, unknown> | undefined)?.welcome as AppUser["welcomePromo"]) ||
+                    undefined;
                 const appUser: AppUser = {
                     id: String(sessionUser.uid || sessionUser.id || sessionUser.userId || email),
                     email,
@@ -65,6 +68,7 @@ export function useAuthUser() {
                     createdAt: sessionUser.createdAt ? new Date(sessionUser.createdAt as string | number) : new Date(),
                     storeName: profile?.storeName ? String(profile.storeName) : undefined,
                     storeDescription: profile?.storeDescription ? String(profile.storeDescription) : undefined,
+                    welcomePromo: welcomePromo && welcomePromo.code ? welcomePromo : undefined,
                 };
 
                 console.debug("[useAuthUser] session user loaded", appUser);

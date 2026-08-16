@@ -27,6 +27,11 @@ type CheckoutFormLayoutProps = {
     onUseDifferentAddress: () => void;
     onSelectFulfillment: (method: FulfillmentMethod) => void;
     onPayFastSubmit: () => void;
+    promoCodeInput?: string;
+    promoCodeError?: string | null;
+    promoApplied?: boolean;
+    onPromoCodeChange?: (value: string) => void;
+    onApplyPromoCode?: () => void;
 };
 
 export function CheckoutFormLayout({
@@ -45,6 +50,11 @@ export function CheckoutFormLayout({
     onUseDifferentAddress,
     onSelectFulfillment,
     onPayFastSubmit,
+    promoCodeInput,
+    promoCodeError,
+    promoApplied,
+    onPromoCodeChange,
+    onApplyPromoCode,
 }: CheckoutFormLayoutProps) {
     return (
         <div className="grid gap-6 lg:grid-cols-[1.45fr_1fr]">
@@ -246,6 +256,32 @@ export function CheckoutFormLayout({
                                     or fill it in here.
                                 </p>
                             )}
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* ── Promo code ── */}
+                {user?.welcomePromo && (
+                    <Card className="border-amber-500/30 bg-amber-500/5">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-xl text-amber-200">Welcome discount</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <div className="flex flex-col gap-3 sm:flex-row">
+                                <Input
+                                    value={promoCodeInput ?? user.welcomePromo.code}
+                                    onChange={(e) => onPromoCodeChange?.(e.target.value)}
+                                    placeholder="Enter promo code"
+                                    className="border-amber-400/30 bg-slate-950/80 text-white"
+                                />
+                                <Button type="button" variant="secondary" onClick={onApplyPromoCode} disabled={promoApplied}>
+                                    {promoApplied ? 'Applied' : 'Apply'}
+                                </Button>
+                            </div>
+                            <p className="text-sm text-amber-200">
+                                Your welcome offer: {user.welcomePromo.discountPercent ?? 10}% off your first order.
+                            </p>
+                            {promoCodeError && <p className="text-sm text-red-300">{promoCodeError}</p>}
                         </CardContent>
                     </Card>
                 )}

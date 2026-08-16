@@ -28,6 +28,9 @@ function CheckoutContent() {
     const { cart, cartTotal, clearCart } = useCart();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [placedOrder, setPlacedOrder] = useState<SavedOrder | null>(null);
+    const [promoCodeInput, setPromoCodeInput] = useState('');
+    const [promoCodeError, setPromoCodeError] = useState<string | null>(null);
+    const [promoApplied, setPromoApplied] = useState(false);
     const [form, setForm] = useState<CheckoutForm>({
         fullName: '',
         email: '',
@@ -48,7 +51,13 @@ function CheckoutContent() {
     const shipping = 0;
     const tax = 0;
     const deliveryFee = fulfillmentMethod === 'deliver' ? 60 : 0;
-    const grandTotal = cartTotal + shipping + tax + deliveryFee;
+    const welcomePromoDiscountPercent = user?.welcomePromo?.discountPercent ?? 10;
+    const welcomePromoCode = user?.welcomePromo?.code ?? '';
+    const effectivePromoDiscount = promoApplied || (welcomePromoCode && !promoCodeInput && user?.welcomePromo?.code)
+        ? welcomePromoDiscountPercent
+        : 0;
+    const subtotalAfterPromo = Math.max(0, cartTotal - (cartTotal * effectivePromoDiscount) / 100);
+    const grandTotal = subtotalAfterPromo + shipping + tax + deliveryFee;
 
     const onFormFieldChange = useCallback((field: keyof CheckoutForm, value: string) => {
         setForm((prev) => ({ ...prev, [field]: value }));
@@ -67,7 +76,33 @@ function CheckoutContent() {
         if (!form.phone && user.phone) {
             onFormFieldChange('phone', user.phone);
         }
-    }, [user, form.fullName, form.email, form.phone, onFormFieldChange]);
+        if (user.welcomePromo?.code && !promoCodeInput) {
+            setPromoCodeInput(user.welcomePromo.code);
+            setPromoApplied(true);
+        }
+    }, [user, form.fullName, form.email, form.phone, promoCodeInput, onFormFieldChange]);
+
+    const applyWelcomePromo = useCallback(() => {
+        if (!user?.welcomePromo?.code) {
+            setPromoCodeError('No welcome promo is available for this account.');
+            return false;
+        }
+
+        const entered = promoCodeInput.trim().toUpperCase();
+        if (!entered) {
+            setPromoCodeError('Enter your welcome promo code.');
+            return false;
+        }
+
+        if (entered !== user.welcomePromo.code.toUpperCase()) {
+            setPromoCodeError('That promo code does not match your welcome offer.');
+            return false;
+        }
+
+        setPromoCodeError(null);
+        setPromoApplied(true);
+        return true;
+    }, [promoCodeInput, user]);
 
     // Handle PayFast return redirects
     useEffect(() => {
@@ -158,6 +193,14 @@ function CheckoutContent() {
         const email = form.email.trim() || user?.email?.trim() || 'customer@drippybanks.com';
         const phone = form.phone.trim() || user?.phone?.trim() || '';
 
+        if (user?.welcomePromo?.code && !promoApplied && promoCodeInput.trim()) {
+            const valid = applyWelcomePromo();
+            if (!valid) {
+                setIsSubmitting(false);
+                return;
+            }
+        }
+
         const orderId = `ORD-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
 
         const order: SavedOrder = {
@@ -165,7 +208,7 @@ function CheckoutContent() {
             date: new Date().toISOString(),
             status: 'Processing',
             total: Number(grandTotal.toFixed(2)),
-            subtotal: Number(cartTotal.toFixed(2)),
+            subtotal: Number(subtotalAfterPromo.toFixed(2)),
             shipping: Number(shipping.toFixed(2)),
             tax: Number(tax.toFixed(2)),
             deliveryFee: Number(deliveryFee.toFixed(2)),
@@ -280,6 +323,20 @@ function CheckoutContent() {
                         onUseDifferentAddress={() => setUseSavedAddressOverride(false)}
                         onSelectFulfillment={(method) => setFulfillmentMethod(method)}
                         onPayFastSubmit={handlePayFastSubmit}
+                        promoCodeInput={promoCodeInput}
+                        promoCodeError={promoCodeError}
+                        promoApplied={promoApplied}
+                        onPromoCodeChange={setPromoCodeInput}
+                        onApplyPromoCode={() => {
+                            if (promoCodeInput.trim()) {
+                                const valid = applyWelcomePromo();
+                                if (valid) {
+                                    toast.success('Welcome promo applied.');
+                                }
+                            } else {
+                                setPromoCodeError('Enter your welcome promo code.');
+                            }
+                        }}
                     />
                 )}
             </main>
