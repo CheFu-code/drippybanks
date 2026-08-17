@@ -16,11 +16,11 @@ const SHOP_LINKS = [
 ];
 
 const HELP_LINKS = [
-    { label: "Customer Service", href: "mailto:support@drippybanks.com" },
+    { label: "Customer Service", href: "mailto:support@chefuinc.com" },
     { label: "My Account", type: "account" as const },
     { label: "Find a Store", href: "/shop" },
-    { label: "Legal & Privacy", href: "mailto:legal@drippybanks.com" },
-    { label: "Contact", href: "mailto:hello@drippybanks.com" },
+    { label: "Legal & Privacy", href: "/privacy" },
+    { label: "Contact", href: "mailto:hello@chefuinc.com" },
 ];
 
 type HelpLink = (typeof HELP_LINKS)[number];
@@ -188,9 +188,9 @@ export function Footer() {
                         reserved.
                     </p>
                     <p>
-                        Crafted with precision by{" "}
+                        Built by{" "}
                         <a
-                            href="https://chefuinc.com"
+                            href="https://chefuinc.com/?utm_source=drippybanks&utm_medium=website&utm_campaign=footer"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-amber-300 hover:text-amber-200"
@@ -199,12 +199,12 @@ export function Footer() {
                         </a>
                     </p>
                     <div className="flex flex-wrap gap-4">
-                        <a href="#" className="text-slate-400 hover:text-white">
+                        <Link href="/privacy" className="text-slate-400 hover:text-white transition-colors">
                             Privacy Policy
-                        </a>
-                        <a href="#" className="text-slate-400 hover:text-white">
+                        </Link>
+                        <Link href="/terms" className="text-slate-400 hover:text-white transition-colors">
                             Terms of Service
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>

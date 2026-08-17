@@ -11,6 +11,7 @@ import { PromoTopBanner } from '@/components/Home/PromoTopBanner';
 import { Input } from '@/components/ui/input';
 import { useNewsletterSubscription } from '@/hooks/useNewsletterSubscription';
 import { useState } from 'react';
+import Link from 'next/link';
 
 function App() {
     const [email, setEmail] = useState('');
@@ -69,7 +70,15 @@ function App() {
                                 </p>
                             )}
                             <p className="mt-4 text-xs text-slate-500">
-                                By subscribing you agree to our Terms & Conditions and Privacy Policy.
+                                By subscribing you agree to our{" "}
+                                <Link href="/terms" className="underline hover:text-slate-300">
+                                    Terms of Service
+                                </Link>{" "}
+                                and{" "}
+                                <Link href="/privacy" className="underline hover:text-slate-300">
+                                    Privacy Policy
+                                </Link>
+                                .
                             </p>
                         </div>
                     </div>

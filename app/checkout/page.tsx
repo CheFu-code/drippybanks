@@ -19,13 +19,13 @@ import {
 import { CheckoutForm, FulfillmentMethod, SavedOrder } from './_components/types';
 import { generatePayFastPaymentApi, submitPayFastForm } from '@/lib/api/payfast';
 import { createOrderApi, fetchOrderByIdApi } from '@/lib/api/orders';
-import { 
-    getStoredPromoCode, 
-    saveStoredPromoCode, 
-    resolvePromoDiscount, 
+import {
+    getStoredPromoCode,
+    saveStoredPromoCode,
+    resolvePromoDiscount,
     isValidPromoCode,
     DEFAULT_PROMO_CODE,
-    DEFAULT_PROMO_DISCOUNT 
+    DEFAULT_PROMO_DISCOUNT
 } from '@/lib/promo';
 
 function CheckoutContent() {
@@ -218,7 +218,7 @@ function CheckoutContent() {
             };
 
         const fullName = form.fullName.trim() || user?.fullname?.trim() || 'Valued Customer';
-        const email = form.email.trim() || user?.email?.trim() || 'customer@drippybanks.com';
+        const email = form.email.trim() || user?.email?.trim() || 'customer@chefuinc.com';
         const phone = form.phone.trim() || user?.phone?.trim() || '';
 
         if (!promoApplied && promoCodeInput.trim()) {

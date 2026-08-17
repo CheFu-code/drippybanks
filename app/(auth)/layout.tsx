@@ -24,7 +24,17 @@ export default function AuthLayout({
                         <p className="mt-2 text-sm text-slate-600 max-w-xs">One account for all your services — secure, fast, and simple.</p>
                     </div>
 
-                    <p className="mt-auto text-xs text-slate-400">By continuing you agree to our Privacy Policy and Terms.</p>
+                    <p className="mt-auto text-xs text-slate-400">
+                        By continuing you agree to our{" "}
+                        <Link href="/privacy" className="underline hover:text-slate-600">
+                            Privacy Policy
+                        </Link>{" "}
+                        and{" "}
+                        <Link href="/terms" className="underline hover:text-slate-600">
+                            Terms
+                        </Link>
+                        .
+                    </p>
                 </div>
 
                 <div className="p-8 md:p-12">

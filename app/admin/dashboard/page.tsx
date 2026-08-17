@@ -100,7 +100,7 @@ export default function AdminDashboardPage() {
                 const mapped: AdminOrder[] = fetched.map((item) => ({
                     id: item.id,
                     customerName: item.customer.fullName || "Guest Customer",
-                    customerEmail: item.customer.email || "customer@drippybanks.com",
+                    customerEmail: item.customer.email || "customer@chefuinc.com",
                     status: item.status || "Processing",
                     total: Number(item.total) || 0,
                     createdAt: item.date ? new Date(item.date) : item.createdAt ? new Date(item.createdAt) : new Date(),
@@ -272,7 +272,7 @@ export default function AdminDashboardPage() {
                     <div className="pointer-events-none absolute -bottom-24 -left-12 h-56 w-56 rounded-full bg-cyan-500/15 blur-3xl" />
                     <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                         <div>
-                            
+
                             <h1 className="mt-4 text-3xl md:text-4xl font-extrabold text-white">
                                 Drippy Banks Control Center
                             </h1>
