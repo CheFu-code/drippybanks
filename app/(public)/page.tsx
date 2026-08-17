@@ -7,6 +7,7 @@ import { Hero } from '@/components/Home/Hero';
 import { Navbar } from '@/components/Home/Navbar';
 import { AdvertisingSection } from '@/components/Home/AdvertisingSection';
 import { UpcomingGigModal } from '@/components/Home/UpcomingGigModal';
+import { PromoTopBanner } from '@/components/Home/PromoTopBanner';
 import { Input } from '@/components/ui/input';
 import { useNewsletterSubscription } from '@/hooks/useNewsletterSubscription';
 import { useState } from 'react';
@@ -26,8 +27,9 @@ function App() {
     return (
         <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-amber-300 selection:text-slate-950">
             <UpcomingGigModal />
+            <PromoTopBanner />
             <Navbar />
-            <main className="pt-24">
+            <main className="pt-28">
                 <Hero />
                 <CategoryGrid />
                 <AdvertisingSection />

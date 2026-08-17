@@ -15,9 +15,36 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Drippy Banks",
+    metadataBase: new URL("https://drippybanks.chefuinc.com"),
+    title: {
+        default: "Drippy Banks | Premium Streetwear",
+        template: "%s | Drippy Banks",
+    },
     description:
         "Drippy Banks is the premium streetwear destination for bold drops, elevated essentials, and seamless CheFu account access.",
+    openGraph: {
+        title: "Drippy Banks | Premium Streetwear",
+        description:
+            "Drippy Banks is the premium streetwear destination for bold drops, elevated essentials, and seamless CheFu account access.",
+        url: "https://drippybanks.chefuinc.com",
+        siteName: "Drippy Banks",
+        images: [
+            {
+                url: "/promo-og.jpg",
+                width: 1280,
+                height: 720,
+                alt: "Drippy Banks Streetwear",
+            },
+        ],
+        type: "website",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Drippy Banks | Premium Streetwear",
+        description:
+            "Drippy Banks is the premium streetwear destination for bold drops and elevated essentials.",
+        images: ["/promo-og.jpg"],
+    },
 };
 
 export default function RootLayout({

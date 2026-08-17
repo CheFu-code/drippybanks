@@ -30,6 +30,7 @@ type CheckoutFormLayoutProps = {
     promoCodeInput?: string;
     promoCodeError?: string | null;
     promoApplied?: boolean;
+    appliedDiscountPercent?: number;
     onPromoCodeChange?: (value: string) => void;
     onApplyPromoCode?: () => void;
 };
@@ -53,6 +54,7 @@ export function CheckoutFormLayout({
     promoCodeInput,
     promoCodeError,
     promoApplied,
+    appliedDiscountPercent,
     onPromoCodeChange,
     onApplyPromoCode,
 }: CheckoutFormLayoutProps) {
@@ -261,30 +263,38 @@ export function CheckoutFormLayout({
                 )}
 
                 {/* ── Promo code ── */}
-                {user?.welcomePromo && (
-                    <Card className="border-amber-500/30 bg-amber-500/5">
-                        <CardHeader className="pb-3">
-                            <CardTitle className="text-xl text-amber-200">Welcome discount</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <div className="flex flex-col gap-3 sm:flex-row">
-                                <Input
-                                    value={promoCodeInput ?? user.welcomePromo.code}
-                                    onChange={(e) => onPromoCodeChange?.(e.target.value)}
-                                    placeholder="Enter promo code"
-                                    className="border-amber-400/30 bg-slate-950/80 text-white"
-                                />
-                                <Button type="button" variant="secondary" onClick={onApplyPromoCode} disabled={promoApplied}>
-                                    {promoApplied ? 'Applied' : 'Apply'}
-                                </Button>
-                            </div>
-                            <p className="text-sm text-amber-200">
-                                Your welcome offer: {user.welcomePromo.discountPercent ?? 10}% off your first order.
+                <Card className="border-amber-500/30 bg-amber-500/5">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-xl text-amber-200">Promo & Welcome Discount</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        <div className="flex flex-col gap-3 sm:flex-row">
+                            <Input
+                                value={promoCodeInput || ''}
+                                onChange={(e) => onPromoCodeChange?.(e.target.value)}
+                                placeholder="Enter promo code (e.g. DRIP10)"
+                                className="border-amber-400/30 bg-slate-950/80 text-white font-mono uppercase"
+                            />
+                            <Button type="button" variant="secondary" onClick={onApplyPromoCode} disabled={promoApplied}>
+                                {promoApplied ? 'Applied' : 'Apply'}
+                            </Button>
+                        </div>
+                        {promoApplied ? (
+                            <p className="text-sm text-emerald-400 font-medium">
+                                ✓ Promo applied: {appliedDiscountPercent || 10}% off your order!
                             </p>
-                            {promoCodeError && <p className="text-sm text-red-300">{promoCodeError}</p>}
-                        </CardContent>
-                    </Card>
-                )}
+                        ) : user?.welcomePromo ? (
+                            <p className="text-xs text-amber-200">
+                                Your account welcome offer: {user.welcomePromo.discountPercent ?? 10}% off with code <strong>{user.welcomePromo.code}</strong>.
+                            </p>
+                        ) : (
+                            <p className="text-xs text-slate-400">
+                                Have a WhatsApp promo code? Enter it above to apply your 10% discount.
+                            </p>
+                        )}
+                        {promoCodeError && <p className="text-sm text-red-300">{promoCodeError}</p>}
+                    </CardContent>
+                </Card>
 
                 {/* ── PayFast Payment Section ── */}
                 <Card className="border-white/10 bg-slate-900/80">

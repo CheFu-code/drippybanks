@@ -19,6 +19,14 @@ import {
 import { CheckoutForm, FulfillmentMethod, SavedOrder } from './_components/types';
 import { generatePayFastPaymentApi, submitPayFastForm } from '@/lib/api/payfast';
 import { createOrderApi, fetchOrderByIdApi } from '@/lib/api/orders';
+import { 
+    getStoredPromoCode, 
+    saveStoredPromoCode, 
+    resolvePromoDiscount, 
+    isValidPromoCode,
+    DEFAULT_PROMO_CODE,
+    DEFAULT_PROMO_DISCOUNT 
+} from '@/lib/promo';
 
 function CheckoutContent() {
     const router = useRouter();
@@ -30,6 +38,7 @@ function CheckoutContent() {
     const [promoCodeInput, setPromoCodeInput] = useState('');
     const [promoCodeError, setPromoCodeError] = useState<string | null>(null);
     const [promoApplied, setPromoApplied] = useState(false);
+    const [activeDiscountPercent, setActiveDiscountPercent] = useState<number>(10);
     const [form, setForm] = useState<CheckoutForm>({
         fullName: '',
         email: '',
@@ -50,8 +59,7 @@ function CheckoutContent() {
     const shipping = 0;
     const tax = 0;
     const deliveryFee = fulfillmentMethod === 'deliver' ? 60 : 0;
-    const welcomePromoDiscountPercent = user?.welcomePromo?.discountPercent ?? 10;
-    const effectivePromoDiscount = promoApplied ? welcomePromoDiscountPercent : 0;
+    const effectivePromoDiscount = promoApplied ? activeDiscountPercent : 0;
     const promoDiscountAmount = Number(((cartTotal * effectivePromoDiscount) / 100).toFixed(2));
     const subtotalAfterPromo = Math.max(0, Number((cartTotal - promoDiscountAmount).toFixed(2)));
     const grandTotal = subtotalAfterPromo + shipping + tax + deliveryFee;
@@ -75,27 +83,50 @@ function CheckoutContent() {
         }
     }, [user, form.fullName, form.email, form.phone, onFormFieldChange]);
 
-    const applyWelcomePromo = useCallback(() => {
-        if (!user?.welcomePromo?.code) {
-            setPromoCodeError('No welcome promo is available for this account.');
+    const applyPromoCode = useCallback((codeToApply?: string) => {
+        const targetCode = (codeToApply ?? promoCodeInput).trim().toUpperCase();
+        if (!targetCode) {
+            setPromoCodeError('Please enter a promo code.');
             return false;
         }
 
-        const entered = promoCodeInput.trim().toUpperCase();
-        if (!entered) {
-            setPromoCodeError('Enter your welcome promo code.');
-            return false;
+        // Check if user has an assigned welcome promo
+        if (user?.welcomePromo?.code && targetCode === user.welcomePromo.code.toUpperCase()) {
+            const discount = user.welcomePromo.discountPercent ?? 10;
+            setActiveDiscountPercent(discount);
+            setPromoCodeInput(targetCode);
+            setPromoCodeError(null);
+            setPromoApplied(true);
+            saveStoredPromoCode(targetCode, discount);
+            return true;
         }
 
-        if (entered !== user.welcomePromo.code.toUpperCase()) {
-            setPromoCodeError('This welcome code is not assigned to your account.');
-            return false;
+        // Check general promotional / WhatsApp promo campaigns
+        if (isValidPromoCode(targetCode)) {
+            const discount = resolvePromoDiscount(targetCode);
+            setActiveDiscountPercent(discount);
+            setPromoCodeInput(targetCode);
+            setPromoCodeError(null);
+            setPromoApplied(true);
+            saveStoredPromoCode(targetCode, discount);
+            return true;
         }
 
-        setPromoCodeError(null);
-        setPromoApplied(true);
-        return true;
+        setPromoCodeError('Invalid or expired promo code.');
+        setPromoApplied(false);
+        return false;
     }, [promoCodeInput, user]);
+
+    // Auto-detect promo code from URL params, storage, or user profile
+    useEffect(() => {
+        const paramPromo = searchParams.get('promo') || searchParams.get('code');
+        const stored = getStoredPromoCode();
+        const initialCode = paramPromo || stored?.code || user?.welcomePromo?.code;
+
+        if (initialCode) {
+            applyPromoCode(initialCode);
+        }
+    }, [searchParams, user, applyPromoCode]);
 
     // Handle PayFast return redirects
     useEffect(() => {
@@ -190,8 +221,8 @@ function CheckoutContent() {
         const email = form.email.trim() || user?.email?.trim() || 'customer@drippybanks.com';
         const phone = form.phone.trim() || user?.phone?.trim() || '';
 
-        if (user?.welcomePromo?.code && !promoApplied && promoCodeInput.trim()) {
-            const valid = applyWelcomePromo();
+        if (!promoApplied && promoCodeInput.trim()) {
+            const valid = applyPromoCode();
             if (!valid) {
                 setIsSubmitting(false);
                 return;
@@ -317,7 +348,7 @@ function CheckoutContent() {
                         promoCodeInput={promoCodeInput}
                         promoCodeError={promoCodeError}
                         promoApplied={promoApplied}
-                        promoDiscountAmount={promoDiscountAmount}
+                        appliedDiscountPercent={effectivePromoDiscount}
                         onPromoCodeChange={(value) => {
                             setPromoCodeInput(value);
                             setPromoApplied(false);
@@ -327,12 +358,12 @@ function CheckoutContent() {
                         }}
                         onApplyPromoCode={() => {
                             if (promoCodeInput.trim()) {
-                                const valid = applyWelcomePromo();
+                                const valid = applyPromoCode();
                                 if (valid) {
-                                    toast.success('Welcome promo applied.');
+                                    toast.success(`${effectivePromoDiscount || 10}% promo applied.`);
                                 }
                             } else {
-                                setPromoCodeError('Enter your welcome promo code.');
+                                setPromoCodeError('Enter a promo code.');
                             }
                         }}
                     />
