@@ -209,7 +209,7 @@ export default function PrivacyPolicyPage() {
                                 <h2 className="text-xl sm:text-2xl font-bold text-white">4. CheFu Unified Account & Data Sharing</h2>
                             </div>
                             <p>
-                                Drippy Banks is integrated into the <strong className="text-white">CheFu Ecosystem</strong>. When you log in with your CheFu Account, authentication credentials and unified profile details are processed securely across CheFu Technologies services.
+                                Drippy Banks is integrated into the <strong className="text-white">CheFu Ecosystem</strong>. When you log in with your CHEFU Account, authentication credentials and unified profile details are processed securely across CheFu Technologies services.
                             </p>
                             <p>We do NOT sell, rent, or trade your personal data to external advertisers. We only share information with trusted third parties strictly necessary for our operations:</p>
                             <ul className="list-disc pl-6 space-y-2 text-slate-300">

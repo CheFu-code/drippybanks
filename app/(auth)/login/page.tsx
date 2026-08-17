@@ -40,7 +40,7 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
                     Sign in to Drippy Banks
                 </h1>
                 <p className="text-slate-300 leading-relaxed mb-8">
-                    You are being redirected to CheFu Account to sign in securely and return to Drippy Banks.
+                    You are being redirected to CHEFU Account to sign in securely and return to Drippy Banks.
                 </p>
                 <div className="rounded-full bg-slate-800/80 p-5 text-center text-slate-400">
                     Redirecting now… If nothing happens,{' '}

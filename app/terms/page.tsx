@@ -24,7 +24,7 @@ import {
 
 const SECTIONS = [
     { id: 'acceptance', title: '1. Acceptance & Eligibility', icon: FileText },
-    { id: 'chefu-account', title: '2. CheFu Account & Security', icon: UserCheck },
+    { id: 'chefu-account', title: '2. CHEFU Account & Security', icon: UserCheck },
     { id: 'products-pricing', title: '3. Products, Drops & Pricing', icon: ShoppingBag },
     { id: 'orders-payments', title: '4. Orders & Payment Terms', icon: CreditCard },
     { id: 'shipping-delivery', title: '5. Shipping & Courier Delivery', icon: Truck },
@@ -157,10 +157,10 @@ export default function TermsOfServicePage() {
                         <section id="chefu-account" className="rounded-2xl border border-white/10 bg-slate-900/50 p-6 sm:p-8 space-y-4">
                             <div className="flex items-center gap-3">
                                 <UserCheck className="text-amber-300" size={24} />
-                                <h2 className="text-xl sm:text-2xl font-bold text-white">2. CheFu Account & Security</h2>
+                                <h2 className="text-xl sm:text-2xl font-bold text-white">2. CHEFU Account & Security</h2>
                             </div>
                             <p>
-                                Drippy Banks utilizes the unified <strong className="text-white">CheFu Account Single Sign-On (SSO)</strong> system. When creating or accessing your profile:
+                                Drippy Banks utilizes the unified <strong className="text-white">CHEFU Account Single Sign-On (SSO)</strong> system. When creating or accessing your profile:
                             </p>
                             <ul className="list-disc pl-6 space-y-2 text-slate-300">
                                 <li>You agree to provide true, accurate, current, and complete information during signup.</li>
