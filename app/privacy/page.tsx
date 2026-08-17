@@ -24,7 +24,7 @@ const SECTIONS = [
     { id: 'overview', title: '1. Overview & Scope', icon: Eye },
     { id: 'information-collected', title: '2. Information We Collect', icon: Database },
     { id: 'how-we-use-info', title: '3. How We Use Information', icon: Sparkles },
-    { id: 'chefu-ecosystem', title: '4. CheFu Unified Account & Sharing', icon: Share2 },
+    { id: 'chefu-ecosystem', title: '4. CHEFU Unified Account & Sharing', icon: Share2 },
     { id: 'payment-security', title: '5. Payment Processing & Security', icon: Lock },
     { id: 'cookies-tracking', title: '6. Cookies & Tracking Technologies', icon: Eye },
     { id: 'data-retention', title: '7. Data Retention & Protection', icon: ShieldCheck },
@@ -74,7 +74,7 @@ export default function PrivacyPolicyPage() {
                             Privacy Policy
                         </h1>
                         <p className="mt-4 text-base sm:text-lg text-slate-300 leading-relaxed">
-                            At Drippy Banks, we value your trust and are committed to protecting your personal information. This Privacy Policy details how we collect, safeguard, and utilize data across our e-commerce platform and the CheFu ecosystem.
+                            At Drippy Banks, we value your trust and are committed to protecting your personal information. This Privacy Policy details how we collect, safeguard, and utilize data across our e-commerce platform and the CHEFU ecosystem.
                         </p>
                         <div className="mt-6 flex flex-wrap gap-4 text-xs sm:text-sm text-slate-400">
                             <div className="flex items-center gap-2">
@@ -142,7 +142,7 @@ export default function PrivacyPolicyPage() {
                                 Drippy Banks (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) is a premium streetwear brand and e-commerce platform operated by <strong className="text-white">CHEFU TECHNOLOGIES PTY (LTD)</strong>, registered in the Republic of South Africa.
                             </p>
                             <p>
-                                This Privacy Policy applies to all personal information collected through our website (<strong className="text-amber-300">drippybanks.chefuinc.com</strong>), mobile experiences, marketing campaigns, and unified CheFu account services.
+                                This Privacy Policy applies to all personal information collected through our website (<strong className="text-amber-300">drippybanks.chefuinc.com</strong>), mobile experiences, marketing campaigns, and unified CHEFU account services.
                             </p>
                             <p>
                                 By accessing our services, creating an account, browsing our catalog, or purchasing apparel, you acknowledge that you have read and understood this Privacy Policy and consent to the data collection and usage practices described herein.
@@ -158,7 +158,7 @@ export default function PrivacyPolicyPage() {
                             <p>We collect information in several ways to provide seamless streetwear drops, checkout, and member services:</p>
                             <ul className="list-disc pl-6 space-y-2 text-slate-300">
                                 <li>
-                                    <strong className="text-white">Account Information:</strong> When you register via CheFu Single Sign-On (SSO) or create an account, we collect your name, email address, phone number, and avatar image.
+                                    <strong className="text-white">Account Information:</strong> When you register via CHEFU Single Sign-On (SSO) or create an account, we collect your name, email address, phone number, and avatar image.
                                 </li>
                                 <li>
                                     <strong className="text-white">Order & Delivery Details:</strong> Physical shipping address, recipient contact numbers, item sizes, color selections, and order history.
@@ -189,7 +189,7 @@ export default function PrivacyPolicyPage() {
                                 </div>
                                 <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5">
                                     <h3 className="font-semibold text-white mb-1">Account & Preferences</h3>
-                                    <p className="text-xs text-slate-400">Maintaining your unified CheFu profile, wishlists, cart persistence, and personalized size recommendations.</p>
+                                    <p className="text-xs text-slate-400">Maintaining your unified CHEFU profile, wishlists, cart persistence, and personalized size recommendations.</p>
                                 </div>
                                 <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5">
                                     <h3 className="font-semibold text-white mb-1">Exclusive Drops & Alerts</h3>
@@ -206,10 +206,10 @@ export default function PrivacyPolicyPage() {
                         <section id="chefu-ecosystem" className="rounded-2xl border border-white/10 bg-slate-900/50 p-6 sm:p-8 space-y-4">
                             <div className="flex items-center gap-3">
                                 <Share2 className="text-amber-300" size={24} />
-                                <h2 className="text-xl sm:text-2xl font-bold text-white">4. CheFu Unified Account & Data Sharing</h2>
+                                <h2 className="text-xl sm:text-2xl font-bold text-white">4. CHEFU Unified Account & Data Sharing</h2>
                             </div>
                             <p>
-                                Drippy Banks is integrated into the <strong className="text-white">CheFu Ecosystem</strong>. When you log in with your CHEFU Account, authentication credentials and unified profile details are processed securely across CheFu Technologies services.
+                                Drippy Banks is integrated into the <strong className="text-white">CHEFU Ecosystem</strong>. When you log in with your CHEFU Account, authentication credentials and unified profile details are processed securely across CHEFU Technologies services.
                             </p>
                             <p>We do NOT sell, rent, or trade your personal data to external advertisers. We only share information with trusted third parties strictly necessary for our operations:</p>
                             <ul className="list-disc pl-6 space-y-2 text-slate-300">
@@ -260,7 +260,7 @@ export default function PrivacyPolicyPage() {
                                 <h2 className="text-xl sm:text-2xl font-bold text-white">7. Data Retention & Protection</h2>
                             </div>
                             <p>
-                                We retain personal information for as long as your CheFu account is active, or as required to fulfill purchases, comply with tax and statutory accounting obligations in South Africa, resolve disputes, and enforce our agreements.
+                                We retain personal information for as long as your CHEFU account is active, or as required to fulfill purchases, comply with tax and statutory accounting obligations in South Africa, resolve disputes, and enforce our agreements.
                             </p>
                             <p>
                                 We employ robust physical, administrative, and technological safeguards to shield your personal data against unauthorized disclosure, alteration, or destruction.

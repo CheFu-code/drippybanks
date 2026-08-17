@@ -21,11 +21,11 @@ export const metadata: Metadata = {
         template: "%s | Drippy Banks",
     },
     description:
-        "Drippy Banks is the premium streetwear destination for bold drops, elevated essentials, and seamless CheFu account access.",
+        "Drippy Banks is the premium streetwear destination for bold drops, elevated essentials, and seamless CHEFU account access.",
     openGraph: {
         title: "Drippy Banks | Premium Streetwear",
         description:
-            "Drippy Banks is the premium streetwear destination for bold drops, elevated essentials, and seamless CheFu account access.",
+            "Drippy Banks is the premium streetwear destination for bold drops, elevated essentials, and seamless CHEFU account access.",
         url: "https://drippybanks.chefuinc.com",
         siteName: "Drippy Banks",
         images: [

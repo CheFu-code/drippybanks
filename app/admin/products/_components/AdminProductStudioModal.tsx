@@ -48,7 +48,7 @@ function InnerStudioForm({ initialProduct, onClose, onSaveProduct }: InnerStudio
     const [isSubmitting, setIsSubmitting] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Handle cloud file upload to CheFu Backend -> Firebase Storage
+    // Handle cloud file upload to CHEFU Backend -> Firebase Storage
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;

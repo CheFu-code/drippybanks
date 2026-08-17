@@ -78,7 +78,7 @@ export default function TermsOfServicePage() {
                             Terms of Service
                         </h1>
                         <p className="mt-4 text-base sm:text-lg text-slate-300 leading-relaxed">
-                            Welcome to Drippy Banks. These Terms of Service govern your access to our streetwear platform, product purchases, promotional drops, and associated CheFu account features.
+                            Welcome to Drippy Banks. These Terms of Service govern your access to our streetwear platform, product purchases, promotional drops, and associated CHEFU account features.
                         </p>
                         <div className="mt-6 flex flex-wrap gap-4 text-xs sm:text-sm text-slate-400">
                             <div className="flex items-center gap-2">
@@ -164,7 +164,7 @@ export default function TermsOfServicePage() {
                             </p>
                             <ul className="list-disc pl-6 space-y-2 text-slate-300">
                                 <li>You agree to provide true, accurate, current, and complete information during signup.</li>
-                                <li>You are solely responsible for maintaining the confidentiality of your CheFu credentials and passwords.</li>
+                                <li>You are solely responsible for maintaining the confidentiality of your CHEFU credentials and passwords.</li>
                                 <li>You accept full responsibility for all activities, purchases, and interactions that occur under your account.</li>
                                 <li>You must immediately notify us at <a href="mailto:support@chefuinc.com" className="text-amber-300 hover:underline">support@chefuinc.com</a> if you suspect any unauthorized access or breach of security.</li>
                             </ul>

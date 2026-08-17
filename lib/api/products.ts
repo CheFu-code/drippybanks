@@ -51,7 +51,7 @@ export function fileToBase64(file: File): Promise<string> {
 }
 
 /**
- * Fetch all products from CheFu Backend
+ * Fetch all products from CHEFU Backend
  */
 export async function fetchProductsApi(): Promise<Product[]> {
   const res = await fetch(apiUrl("/drippybanks/products"), {
@@ -86,7 +86,7 @@ export async function fetchProductByIdApi(id: string): Promise<Product> {
 }
 
 /**
- * Upload an image file to Firebase Storage via CheFu Backend
+ * Upload an image file to Firebase Storage via CHEFU Backend
  */
 export async function uploadProductImageApi(
   fileOrBase64: File | string,
@@ -125,7 +125,7 @@ export async function uploadProductImageApi(
 }
 
 /**
- * Create a new product in CheFu Backend (Admin only)
+ * Create a new product in CHEFU Backend (Admin only)
  */
 export async function createProductApi(
   payload: CreateProductPayload,
