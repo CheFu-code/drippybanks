@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
@@ -12,6 +12,7 @@ export type Product = {
     sizes?: string[];
     selectedSize?: string;
     colors?: string[];
+    selectedColor?: string;
     badge?: string;
     description?: string;
     fit?: string;
@@ -24,13 +25,14 @@ export type Product = {
 export type CartItem = Product & {
     quantity: number;
     selectedSize?: string;
+    selectedColor?: string;
 };
 
 type CartContextType = {
     cart: CartItem[];
-    addToCart: (product: Product, selectedSize?: string) => void;
-    decreaseQuantity: (productId: string, selectedSize?: string) => void;
-    removeFromCart: (productId: string, selectedSize?: string) => void;
+    addToCart: (product: Product, selectedSize?: string, selectedColor?: string) => void;
+    decreaseQuantity: (productId: string, selectedSize?: string, selectedColor?: string) => void;
+    removeFromCart: (productId: string, selectedSize?: string, selectedColor?: string) => void;
     clearCart: () => void;
     cartCount: number;
     cartTotal: number;
@@ -44,43 +46,64 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [isCartOpen, setIsCartOpen] = useState(false);
 
-    const matchesItem = (item: CartItem, productId: string, size?: string) => {
+    const matchesItem = (item: CartItem, productId: string, size?: string, color?: string) => {
         if (item.id !== productId) return false;
-        if (size !== undefined) {
-            return (item.selectedSize ?? '') === size;
+        if (size !== undefined && (item.selectedSize ?? '') !== size) {
+            return false;
+        }
+        if (color !== undefined && (item.selectedColor ?? '') !== color) {
+            return false;
         }
         return true;
     };
 
-    const addToCart = (product: Product, selectedSize?: string) => {
+    const addToCart = (product: Product, selectedSize?: string, selectedColor?: string) => {
         const effectiveSize = selectedSize ?? product.selectedSize ?? (product.sizes && product.sizes.length > 0 ? product.sizes[0] : undefined);
+        const effectiveColor = selectedColor ?? product.selectedColor ?? (product.colors && product.colors.length > 0 ? product.colors[0] : undefined);
+
         setCart((prev) => {
-            const existing = prev.find((item) => item.id === product.id && (item.selectedSize ?? '') === (effectiveSize ?? ''));
+            const existing = prev.find(
+                (item) =>
+                    item.id === product.id &&
+                    (item.selectedSize ?? '') === (effectiveSize ?? '') &&
+                    (item.selectedColor ?? '') === (effectiveColor ?? '')
+            );
+
             if (existing) {
                 return prev.map((item) =>
-                    item.id === product.id && (item.selectedSize ?? '') === (effectiveSize ?? '')
+                    item.id === product.id &&
+                    (item.selectedSize ?? '') === (effectiveSize ?? '') &&
+                    (item.selectedColor ?? '') === (effectiveColor ?? '')
                         ? { ...item, quantity: item.quantity + 1 }
                         : item
                 );
             }
-            return [...prev, { ...product, selectedSize: effectiveSize, quantity: 1 }];
+            return [
+                ...prev,
+                {
+                    ...product,
+                    selectedSize: effectiveSize,
+                    selectedColor: effectiveColor,
+                    quantity: 1,
+                },
+            ];
         });
         setIsCartOpen(true);
     };
 
-    const removeFromCart = (productId: string, size?: string) => {
-        setCart((prev) => prev.filter((item) => !matchesItem(item, productId, size)));
+    const removeFromCart = (productId: string, size?: string, color?: string) => {
+        setCart((prev) => prev.filter((item) => !matchesItem(item, productId, size, color)));
     };
 
-    const decreaseQuantity = (productId: string, size?: string) => {
+    const decreaseQuantity = (productId: string, size?: string, color?: string) => {
         setCart((prev) =>
             prev
                 .map((item) =>
-                    matchesItem(item, productId, size)
+                    matchesItem(item, productId, size, color)
                         ? { ...item, quantity: item.quantity - 1 }
-                        : item,
+                        : item
                 )
-                .filter((item) => item.quantity > 0),
+                .filter((item) => item.quantity > 0)
         );
     };
 

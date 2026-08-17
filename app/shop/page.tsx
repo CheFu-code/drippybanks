@@ -2,7 +2,8 @@
 
 import { Suspense, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Sparkles, Plus } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
+import { getColorHex } from '@/lib/constants';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import type { Product } from '@/context/CartContext';
@@ -18,8 +19,9 @@ const ShopPageContent = () => {
     const searchParams = useSearchParams();
     const { products } = useStoredProducts();
 
-    // Size selection state per product card
+    // Size & color selection state per product card
     const [selectedSizes, setSelectedSizes] = useState<Record<string, string>>({});
+    const [selectedColors, setSelectedColors] = useState<Record<string, string>>({});
 
     // Dynamic categories from catalog
     const allCategories = useMemo(() => {
@@ -71,6 +73,11 @@ const ShopPageContent = () => {
         setSelectedSizes((prev) => ({ ...prev, [productId]: size }));
     };
 
+    const handleSelectColor = (productId: string, color: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setSelectedColors((prev) => ({ ...prev, [productId]: color }));
+    };
+
     const handleAddToCart = (product: Product, e: React.MouseEvent) => {
         e.stopPropagation();
         if (product.inStock === false) {
@@ -79,8 +86,10 @@ const ShopPageContent = () => {
         }
 
         const sizeToUse = selectedSizes[product.id] || (product.sizes && product.sizes.length > 0 ? product.sizes[0] : undefined);
-        addToCart(product, sizeToUse);
-        toast.success(`Added "${product.name}"${sizeToUse ? ` (${sizeToUse})` : ''} to cart!`);
+        const colorToUse = selectedColors[product.id] || (product.colors && product.colors.length > 0 ? product.colors[0] : undefined);
+        addToCart(product, sizeToUse, colorToUse);
+        const colorLabel = colorToUse ? ` · ${colorToUse}` : '';
+        toast.success(`Added "${product.name}"${sizeToUse ? ` (${sizeToUse}` : ''}${colorLabel}${sizeToUse ? ')' : ''} to cart!`);
     };
 
     return (
@@ -136,7 +145,9 @@ const ShopPageContent = () => {
                 {filteredProducts.map((product, index) => {
                     const isSoldOut = product.inStock === false;
                     const availableSizes = product.sizes || ['One Size'];
+                    const availableColors = product.colors || [];
                     const currentSize = selectedSizes[product.id] || availableSizes[0];
+                    const currentColor = selectedColors[product.id] || availableColors[0];
 
                     return (
                         <motion.div
@@ -218,6 +229,35 @@ const ShopPageContent = () => {
                                                         {sz}
                                                     </button>
                                                 ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Color swatches */}
+                                    {availableColors.length > 0 && (
+                                        <div className="space-y-1">
+                                            <p className="text-[9px] sm:text-[10px] font-semibold uppercase text-slate-400">
+                                                Color: <span className="text-slate-200 normal-case font-normal">{currentColor}</span>
+                                            </p>
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {availableColors.map((color) => {
+                                                    const hex = getColorHex(color);
+                                                    const isSelected = currentColor === color;
+                                                    return (
+                                                        <button
+                                                            key={color}
+                                                            type="button"
+                                                            title={color}
+                                                            onClick={(e) => handleSelectColor(product.id, color, e)}
+                                                            className={`h-4 w-4 sm:h-5 sm:w-5 rounded-full border-2 transition-all hover:scale-110 ${
+                                                                isSelected
+                                                                    ? 'border-amber-300 scale-110 ring-2 ring-amber-300/40'
+                                                                    : 'border-white/20 hover:border-white/50'
+                                                            }`}
+                                                            style={{ backgroundColor: hex }}
+                                                        />
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     )}

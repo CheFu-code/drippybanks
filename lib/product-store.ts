@@ -34,6 +34,21 @@ export function normalizeProduct(raw: Partial<Product>, index = 0): Product {
     const isCapOrBag = raw.category === "Caps" || raw.category === "Bags" || raw.category === "Accessories";
     const defaultSizes = isCapOrBag ? ["One Size"] : ["S", "M", "L", "XL"];
 
+    const inferColors = (): string[] => {
+        if (Array.isArray(raw.colors) && raw.colors.length > 0) return raw.colors;
+        const nameLower = (raw.name || "").toLowerCase();
+        const imgLower = (raw.image || "").toLowerCase();
+        const combined = `${nameLower} ${imgLower}`;
+
+        if (combined.includes("white")) return ["Bone White", "Midnight Black"];
+        if (combined.includes("blue") || combined.includes("azure")) return ["Royal Blue", "Midnight Black"];
+        if (combined.includes("red") || combined.includes("crimson")) return ["Crimson Red", "Midnight Black"];
+        if (combined.includes("pink")) return ["Cyber Pink", "Bone White"];
+        if (combined.includes("green") || combined.includes("volt")) return ["Neon Volt", "Midnight Black"];
+        if (combined.includes("grey") || combined.includes("gray")) return ["Heather Grey", "Midnight Black"];
+        return ["Midnight Black", "Bone White"];
+    };
+
     return {
         id: String(raw.id || `db_${Date.now()}_${index}`),
         name: raw.name?.trim() || "Untitled...",
@@ -43,7 +58,8 @@ export function normalizeProduct(raw: Partial<Product>, index = 0): Product {
         image: raw.image?.trim() || "/placeholder.png",
         sizes: Array.isArray(raw.sizes) && raw.sizes.length > 0 ? raw.sizes : defaultSizes,
         selectedSize: raw.selectedSize,
-        colors: Array.isArray(raw.colors) && raw.colors.length > 0 ? raw.colors : ["Midnight Black"],
+        colors: inferColors(),
+        selectedColor: raw.selectedColor,
         badge: raw.badge ?? (index < 3 ? "New Drop" : undefined),
         description: raw.description?.trim() || "Premium heavyweight cotton streetwear garment with signature Drippy Banks tailored fit and high-density detailing.",
         fit: raw.fit?.trim() || (isCapOrBag ? "Adjustable fit" : "Boxy oversized streetwear fit"),

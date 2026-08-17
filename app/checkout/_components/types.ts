@@ -25,7 +25,7 @@ export type SavedOrder = {
     payfastPaymentId?: string;
     fulfillmentMethod: FulfillmentMethod;
     deliveryFee: number;
-    items: Array<{ id: string; name: string; quantity: number; price: number; image: string }>;
+    items: Array<{ id: string; name: string; quantity: number; price: number; image: string; selectedSize?: string; selectedColor?: string }>;
     customer: {
         fullName: string;
         email: string;

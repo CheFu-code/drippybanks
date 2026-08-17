@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/context/CartContext';
 import { useAuthUser } from '@/hooks/useAuthUser';
+import { getColorHex } from '@/lib/constants';
 
 export default function CartPage() {
     const router = useRouter();
@@ -46,7 +47,7 @@ export default function CartPage() {
                         ) : (
                             <>
                                 {cart.map((item, idx) => (
-                                    <div key={`${item.id}-${item.selectedSize ?? idx}`} className="flex items-center gap-4">
+                                    <div key={`${item.id}-${item.selectedSize ?? ''}-${item.selectedColor ?? idx}`} className="flex items-center gap-4">
                                         <div className="relative h-20 w-20 rounded-2xl overflow-hidden border border-white/10 bg-slate-900 flex-shrink-0">
                                             <Image
                                                 fill
@@ -58,7 +59,7 @@ export default function CartPage() {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="font-bold text-white truncate">{item.name}</p>
-                                            <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
+                                            <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5 flex-wrap">
                                                 <span>{item.category}</span>
                                                 {item.selectedSize && (
                                                     <>
@@ -68,13 +69,25 @@ export default function CartPage() {
                                                         </span>
                                                     </>
                                                 )}
+                                                {item.selectedColor && (
+                                                    <>
+                                                        <span>•</span>
+                                                        <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/10 font-semibold text-slate-200">
+                                                            <span
+                                                                className="h-2.5 w-2.5 rounded-full border border-white/30 flex-shrink-0"
+                                                                style={{ backgroundColor: getColorHex(item.selectedColor) }}
+                                                            />
+                                                            {item.selectedColor}
+                                                        </span>
+                                                    </>
+                                                )}
                                             </div>
                                             <div className="flex items-center gap-2 mt-2">
                                                 <p className="text-xs text-slate-400">Qty: {item.quantity}</p>
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    onClick={() => decreaseQuantity(item.id, item.selectedSize)}
+                                                    onClick={() => decreaseQuantity(item.id, item.selectedSize, item.selectedColor)}
                                                     className="h-7 w-7 p-0 rounded-lg border-white/10"
                                                 >
                                                     -
@@ -82,7 +95,7 @@ export default function CartPage() {
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    onClick={() => addToCart(item, item.selectedSize)}
+                                                    onClick={() => addToCart(item, item.selectedSize, item.selectedColor)}
                                                     className="h-7 w-7 p-0 rounded-lg border-white/10"
                                                 >
                                                     +
@@ -94,7 +107,7 @@ export default function CartPage() {
                                             <Button
                                                 size="sm"
                                                 variant="destructive"
-                                                onClick={() => removeFromCart(item.id, item.selectedSize)}
+                                                onClick={() => removeFromCart(item.id, item.selectedSize, item.selectedColor)}
                                                 className="h-7 text-xs rounded-lg px-2.5"
                                             >
                                                 Remove

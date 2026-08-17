@@ -10,6 +10,7 @@ import { CartItem } from '@/context/CartContext';
 import { CheckoutForm, FulfillmentMethod } from './types';
 import { MapPin, ShoppingBag } from 'lucide-react';
 import { PayFastCheckoutSection } from './PayFastCheckoutSection';
+import { getColorHex } from '@/lib/constants';
 
 type CheckoutFormLayoutProps = {
     user: AppUser | null;
@@ -319,8 +320,8 @@ export function CheckoutFormLayout({
                 <CardContent className="space-y-4">
                     <div className="max-h-72 overflow-y-auto pr-1 space-y-3">
                         {cart.map((item) => (
-                            <div key={item.id} className="flex gap-3">
-                                <div className="relative h-16 w-16 overflow-hidden rounded-md border border-white/10 bg-slate-950">
+                            <div key={`${item.id}-${item.selectedSize ?? ''}-${item.selectedColor ?? ''}`} className="flex gap-3">
+                                <div className="relative h-16 w-16 overflow-hidden rounded-md border border-white/10 bg-slate-950 flex-shrink-0">
                                     <Image
                                         fill
                                         src={item.image}
@@ -331,9 +332,25 @@ export function CheckoutFormLayout({
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="font-medium truncate">{item.name}</p>
-                                    <p className="text-sm text-slate-400">Qty {item.quantity}</p>
+                                    <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                                        {item.selectedSize && (
+                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 font-bold text-amber-300">
+                                                {item.selectedSize}
+                                            </span>
+                                        )}
+                                        {item.selectedColor && (
+                                            <span className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-slate-300">
+                                                <span
+                                                    className="h-2 w-2 rounded-full border border-white/20 flex-shrink-0"
+                                                    style={{ backgroundColor: getColorHex(item.selectedColor) }}
+                                                />
+                                                {item.selectedColor}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-sm text-slate-400 mt-0.5">Qty {item.quantity}</p>
                                 </div>
-                                <p className="text-sm font-medium">
+                                <p className="text-sm font-medium flex-shrink-0">
                                     R{(item.price * item.quantity).toFixed(2)}
                                 </p>
                             </div>

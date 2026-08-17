@@ -232,7 +232,7 @@ const AdminProductStudioModalUI = ({
                         className="bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-bold px-8 rounded-xl shadow-lg shadow-amber-400/25 flex-1 sm:flex-none disabled:opacity-50"
                     >
                         {isSubmitting
-                            ? "Saving to Backend…"
+                            ? "Saving..."
                             : isUploadingImage
                               ? "Uploading Image…"
                               : isEdit
