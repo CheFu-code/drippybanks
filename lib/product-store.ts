@@ -60,7 +60,9 @@ export function normalizeProduct(raw: Partial<Product>, index = 0): Product {
         selectedSize: raw.selectedSize,
         colors: inferColors(),
         selectedColor: raw.selectedColor,
-        badge: raw.badge ?? (index < 3 ? "New Drop" : undefined),
+        badge: ('badge' in raw)
+            ? (raw.badge?.trim() || undefined)
+            : (index < 3 ? 'New Drop' : undefined),
         description: raw.description?.trim() || "Premium heavyweight cotton streetwear garment with signature Drippy Banks tailored fit and high-density detailing.",
         fit: raw.fit?.trim() || (isCapOrBag ? "Adjustable fit" : "Boxy oversized streetwear fit"),
         inStock: raw.inStock !== false,
