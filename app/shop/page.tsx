@@ -132,7 +132,7 @@ const ShopPageContent = () => {
             </div>
 
             {/* Product Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
                 {filteredProducts.map((product, index) => {
                     const isSoldOut = product.inStock === false;
                     const availableSizes = product.sizes || ['One Size'];
@@ -144,28 +144,28 @@ const ShopPageContent = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3) }}
-                            className="group overflow-hidden rounded-3xl border border-white/10 bg-slate-900/80 shadow-xl shadow-slate-950/40 flex flex-col justify-between hover:border-amber-300/30 transition-all duration-300"
+                            className="group overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-slate-900/80 shadow-xl shadow-slate-950/40 flex flex-col justify-between hover:border-amber-300/30 transition-all duration-300"
                         >
                             <div>
-                                <div className="aspect-4/5 w-full overflow-hidden rounded-t-3xl relative bg-slate-950">
+                                <div className="aspect-4/5 w-full overflow-hidden rounded-t-2xl sm:rounded-t-3xl relative bg-slate-950">
                                     <Image
                                         fill
                                         priority={index < 4}
                                         src={product.image}
                                         alt={product.name}
-                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
                                         className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                                     />
                                     <div className="absolute inset-0 bg-linear-to-t from-slate-950/90 via-slate-950/10 to-transparent" />
 
                                     {/* Category Pill */}
-                                    <span className="absolute left-3.5 top-3.5 rounded-full bg-slate-950/80 backdrop-blur-md px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-300 border border-white/10">
+                                    <span className="absolute left-2 top-2 sm:left-3.5 sm:top-3.5 rounded-full bg-slate-950/80 backdrop-blur-md px-2 py-0.5 sm:px-3 sm:py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-amber-300 border border-white/10">
                                         {product.category}
                                     </span>
 
                                     {/* Badge */}
                                     {product.badge && (
-                                        <span className="absolute right-3.5 top-3.5 rounded-full bg-amber-400 text-slate-950 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider shadow-md">
+                                        <span className="absolute right-2 top-2 sm:right-3.5 sm:top-3.5 rounded-full bg-amber-400 text-slate-950 px-2 py-0.5 sm:px-2.5 text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-md">
                                             {product.badge}
                                         </span>
                                     )}
@@ -173,7 +173,7 @@ const ShopPageContent = () => {
                                     {/* Sold Out / In Stock */}
                                     {isSoldOut && (
                                         <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center">
-                                            <span className="px-4 py-1.5 rounded-full bg-red-950/90 border border-red-500/40 text-red-300 font-bold text-xs uppercase tracking-wider">
+                                            <span className="px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-red-950/90 border border-red-500/40 text-red-300 font-bold text-[10px] sm:text-xs uppercase tracking-wider">
                                                 Sold Out
                                             </span>
                                         </div>
@@ -184,32 +184,33 @@ const ShopPageContent = () => {
                                         <button
                                             onClick={(e) => handleAddToCart(product, e)}
                                             aria-label={`Add ${product.name} to cart`}
-                                            className="absolute bottom-3.5 right-3.5 cursor-pointer bg-amber-300 hover:bg-amber-200 p-3 rounded-full shadow-lg text-slate-950 transition-all duration-300 transform translate-y-0 hover:scale-105 flex items-center justify-center font-bold"
+                                            className="absolute bottom-2 right-2 sm:bottom-3.5 sm:right-3.5 cursor-pointer bg-amber-300 hover:bg-amber-200 p-2 sm:p-3 rounded-full shadow-lg text-slate-950 transition-all duration-300 transform translate-y-0 hover:scale-105 flex items-center justify-center font-bold"
                                         >
-                                            <Plus size={18} className="stroke-3" />
+                                            <Plus size={16} className="stroke-3 sm:hidden" />
+                                            <Plus size={18} className="stroke-3 hidden sm:block" />
                                         </button>
                                     )}
                                 </div>
 
-                                <div className="p-5 space-y-3">
+                                <div className="p-3 sm:p-5 space-y-2 sm:space-y-3">
                                     <div>
-                                        <h3 className="text-base text-white font-bold group-hover:text-amber-300 transition-colors line-clamp-1">
+                                        <h3 className="text-xs sm:text-base text-white font-bold group-hover:text-amber-300 transition-colors line-clamp-1">
                                             {product.name}
                                         </h3>
-                                        <p className="mt-0.5 text-xs text-slate-400">{product.fit || product.category}</p>
+                                        <p className="mt-0.5 text-[10px] sm:text-xs text-slate-400 line-clamp-1">{product.fit || product.category}</p>
                                     </div>
 
                                     {/* Sizes selector chips */}
                                     {availableSizes.length > 1 && (
                                         <div className="space-y-1">
-                                            <p className="text-[10px] font-semibold uppercase text-slate-400">Size:</p>
+                                            <p className="text-[9px] sm:text-[10px] font-semibold uppercase text-slate-400">Size:</p>
                                             <div className="flex flex-wrap gap-1">
                                                 {availableSizes.map((sz) => (
                                                     <button
                                                         key={sz}
                                                         type="button"
                                                         onClick={(e) => handleSelectSize(product.id, sz, e)}
-                                                        className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-all ${currentSize === sz
+                                                        className={`px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded-md sm:rounded-lg text-[9px] sm:text-[10px] font-bold border transition-all ${currentSize === sz
                                                             ? 'bg-amber-300 text-slate-950 border-amber-300 font-extrabold shadow-sm'
                                                             : 'bg-slate-950 text-slate-300 border-white/10 hover:border-white/30'
                                                             }`}
@@ -224,18 +225,18 @@ const ShopPageContent = () => {
                             </div>
 
                             {/* Price footer */}
-                            <div className="px-5 pb-5 pt-2 flex items-baseline justify-between border-t border-white/5">
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-base font-extrabold text-amber-300">
+                            <div className="px-3 sm:px-5 pb-3 sm:pb-5 pt-2 flex items-baseline justify-between border-t border-white/5">
+                                <div className="flex items-baseline gap-1.5 sm:gap-2">
+                                    <span className="text-xs sm:text-base font-extrabold text-amber-300 font-mono">
                                         R{product.price.toFixed(2)}
                                     </span>
                                     {product.originalPrice && (
-                                        <span className="text-xs text-slate-400 line-through">
+                                        <span className="text-[10px] sm:text-xs text-slate-400 line-through font-mono">
                                             R{product.originalPrice.toFixed(2)}
                                         </span>
                                     )}
                                 </div>
-                                <span className="text-[11px] text-slate-400 font-medium">
+                                <span className="text-[9px] sm:text-[11px] text-slate-400 font-medium">
                                     {product.inStock !== false ? 'In stock' : 'Out of stock'}
                                 </span>
                             </div>

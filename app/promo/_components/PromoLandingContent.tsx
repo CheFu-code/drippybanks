@@ -371,7 +371,7 @@ export function PromoLandingContent({ initialCode = DEFAULT_PROMO_CODE }: PromoL
                         </Link>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                         {promoProducts.map((product) => {
                             const discPrice = calcDiscountPrice(product.price);
                             const savings = product.price - discPrice;
@@ -385,57 +385,58 @@ export function PromoLandingContent({ initialCode = DEFAULT_PROMO_CODE }: PromoL
                                 <motion.div
                                     key={product.id}
                                     whileHover={{ y: -4 }}
-                                    className="group rounded-3xl border border-white/10 bg-slate-900/90 overflow-hidden flex flex-col justify-between shadow-xl transition-all hover:border-amber-400/40"
+                                    className="group rounded-2xl sm:rounded-3xl border border-white/10 bg-slate-900/90 overflow-hidden flex flex-col justify-between shadow-xl transition-all hover:border-amber-400/40"
                                 >
-                                    <div className="relative aspect-[4/5] bg-slate-950 overflow-hidden">
+                                    <div className="relative aspect-4/5 bg-slate-950 overflow-hidden">
                                         <Image
                                             src={product.image}
                                             alt={product.name}
                                             fill
+                                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
                                             className="object-cover transition-transform duration-500 group-hover:scale-105"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
                                         
                                         {/* Promo Discount Tag */}
-                                        <div className="absolute top-3 left-3 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 px-3 py-1 text-xs font-black text-slate-950 uppercase shadow-lg">
+                                        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 px-2 py-0.5 sm:px-3 sm:py-1 text-[9px] sm:text-xs font-black text-slate-950 uppercase shadow-lg">
                                             {discountPercent}% OFF
                                         </div>
 
-                                        <div className="absolute top-3 right-3 rounded-full bg-slate-950/80 border border-white/20 px-2.5 py-0.5 text-[11px] font-semibold text-slate-300 backdrop-blur-md">
+                                        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 rounded-full bg-slate-950/80 border border-white/20 px-2 py-0.5 sm:px-2.5 text-[9px] sm:text-[11px] font-semibold text-slate-300 backdrop-blur-md">
                                             {product.category}
                                         </div>
 
                                         {/* Savings badge */}
-                                        <div className="absolute bottom-3 left-3 rounded-md bg-emerald-500/20 border border-emerald-500/40 px-2 py-0.5 text-xs font-bold text-emerald-300 backdrop-blur-md">
+                                        <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 rounded-md bg-emerald-500/20 border border-emerald-500/40 px-1.5 py-0.5 sm:px-2 text-[9px] sm:text-xs font-bold text-emerald-300 backdrop-blur-md">
                                             Save R {savings.toFixed(0)}
                                         </div>
                                     </div>
 
-                                    <div className="p-5 flex flex-col flex-1 justify-between">
+                                    <div className="p-3 sm:p-5 flex flex-col flex-1 justify-between">
                                         <div>
-                                            <h3 className="font-bold text-white text-base leading-snug line-clamp-1 mb-2">
+                                            <h3 className="font-bold text-white text-xs sm:text-base leading-snug line-clamp-1 mb-1 sm:mb-2">
                                                 {product.name}
                                             </h3>
 
                                             {/* Price comparison */}
-                                            <div className="flex items-baseline gap-2.5 mb-4">
-                                                <span className="text-2xl font-black text-amber-300 font-mono">
+                                            <div className="flex items-baseline gap-1.5 sm:gap-2.5 mb-2 sm:mb-4">
+                                                <span className="text-sm sm:text-2xl font-black text-amber-300 font-mono">
                                                     {formatPrice(discPrice)}
                                                 </span>
-                                                <span className="text-sm text-slate-500 line-through font-mono">
+                                                <span className="text-[10px] sm:text-sm text-slate-500 line-through font-mono">
                                                     {formatPrice(product.price)}
                                                 </span>
                                             </div>
 
                                             {/* Size Selector */}
                                             {availableSizes.length > 1 && (
-                                                <div className="flex items-center gap-1.5 mb-4 flex-wrap">
-                                                    <span className="text-[11px] text-slate-400 uppercase font-semibold mr-1">Size:</span>
+                                                <div className="flex items-center gap-1 sm:gap-1.5 mb-3 sm:mb-4 flex-wrap">
+                                                    <span className="text-[9px] sm:text-[11px] text-slate-400 uppercase font-semibold mr-0.5">Size:</span>
                                                     {availableSizes.map((size) => (
                                                         <button
                                                             key={size}
                                                             onClick={() => setSelectedSizes((prev) => ({ ...prev, [product.id]: size }))}
-                                                            className={`px-2 py-0.5 rounded text-xs font-bold transition-colors ${
+                                                            className={`px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded text-[9px] sm:text-xs font-bold transition-colors ${
                                                                 selectedSize === size
                                                                     ? 'bg-amber-400 text-slate-950'
                                                                     : 'bg-white/5 text-slate-300 hover:bg-white/10 border border-white/10'
@@ -450,9 +451,10 @@ export function PromoLandingContent({ initialCode = DEFAULT_PROMO_CODE }: PromoL
 
                                         <Button
                                             onClick={() => handleAddToCartWithPromo(product)}
-                                            className="w-full rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold py-5 gap-2 transition-all shadow-md active:scale-95"
+                                            className="w-full rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold py-3 sm:py-5 text-xs sm:text-sm gap-1.5 transition-all shadow-md active:scale-95"
                                         >
-                                            <ShoppingBag size={16} /> Add to Cart (Save {discountPercent}%)
+                                            <ShoppingBag size={14} className="sm:h-4 sm:w-4" /> 
+                                            <span>Add to Cart</span>
                                         </Button>
                                     </div>
                                 </motion.div>
