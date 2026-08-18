@@ -417,9 +417,7 @@ export const ProfilePageUI = ({
                         <h1 className="text-2xl font-bold text-white">
                             {user.fullname}
                         </h1>
-                        <span className="bg-amber-300/15 text-amber-200 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                            Gold Member
-                        </span>
+                       
                     </div>
                     <p className="text-slate-300">{user.email}</p>
                     <p className="text-sm text-slate-400 mt-1">

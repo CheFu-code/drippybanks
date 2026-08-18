@@ -20,8 +20,7 @@ type ProfileEditForm = {
     addressPostalCode: string;
     countryName: string;
     countryCode: string;
-    storeName: string;
-    storeDescription: string;
+
 };
 
 export default function EditProfilePage() {
@@ -40,8 +39,6 @@ export default function EditProfilePage() {
         addressPostalCode: "",
         countryName: "",
         countryCode: "",
-        storeName: "",
-        storeDescription: "",
     });
 
     useEffect(() => {
@@ -60,8 +57,6 @@ export default function EditProfilePage() {
             addressPostalCode: user.addressPostalCode ?? "",
             countryName: user.country?.name ?? "",
             countryCode: user.country?.code ?? "",
-            storeName: user.storeName ?? "",
-            storeDescription: user.storeDescription ?? "",
         });
         previousUserIdRef.current = user.id;
     }, [user]);
@@ -99,8 +94,7 @@ export default function EditProfilePage() {
                 addressPostalCode: form.addressPostalCode.trim(),
                 countryName: form.countryName.trim(),
                 countryCode: form.countryCode.trim().toUpperCase(),
-                storeName: form.storeName.trim(),
-                storeDescription: form.storeDescription.trim(),
+               
             };
 
             const res = await fetch(apiUrl("/auth/profile"), {
@@ -192,16 +186,16 @@ export default function EditProfilePage() {
             <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-300 selection:text-slate-950">
                 <div className="p-5 max-w-2xl mx-auto">
                     <Card className="bg-slate-900/80 border-white/10">
-                    <CardHeader>
-                        <CardTitle>Access denied</CardTitle>
-                        <CardDescription>You can only edit your own profile.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Button asChild>
-                            <Link href={`/${user.id}/profile`}>Go to your profile</Link>
-                        </Button>
-                    </CardContent>
-                </Card>
+                        <CardHeader>
+                            <CardTitle>Access denied</CardTitle>
+                            <CardDescription>You can only edit your own profile.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Button asChild>
+                                <Link href={`/${user.id}/profile`}>Go to your profile</Link>
+                            </Button>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         );
@@ -303,27 +297,7 @@ export default function EditProfilePage() {
                                 />
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="storeName">Store name</Label>
-                                    <Input
-                                        id="storeName"
-                                        value={form.storeName}
-                                        onChange={(e) => setForm((prev) => ({ ...prev, storeName: e.target.value }))}
-                                    />
-                                </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="storeDescription">Store description</Label>
-                                    <Input
-                                        id="storeDescription"
-                                        value={form.storeDescription}
-                                        onChange={(e) =>
-                                            setForm((prev) => ({ ...prev, storeDescription: e.target.value }))
-                                        }
-                                    />
-                                </div>
-                            </div>
 
                             <div className="flex items-center justify-end gap-3">
                                 <Button type="button" variant="outline" asChild>
