@@ -115,9 +115,6 @@ export function saveStoredProducts(products: Product[]): void {
     }
 }
 
-/**
- * Synchronizes products fetched from CHEFU Backend into the local store
- */
 export function syncProductsFromBackend(products: Product[]): Product[] {
     if (!Array.isArray(products)) {
         return loadStoredProducts();

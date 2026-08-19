@@ -62,7 +62,6 @@ export function useStoredProducts() {
     const products = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Initial load and sync from CHEFU Backend
     const refreshProducts = useCallback(async () => {
         try {
             setIsLoading(true);

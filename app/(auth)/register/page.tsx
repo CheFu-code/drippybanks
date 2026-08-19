@@ -40,7 +40,7 @@ export default function RegisterPage({ searchParams }: RegisterPageProps) {
                     Create your Drippy Banks account
                 </h1>
                 <p className="text-slate-300 leading-relaxed mb-8">
-                    Register through CHEFU Account to unlock premium access, order tracking, and a seamless Drippy Banks experience.
+                    Register an account to unlock premium access, order tracking, and a seamless Drippy Banks experience.
                 </p>
                 <div className="rounded-full bg-slate-800/80 p-5 text-center text-slate-400">
                     Redirecting now… If nothing happens,{' '}

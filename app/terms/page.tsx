@@ -24,7 +24,7 @@ import {
 
 const SECTIONS = [
     { id: 'acceptance', title: '1. Acceptance & Eligibility', icon: FileText },
-    { id: 'chefu-account', title: '2. CHEFU Account & Security', icon: UserCheck },
+    { id: 'unified-ecosystem', title: '2. Unified Account & Security', icon: UserCheck },
     { id: 'products-pricing', title: '3. Products, Drops & Pricing', icon: ShoppingBag },
     { id: 'orders-payments', title: '4. Orders & Payment Terms', icon: CreditCard },
     { id: 'shipping-delivery', title: '5. Shipping & Courier Delivery', icon: Truck },
@@ -78,7 +78,7 @@ export default function TermsOfServicePage() {
                             Terms of Service
                         </h1>
                         <p className="mt-4 text-base sm:text-lg text-slate-300 leading-relaxed">
-                            Welcome to Drippy Banks. These Terms of Service govern your access to our streetwear platform, product purchases, promotional drops, and associated CHEFU account features.
+                            Welcome to Drippy Banks. These Terms of Service govern your access to our streetwear platform, product purchases, promotional drops, and associated account features.
                         </p>
                         <div className="mt-6 flex flex-wrap gap-4 text-xs sm:text-sm text-slate-400">
                             <div className="flex items-center gap-2">
@@ -110,8 +110,8 @@ export default function TermsOfServicePage() {
                                             key={section.id}
                                             onClick={() => scrollToSection(section.id)}
                                             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs sm:text-sm font-medium transition-all ${isActive
-                                                    ? 'bg-amber-300 text-slate-950 font-bold shadow-md shadow-amber-300/20'
-                                                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                                                ? 'bg-amber-300 text-slate-950 font-bold shadow-md shadow-amber-300/20'
+                                                : 'text-slate-300 hover:text-white hover:bg-white/5'
                                                 }`}
                                         >
                                             <Icon size={16} className={isActive ? 'text-slate-950' : 'text-amber-300'} />
@@ -154,17 +154,17 @@ export default function TermsOfServicePage() {
                         </section>
 
                         {/* Section 2 */}
-                        <section id="chefu-account" className="rounded-2xl border border-white/10 bg-slate-900/50 p-6 sm:p-8 space-y-4">
+                        <section id="unified-ecosystem" className="rounded-2xl border border-white/10 bg-slate-900/50 p-6 sm:p-8 space-y-4">
                             <div className="flex items-center gap-3">
                                 <UserCheck className="text-amber-300" size={24} />
-                                <h2 className="text-xl sm:text-2xl font-bold text-white">2. CHEFU Account & Security</h2>
+                                <h2 className="text-xl sm:text-2xl font-bold text-white">2. Account & Security</h2>
                             </div>
                             <p>
-                                Drippy Banks utilizes the unified <strong className="text-white">CHEFU Account Single Sign-On (SSO)</strong> system. When creating or accessing your profile:
+                                Drippy Banks utilizes a unified <strong className="text-white">Single Sign-On (SSO)</strong> system. When creating or accessing your profile:
                             </p>
                             <ul className="list-disc pl-6 space-y-2 text-slate-300">
                                 <li>You agree to provide true, accurate, current, and complete information during signup.</li>
-                                <li>You are solely responsible for maintaining the confidentiality of your CHEFU credentials and passwords.</li>
+                                <li>You are solely responsible for maintaining the confidentiality of your account credentials and passwords.</li>
                                 <li>You accept full responsibility for all activities, purchases, and interactions that occur under your account.</li>
                                 <li>You must immediately notify us at <a href="mailto:support@chefuinc.com" className="text-amber-300 hover:underline">support@chefuinc.com</a> if you suspect any unauthorized access or breach of security.</li>
                             </ul>
