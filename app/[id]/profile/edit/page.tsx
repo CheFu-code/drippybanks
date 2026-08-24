@@ -234,15 +234,6 @@ export default function EditProfilePage() {
                                         onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
                                     />
                                 </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="avatarUrl">Avatar URL</Label>
-                                    <Input
-                                        id="avatarUrl"
-                                        value={form.avatarUrl}
-                                        onChange={(e) => setForm((prev) => ({ ...prev, avatarUrl: e.target.value }))}
-                                    />
-                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -286,18 +277,6 @@ export default function EditProfilePage() {
                                     />
                                 </div>
                             </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="countryCode">Country code (ISO)</Label>
-                                <Input
-                                    id="countryCode"
-                                    placeholder="e.g. ZA, US, GB"
-                                    value={form.countryCode}
-                                    onChange={(e) => setForm((prev) => ({ ...prev, countryCode: e.target.value }))}
-                                />
-                            </div>
-
-
 
                             <div className="flex items-center justify-end gap-3">
                                 <Button type="button" variant="outline" asChild>

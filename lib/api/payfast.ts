@@ -22,7 +22,7 @@ export interface PayFastPaymentData {
 export async function generatePayFastPaymentApi(
     payload: GeneratePayFastPaymentPayload,
 ): Promise<PayFastPaymentData> {
-    const res = await fetch(`${apiUrl}/drippybanks/payfast/generate-payment`, {
+    const res = await fetch(apiUrl("/drippybanks/payfast/generate-payment"), {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
