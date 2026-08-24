@@ -1,9 +1,9 @@
 const CHEFU_ACCOUNT_APP_URL =
     process.env.NEXT_PUBLIC_CHEFU_ACCOUNT_URL ||
-    "https://myaccount.chefuinc.com";
+    "https://myaccount.chefu.co.za";
 const CHEFU_API_BASE_URL =
     process.env.NEXT_PUBLIC_API_BASE_URL ||
-    "https://api.chefuinc.com";
+    "https://api.chefu.co.za";
 const CHEFU_ACCOUNT_APP_ID = "drippybanks";
 
 function buildChefuAuthUrl(

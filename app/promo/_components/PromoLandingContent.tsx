@@ -5,16 +5,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    Copy, 
-    Check, 
-    Share2, 
-    Sparkles, 
-    Clock, 
-    Flame, 
-    ShoppingBag, 
-    Tag, 
-    ArrowRight, 
+import {
+    Copy,
+    Check,
+    Share2,
+    Sparkles,
+    Clock,
+    Flame,
+    ShoppingBag,
+    Tag,
+    ArrowRight,
     ExternalLink,
     ShieldCheck,
     Truck,
@@ -29,11 +29,11 @@ import { Button } from '@/components/ui/button';
 import { useCart, Product } from '@/context/CartContext';
 import { PRODUCTS } from '@/app/shop/products';
 import { loadStoredProducts } from '@/lib/product-store';
-import { 
-    DEFAULT_PROMO_CODE, 
-    resolvePromoDiscount, 
-    saveStoredPromoCode, 
-    generateWhatsAppPromoCaption, 
+import {
+    DEFAULT_PROMO_CODE,
+    resolvePromoDiscount,
+    saveStoredPromoCode,
+    generateWhatsAppPromoCaption,
     getWhatsAppShareUrl,
     sharePromoWithImage,
     downloadPromoImage,
@@ -112,10 +112,10 @@ export function PromoLandingContent({ initialCode = DEFAULT_PROMO_CODE }: PromoL
         }
     };
 
-   
+
 
     const handleCopyLink = async () => {
-        const origin = typeof window !== 'undefined' ? window.location.origin : 'https://drippybanks.chefuinc.com';
+        const origin = typeof window !== 'undefined' ? window.location.origin : 'https://drippybanks.chefu.co.za';
         const url = `${origin}/promo?code=${promoCode}`;
 
         try {
@@ -129,7 +129,7 @@ export function PromoLandingContent({ initialCode = DEFAULT_PROMO_CODE }: PromoL
     };
 
     const handleOpenWhatsApp = async () => {
-        const origin = typeof window !== 'undefined' ? window.location.origin : 'https://drippybanks.chefuinc.com';
+        const origin = typeof window !== 'undefined' ? window.location.origin : 'https://drippybanks.chefu.co.za';
         const url = `${origin}/promo?code=${promoCode}`;
         await sharePromoWithImage({
             code: promoCode,
@@ -183,7 +183,7 @@ export function PromoLandingContent({ initialCode = DEFAULT_PROMO_CODE }: PromoL
                 {/* ── Top Countdown Urgency Ticker ── */}
                 <div className="bg-linear-to-r from-amber-500 via-yellow-400 to-amber-600 text-slate-950 py-2.5 px-4 font-semibold text-center text-xs sm:text-sm tracking-wide shadow-md">
                     <div className="max-w-7xl mx-auto flex items-center justify-center gap-3 flex-wrap">
-                       
+
                         <span>Final hours to grab savings! <strong>{discountPercent}% OFF coupon</strong> for new users only.</span>
                         <div className="flex items-center gap-1 font-mono font-bold bg-slate-950/20 px-2.5 py-0.5 rounded-md text-slate-950">
                             <Clock size={14} />
@@ -201,7 +201,7 @@ export function PromoLandingContent({ initialCode = DEFAULT_PROMO_CODE }: PromoL
                     <div className="absolute -top-20 right-10 w-87.5 h-87.5 bg-yellow-500/10 blur-[100px] rounded-full pointer-events-none" />
 
                     <div className="relative z-10 text-center max-w-3xl mx-auto mb-10">
-                        
+
                         <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white mb-6 leading-tight">
                             <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 bg-clip-text text-transparent">{discountPercent}% OFF</span> Coupon For New Users Only
                         </h1>
@@ -213,7 +213,7 @@ export function PromoLandingContent({ initialCode = DEFAULT_PROMO_CODE }: PromoL
 
                     {/* ── Golden Voucher Coupon Ticket ── */}
                     <div className="max-w-2xl mx-auto">
-                        <motion.div 
+                        <motion.div
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ duration: 0.4 }}
@@ -221,7 +221,7 @@ export function PromoLandingContent({ initialCode = DEFAULT_PROMO_CODE }: PromoL
                         >
                             <div className="rounded-[2.4rem] bg-slate-900/95 backdrop-blur-2xl p-6 sm:p-10 border border-white/10 text-center relative overflow-hidden">
                                 <div className="absolute -right-16 -top-16 w-36 h-36 bg-amber-400/10 rounded-full blur-2xl" />
-                                
+
                                 <div className="flex items-center justify-between border-b border-white/10 pb-6 mb-6">
                                     <div className="flex items-center gap-3">
                                         <Image
@@ -307,7 +307,7 @@ export function PromoLandingContent({ initialCode = DEFAULT_PROMO_CODE }: PromoL
                     </div>
                 </section>
 
-               
+
 
                 {/* ── 3-Step How It Works Section ── */}
                 <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
@@ -376,8 +376,8 @@ export function PromoLandingContent({ initialCode = DEFAULT_PROMO_CODE }: PromoL
                             const discPrice = calcDiscountPrice(product.price);
                             const savings = product.price - discPrice;
                             const isCapOrBag = product.category === 'Caps' || product.category === 'Bags';
-                            const availableSizes = product.sizes && product.sizes.length > 0 
-                                ? product.sizes 
+                            const availableSizes = product.sizes && product.sizes.length > 0
+                                ? product.sizes
                                 : (isCapOrBag ? ['One Size'] : ['S', 'M', 'L', 'XL']);
                             const selectedSize = selectedSizes[product.id] || availableSizes[0];
 
@@ -396,7 +396,7 @@ export function PromoLandingContent({ initialCode = DEFAULT_PROMO_CODE }: PromoL
                                             className="object-cover transition-transform duration-500 group-hover:scale-105"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-                                        
+
                                         {/* Promo Discount Tag */}
                                         <div className="absolute top-2 left-2 sm:top-3 sm:left-3 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 px-2 py-0.5 sm:px-3 sm:py-1 text-[9px] sm:text-xs font-black text-slate-950 uppercase shadow-lg">
                                             {discountPercent}% OFF
@@ -436,11 +436,10 @@ export function PromoLandingContent({ initialCode = DEFAULT_PROMO_CODE }: PromoL
                                                         <button
                                                             key={size}
                                                             onClick={() => setSelectedSizes((prev) => ({ ...prev, [product.id]: size }))}
-                                                            className={`px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded text-[9px] sm:text-xs font-bold transition-colors ${
-                                                                selectedSize === size
+                                                            className={`px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded text-[9px] sm:text-xs font-bold transition-colors ${selectedSize === size
                                                                     ? 'bg-amber-400 text-slate-950'
                                                                     : 'bg-white/5 text-slate-300 hover:bg-white/10 border border-white/10'
-                                                            }`}
+                                                                }`}
                                                         >
                                                             {size}
                                                         </button>
@@ -453,7 +452,7 @@ export function PromoLandingContent({ initialCode = DEFAULT_PROMO_CODE }: PromoL
                                             onClick={() => handleAddToCartWithPromo(product)}
                                             className="w-full rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold py-3 sm:py-5 text-xs sm:text-sm gap-1.5 transition-all shadow-md active:scale-95"
                                         >
-                                            <ShoppingBag size={14} className="sm:h-4 sm:w-4" /> 
+                                            <ShoppingBag size={14} className="sm:h-4 sm:w-4" />
                                             <span>Add to Cart</span>
                                         </Button>
                                     </div>

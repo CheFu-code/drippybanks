@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    metadataBase: new URL("https://drippybanks.chefuinc.com"),
+    metadataBase: new URL("https://drippybanks.chefu.co.za"),
     title: {
         default: "Drippy Banks | Premium Streetwear",
         template: "%s | Drippy Banks",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
         title: "Drippy Banks | Premium Streetwear",
         description:
             "Drippy Banks is the premium streetwear destination for bold drops, elevated essentials, and seamless single sign-on access.",
-        url: "https://drippybanks.chefuinc.com",
+        url: "https://drippybanks.chefu.co.za",
         siteName: "Drippy Banks",
         images: [
             {

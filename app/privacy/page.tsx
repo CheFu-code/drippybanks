@@ -121,10 +121,10 @@ export default function PrivacyPolicyPage() {
                                 <p className="font-semibold text-slate-200">Need immediate help with your data?</p>
                                 <p>Email our Privacy Officer directly:</p>
                                 <a
-                                    href="mailto:legal@chefuinc.com"
+                                    href="mailto:legal@chefu.co.za"
                                     className="inline-block text-amber-300 hover:underline font-mono"
                                 >
-                                    legal@chefuinc.com
+                                    legal@chefu.co.za
                                 </a>
                             </div>
                         </div>
@@ -142,7 +142,7 @@ export default function PrivacyPolicyPage() {
                                 Drippy Banks (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) is a premium streetwear brand and e-commerce platform operated by <strong className="text-white">CHEFU TECHNOLOGIES PTY (LTD)</strong>, registered in the Republic of South Africa.
                             </p>
                             <p>
-                                This Privacy Policy applies to all personal information collected through our website (<strong className="text-amber-300">drippybanks.chefuinc.com</strong>), mobile experiences, marketing campaigns, and connected platform services.
+                                This Privacy Policy applies to all personal information collected through our website (<strong className="text-amber-300">drippybanks.chefu.co.za</strong>), mobile experiences, marketing campaigns, and connected platform services.
                             </p>
                             <p>
                                 By accessing our services, creating an account, browsing our catalog, or purchasing apparel, you acknowledge that you have read and understood this Privacy Policy and consent to the data collection and usage practices described herein.
@@ -311,10 +311,10 @@ export default function PrivacyPolicyPage() {
                                     <Mail className="text-amber-300 mt-1 shrink-0" size={18} />
                                     <div>
                                         <h4 className="font-semibold text-white text-sm">Legal & Privacy Inquiries</h4>
-                                        <a href="mailto:legal@chefuinc.com" className="text-xs text-amber-300 hover:underline">
-                                            legal@chefuinc.com
+                                        <a href="mailto:legal@chefu.co.za" className="text-xs text-amber-300 hover:underline">
+                                            legal@chefu.co.za
                                         </a>
-                                        <p className="text-xs text-slate-400 mt-1">General: support@chefuinc.com</p>
+                                        <p className="text-xs text-slate-400 mt-1">General: support@chefu.co.za</p>
                                     </div>
                                 </div>
                                 <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 flex items-start gap-3">
@@ -335,7 +335,7 @@ export default function PrivacyPolicyPage() {
                             </div>
                             <div className="pt-4 border-t border-white/5 text-xs text-slate-400">
                                 <p className="font-medium text-slate-300">CHEFU TECHNOLOGIES PTY (LTD)</p>
-                                <p>Johannesburg, South Africa &middot; https://chefuinc.com</p>
+                                <p>Johannesburg, South Africa &middot; https://chefu.co.za</p>
                             </div>
                         </section>
                     </article>

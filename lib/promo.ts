@@ -144,7 +144,7 @@ export function generateWhatsAppPromoCaption(options?: {
     const code = (options?.code || DEFAULT_PROMO_CODE).trim().toUpperCase();
     const discount = options?.discountPercent || resolvePromoDiscount(code);
     const storeName = options?.storeName || 'Drippy Banks';
-    const link = options?.url || (typeof window !== 'undefined' ? `${window.location.origin}/promo?code=${code}` : `https://drippybanks.chefuinc.com/promo?code=${code}`);
+    const link = options?.url || (typeof window !== 'undefined' ? `${window.location.origin}/promo?code=${code}` : `https://drippybanks.chefu.co.za/promo?code=${code}`);
 
     return `🚨 Super affordable products! Final hours to grab savings!
 💰 ${discount}% OFF coupon for new users only ⭐ Search ${code} on the ${storeName} App or ⭐ Click the link to get started!

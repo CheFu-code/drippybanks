@@ -16,11 +16,11 @@ const SHOP_LINKS = [
 ];
 
 const HELP_LINKS = [
-    { label: "Customer Service", href: "mailto:support@chefuinc.com" },
+    { label: "Customer Service", href: "mailto:support@chefu.co.za" },
     { label: "My Account", type: "account" as const },
     { label: "Find a Store", href: "/shop" },
     { label: "Legal & Privacy", href: "/privacy" },
-    { label: "Contact", href: "mailto:hello@chefuinc.com" },
+    { label: "Contact", href: "mailto:hello@chefu.co.za" },
 ];
 
 type HelpLink = (typeof HELP_LINKS)[number];
@@ -190,7 +190,7 @@ export function Footer() {
                     <p>
                         Built by{" "}
                         <a
-                            href="https://chefuinc.com/?utm_source=drippybanks&utm_medium=website&utm_campaign=footer"
+                            href="https://chefu.co.za/?utm_source=drippybanks&utm_medium=website&utm_campaign=footer"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-amber-300 hover:text-amber-200"

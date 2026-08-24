@@ -100,7 +100,7 @@ export default function AdminDashboardPage() {
                 const mapped: AdminOrder[] = fetched.map((item) => ({
                     id: item.id,
                     customerName: item.customer.fullName || "Guest Customer",
-                    customerEmail: item.customer.email || "customer@chefuinc.com",
+                    customerEmail: item.customer.email || "customer@chefu.co.za",
                     status: item.status || "Processing",
                     total: Number(item.total) || 0,
                     createdAt: item.date ? new Date(item.date) : item.createdAt ? new Date(item.createdAt) : new Date(),

@@ -125,10 +125,10 @@ export default function TermsOfServicePage() {
                                 <p className="font-semibold text-slate-200">Questions about our terms?</p>
                                 <p>Contact our customer support desk:</p>
                                 <a
-                                    href="mailto:support@chefuinc.com"
+                                    href="mailto:support@chefu.co.za"
                                     className="inline-block text-amber-300 hover:underline font-mono"
                                 >
-                                    support@chefuinc.com
+                                    support@chefu.co.za
                                 </a>
                             </div>
                         </div>
@@ -146,7 +146,7 @@ export default function TermsOfServicePage() {
                                 These Terms of Service (&quot;Terms&quot;) constitute a legally binding agreement between you (&quot;User&quot; or &quot;Customer&quot;) and <strong className="text-white">CHEFU TECHNOLOGIES PTY (LTD)</strong> trading as <strong className="text-amber-300">Drippy Banks</strong>.
                             </p>
                             <p>
-                                By accessing, browsing, registering an account, or placing an order on <strong className="text-white">drippybanks.chefuinc.com</strong>, you certify that you are at least 18 years of age (or accessing under the supervision of a parent or legal guardian) and possess the legal capacity to enter into binding contracts.
+                                By accessing, browsing, registering an account, or placing an order on <strong className="text-white">drippybanks.chefu.co.za</strong>, you certify that you are at least 18 years of age (or accessing under the supervision of a parent or legal guardian) and possess the legal capacity to enter into binding contracts.
                             </p>
                             <p>
                                 If you do not agree to these Terms in full, you must discontinue your use of our platform immediately.
@@ -166,7 +166,7 @@ export default function TermsOfServicePage() {
                                 <li>You agree to provide true, accurate, current, and complete information during signup.</li>
                                 <li>You are solely responsible for maintaining the confidentiality of your account credentials and passwords.</li>
                                 <li>You accept full responsibility for all activities, purchases, and interactions that occur under your account.</li>
-                                <li>You must immediately notify us at <a href="mailto:support@chefuinc.com" className="text-amber-300 hover:underline">support@chefuinc.com</a> if you suspect any unauthorized access or breach of security.</li>
+                                <li>You must immediately notify us at <a href="mailto:support@chefu.co.za" className="text-amber-300 hover:underline">support@chefu.co.za</a> if you suspect any unauthorized access or breach of security.</li>
                             </ul>
                         </section>
 
@@ -346,10 +346,10 @@ export default function TermsOfServicePage() {
                                     <Mail className="text-amber-300 mt-1 shrink-0" size={18} />
                                     <div>
                                         <h4 className="font-semibold text-white text-sm">Customer & Order Support</h4>
-                                        <a href="mailto:support@chefuinc.com" className="text-xs text-amber-300 hover:underline">
-                                            support@chefuinc.com
+                                        <a href="mailto:support@chefu.co.za" className="text-xs text-amber-300 hover:underline">
+                                            support@chefu.co.za
                                         </a>
-                                        <p className="text-xs text-slate-400 mt-1">Legal: legal@chefuinc.com</p>
+                                        <p className="text-xs text-slate-400 mt-1">Legal: legal@chefu.co.za</p>
                                     </div>
                                 </div>
                                 <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 flex items-start gap-3">
@@ -370,7 +370,7 @@ export default function TermsOfServicePage() {
                             </div>
                             <div className="pt-4 border-t border-white/5 text-xs text-slate-400">
                                 <p className="font-medium text-slate-300">CHEFU TECHNOLOGIES PTY (LTD)</p>
-                                <p>Johannesburg, South Africa &middot; https://chefuinc.com</p>
+                                <p>Johannesburg, South Africa &middot; https://chefu.co.za</p>
                             </div>
                         </section>
                     </article>

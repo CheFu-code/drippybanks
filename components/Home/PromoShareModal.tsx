@@ -2,23 +2,23 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { 
-    Dialog, 
-    DialogContent, 
-    DialogHeader, 
-    DialogTitle, 
-    DialogDescription 
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Copy, Check, ExternalLink, Sparkles, Download } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
 import { toast } from 'sonner';
-import { 
-    DEFAULT_PROMO_CODE, 
-    DEFAULT_PROMO_DISCOUNT, 
-    generateWhatsAppPromoCaption, 
+import {
+    DEFAULT_PROMO_CODE,
+    DEFAULT_PROMO_DISCOUNT,
+    generateWhatsAppPromoCaption,
     sharePromoWithImage,
-    downloadPromoImage 
+    downloadPromoImage
 } from '@/lib/promo';
 
 interface PromoShareModalProps {
@@ -37,7 +37,7 @@ export function PromoShareModal({
     const [copiedCaption, setCopiedCaption] = useState(false);
     const [copiedCode, setCopiedCode] = useState(false);
 
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://drippybanks.chefuinc.com';
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://drippybanks.chefu.co.za';
     const promoUrl = `${origin}/promo?code=${promoCode}`;
     const caption = generateWhatsAppPromoCaption({
         code: promoCode,

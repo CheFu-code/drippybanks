@@ -218,7 +218,7 @@ function CheckoutContent() {
             };
 
         const fullName = form.fullName.trim() || user?.fullname?.trim() || 'Valued Customer';
-        const email = form.email.trim() || user?.email?.trim() || 'customer@chefuinc.com';
+        const email = form.email.trim() || user?.email?.trim() || 'customer@chefu.co.za';
         const phone = form.phone.trim() || user?.phone?.trim() || '';
 
         if (!promoApplied && promoCodeInput.trim()) {
@@ -268,7 +268,7 @@ function CheckoutContent() {
                 promoDiscountPercent: promoApplied ? effectivePromoDiscount : undefined,
             });
 
-            const currentOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://drippybanks.chefuinc.com';
+            const currentOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://drippybanks.chefu.co.za';
             const returnUrl = `${currentOrigin}/checkout?payfast_success=true&order_id=${orderId}`;
             const cancelUrl = `${currentOrigin}/checkout?cancelled=true`;
 

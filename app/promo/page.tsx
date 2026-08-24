@@ -17,12 +17,12 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 
     const title = `💰 ${discount}% OFF coupon for new users only ⭐ Search ${code} on Drippy Banks or ⭐ Click the link to get started!`;
     const description = `🚨 Super affordable products! Final hours to grab savings! 💰 ${discount}% OFF coupon for new users only ⭐ Search ${code} on Drippy Banks or ⭐ Click the link to get started!`;
-    const canonicalUrl = `https://drippybanks.chefuinc.com/promo?code=${code}`;
+    const canonicalUrl = `https://drippybanks.chefu.co.za/promo?code=${code}`;
 
     return {
         title,
         description,
-        metadataBase: new URL('https://drippybanks.chefuinc.com'),
+        metadataBase: new URL('https://drippybanks.chefu.co.za'),
         alternates: {
             canonical: canonicalUrl,
         },
