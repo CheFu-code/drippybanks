@@ -26,6 +26,11 @@ Next.js 16 app for the DrippyBanks site.
 ## Environment Variables
 This project uses environment variables stored in `.env`. Make sure required values are set before running locally.
 
+For server-side error monitoring, set `LOGIX_API_KEY`. The app reports unhandled
+request errors to Logix at `LOGIX_ENDPOINT` (defaulting to
+`https://api.chefu.co.za`). Keep this key server-only; do not prefix it with
+`NEXT_PUBLIC_`.
+
 ## Project Structure
 - `app/` - Next.js App Router routes and layouts
 - `components/` - shared UI components
