@@ -1,4 +1,13 @@
-import { logixError } from './lib/logix';
+import { logixError, logixInfo } from './lib/logix';
+
+export function register() {
+    logixInfo('DrippyBanks server started', {
+        operation: 'server.startup',
+        track: {
+            nodeEnv: process.env.NODE_ENV || 'production',
+        },
+    });
+}
 
 export function onRequestError(error: unknown, request: { method: string; path: string }) {
     logixError(
