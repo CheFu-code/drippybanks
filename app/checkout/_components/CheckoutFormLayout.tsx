@@ -378,10 +378,6 @@ export function CheckoutFormLayout({
                         <p className="text-lg font-semibold">R{grandTotal.toFixed(2)}</p>
                     </div>
 
-                    <div className="text-center py-2.5 px-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-xs font-medium">
-                        Complete your payment using PayFast
-                    </div>
-
                     <Button className="w-full" variant="outline" type="button" asChild>
                         <Link href="/cart">Back to cart</Link>
                     </Button>

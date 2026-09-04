@@ -93,7 +93,7 @@ export function PayFastCheckoutSection({
                         </>
                     ) : (
                         <>
-                            <span>Pay with PayFast</span>
+                            <span>Pay</span>
                             <span className="opacity-90">• R{grandTotal.toFixed(2)}</span>
                             <ArrowRight className="w-4 h-4" />
                         </>
