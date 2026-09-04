@@ -1,23 +1,13 @@
-import { logixError, logixInfo } from './lib/logix';
+import * as Sentry from '@sentry/nextjs';
 
-export function register() {
-    logixInfo('DrippyBanks server started', {
-        operation: 'server.startup',
-        track: {
-            nodeEnv: process.env.NODE_ENV || 'production',
-        },
-    });
+export async function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    await import('./sentry.server.config');
+  }
+
+  if (process.env.NEXT_RUNTIME === 'edge') {
+    await import('./sentry.edge.config');
+  }
 }
 
-export function onRequestError(error: unknown, request: { method: string; path: string }) {
-    logixError(
-        error instanceof Error ? error.message : 'Unhandled DrippyBanks request error',
-        {
-            operation: `${request.method} ${request.path}`,
-            track: {
-                errorName: error instanceof Error ? error.name : 'UnknownError',
-                stack: error instanceof Error ? error.stack : undefined,
-            },
-        },
-    );
-}
+export const onRequestError = Sentry.captureRequestError;
