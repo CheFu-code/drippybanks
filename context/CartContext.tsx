@@ -42,18 +42,47 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const CART_STORAGE_KEY = 'drippybanks_cart';
+
+function loadCartFromStorage(): CartItem[] {
+    if (typeof window === 'undefined') return [];
+    try {
+        const raw = localStorage.getItem(CART_STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw) as CartItem[];
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveCartToStorage(cart: CartItem[]): void {
+    if (typeof window === 'undefined') return;
+    try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    } catch {
+        // Storage quota exceeded or private mode — fail silently
+    }
+}
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-    const [cart, setCart] = useState<CartItem[]>([]);
+    // Lazy initializer: load from localStorage on first render only
+    const [cart, setCart] = useState<CartItem[]>(() => loadCartFromStorage());
     const [isCartOpen, setIsCartOpen] = useState(false);
+
+    // Sync to localStorage whenever the cart changes
+    const setCartPersisted = (updater: CartItem[] | ((prev: CartItem[]) => CartItem[])) => {
+        setCart((prev) => {
+            const next = typeof updater === 'function' ? updater(prev) : updater;
+            saveCartToStorage(next);
+            return next;
+        });
+    };
 
     const matchesItem = (item: CartItem, productId: string, size?: string, color?: string) => {
         if (item.id !== productId) return false;
-        if (size !== undefined && (item.selectedSize ?? '') !== size) {
-            return false;
-        }
-        if (color !== undefined && (item.selectedColor ?? '') !== color) {
-            return false;
-        }
+        if (size !== undefined && (item.selectedSize ?? '') !== size) return false;
+        if (color !== undefined && (item.selectedColor ?? '') !== color) return false;
         return true;
     };
 
@@ -61,7 +90,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         const effectiveSize = selectedSize ?? product.selectedSize ?? (product.sizes && product.sizes.length > 0 ? product.sizes[0] : undefined);
         const effectiveColor = selectedColor ?? product.selectedColor ?? (product.colors && product.colors.length > 0 ? product.colors[0] : undefined);
 
-        setCart((prev) => {
+        setCartPersisted((prev) => {
             const existing = prev.find(
                 (item) =>
                     item.id === product.id &&
@@ -92,11 +121,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const removeFromCart = (productId: string, size?: string, color?: string) => {
-        setCart((prev) => prev.filter((item) => !matchesItem(item, productId, size, color)));
+        setCartPersisted((prev) => prev.filter((item) => !matchesItem(item, productId, size, color)));
     };
 
     const decreaseQuantity = (productId: string, size?: string, color?: string) => {
-        setCart((prev) =>
+        setCartPersisted((prev) =>
             prev
                 .map((item) =>
                     matchesItem(item, productId, size, color)
@@ -107,7 +136,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         );
     };
 
-    const clearCart = () => setCart([]);
+    const clearCart = () => setCartPersisted([]);
 
     const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
     const cartTotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
