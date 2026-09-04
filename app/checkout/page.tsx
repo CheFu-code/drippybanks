@@ -15,6 +15,9 @@ import {
     EmptyCartCheckoutCard,
     LoadingCheckoutCard,
     OrderConfirmationCard,
+    VerifyingPaymentCheckoutCard,
+    PaymentPendingCheckoutCard,
+    PaymentFailedCheckoutCard,
 } from './_components/CheckoutStates';
 import { CheckoutForm, FulfillmentMethod, SavedOrder } from './_components/types';
 import { generatePayFastPaymentApi, submitPayFastForm } from '@/lib/api/payfast';
@@ -35,6 +38,9 @@ function CheckoutContent() {
     const { cart, cartTotal, clearCart } = useCart();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [placedOrder, setPlacedOrder] = useState<SavedOrder | null>(null);
+    const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
+    const [verificationError, setVerificationError] = useState<string | null>(null);
+    const [paymentPendingOrderId, setPaymentPendingOrderId] = useState<string | null>(null);
     const [promoCodeInput, setPromoCodeInput] = useState('');
     const [promoCodeError, setPromoCodeError] = useState<string | null>(null);
     const [promoApplied, setPromoApplied] = useState(false);
@@ -128,33 +134,80 @@ function CheckoutContent() {
         }
     }, [searchParams, user, applyPromoCode]);
 
-    // Handle PayFast return redirects
+    // Handle PayFast return redirects with server-side ITN verification
     useEffect(() => {
         let isActive = true;
+        let pollTimer: ReturnType<typeof setTimeout> | null = null;
+        let pollCount = 0;
+        const maxPolls = 6; // Poll every 2s for up to 12 seconds
+
         const isSuccess = searchParams.get('payfast_success');
         const orderId = searchParams.get('order_id');
         const isCancelled = searchParams.get('cancelled');
 
+        if (isCancelled === 'true') {
+            toast.info('PayFast payment was cancelled. You can try again when ready.');
+            return;
+        }
+
         if (isSuccess === 'true' && orderId && user) {
-            const loadOrder = async () => {
+            setIsVerifyingPayment(true);
+            setVerificationError(null);
+            setPaymentPendingOrderId(null);
+
+            const verifyOrder = async () => {
                 try {
                     const order = await fetchOrderByIdApi(orderId);
                     if (!isActive) return;
-                    setPlacedOrder(order as SavedOrder);
-                    clearCart();
-                    toast.success(`Payment confirmed! Order ${orderId} received.`);
-                } catch {
+
+                    // If server ITN confirmed the payment
+                    if (order.paymentStatus === 'paid') {
+                        setPlacedOrder(order as SavedOrder);
+                        setIsVerifyingPayment(false);
+                        clearCart();
+                        toast.success(`Payment confirmed! Order ${orderId} received.`);
+                        return;
+                    }
+
+                    // If payment explicitly failed or cancelled
+                    if (order.paymentStatus === 'failed' || order.paymentStatus === 'cancelled') {
+                        setIsVerifyingPayment(false);
+                        setVerificationError(
+                            order.cancelledReason || 'PayFast payment was not completed.',
+                        );
+                        return;
+                    }
+
+                    // Payment status is still 'pending' (ITN webhook in flight)
+                    pollCount++;
+                    if (pollCount < maxPolls) {
+                        pollTimer = setTimeout(verifyOrder, 2000);
+                    } else {
+                        // Polling completed before ITN arrived; order is recorded as pending in DB
+                        setIsVerifyingPayment(false);
+                        setPaymentPendingOrderId(orderId);
+                    }
+                } catch (error) {
                     if (!isActive) return;
-                    toast.success('Payment completed successfully!');
+                    console.error('Error verifying order payment status:', error);
+                    pollCount++;
+                    if (pollCount < maxPolls) {
+                        pollTimer = setTimeout(verifyOrder, 2000);
+                    } else {
+                        setIsVerifyingPayment(false);
+                        setVerificationError('Unable to verify order payment status.');
+                    }
                 }
             };
-            void loadOrder();
-        } else if (isCancelled === 'true') {
-            toast.info('PayFast payment was cancelled. You can try again when ready.');
+
+            void verifyOrder();
         }
 
         return () => {
             isActive = false;
+            if (pollTimer) {
+                clearTimeout(pollTimer);
+            }
         };
     }, [searchParams, clearCart, user]);
 
@@ -234,7 +287,8 @@ function CheckoutContent() {
         const order: SavedOrder = {
             id: orderId,
             date: new Date().toISOString(),
-            status: 'Processing',
+            status: 'Pending',
+            paymentStatus: 'pending',
             total: Number(grandTotal.toFixed(2)),
             subtotal: Number(subtotalAfterPromo.toFixed(2)),
             shipping: Number(shipping.toFixed(2)),
@@ -306,7 +360,7 @@ function CheckoutContent() {
                 </div>
 
                 {userLoading && <LoadingCheckoutCard />}
-                {!userLoading && !user && (
+                {!userLoading && !user && !isVerifyingPayment && !verificationError && !paymentPendingOrderId && !placedOrder && (
                     <Card className="border-white/10 bg-slate-900/80">
                         <CardHeader>
                             <CardTitle className="text-xl text-white">Sign in required</CardTitle>
@@ -326,9 +380,28 @@ function CheckoutContent() {
                         </CardContent>
                     </Card>
                 )}
-                {!userLoading && placedOrder && <OrderConfirmationCard placedOrder={placedOrder} />}
-                {!userLoading && !placedOrder && cart.length === 0 && <EmptyCartCheckoutCard />}
-                {!userLoading && user && !placedOrder && cart.length > 0 && (
+                {!userLoading && isVerifyingPayment && (
+                    <VerifyingPaymentCheckoutCard orderId={searchParams.get('order_id') || 'Current Order'} />
+                )}
+                {!userLoading && !isVerifyingPayment && verificationError && (
+                    <PaymentFailedCheckoutCard
+                        errorMessage={verificationError}
+                        onRetry={() => {
+                            setVerificationError(null);
+                            router.push('/checkout');
+                        }}
+                    />
+                )}
+                {!userLoading && !isVerifyingPayment && !verificationError && paymentPendingOrderId && (
+                    <PaymentPendingCheckoutCard orderId={paymentPendingOrderId} />
+                )}
+                {!userLoading && !isVerifyingPayment && !verificationError && !paymentPendingOrderId && placedOrder && (
+                    <OrderConfirmationCard placedOrder={placedOrder} />
+                )}
+                {!userLoading && !isVerifyingPayment && !verificationError && !paymentPendingOrderId && !placedOrder && cart.length === 0 && (
+                    <EmptyCartCheckoutCard />
+                )}
+                {!userLoading && !isVerifyingPayment && !verificationError && !paymentPendingOrderId && user && !placedOrder && cart.length > 0 && (
                     <CheckoutFormLayout
                         user={user}
                         form={form}

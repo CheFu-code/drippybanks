@@ -1,6 +1,7 @@
 import { apiUrl } from "@/config/chefuAuth";
 
 export type OrderStatus =
+    | "Pending"
     | "Processing"
     | "Packed"
     | "Shipped"
@@ -44,6 +45,8 @@ export interface StoredOrder {
     paymentStatus?: PaymentStatus;
     payfastPaymentId?: string;
     paidAt?: string;
+    cancelledReason?: string;
+    inventoryDecremented?: boolean;
     createdAt?: string;
     updatedAt?: string;
 }

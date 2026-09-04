@@ -16,13 +16,16 @@ export type FulfillmentMethod = 'collect' | 'deliver';
 export type SavedOrder = {
     id: string;
     date: string;
-    status: 'Processing' | 'Packed' | 'Shipped' | 'Delivered' | 'Cancelled';
+    status: 'Pending' | 'Processing' | 'Packed' | 'Shipped' | 'Delivered' | 'Cancelled';
     total: number;
     subtotal: number;
     shipping: number;
     tax: number;
     paymentMethod: 'payfast';
+    paymentStatus?: 'pending' | 'paid' | 'failed' | 'cancelled';
     payfastPaymentId?: string;
+    paidAt?: string;
+    inventoryDecremented?: boolean;
     fulfillmentMethod: FulfillmentMethod;
     deliveryFee: number;
     items: Array<{ id: string; name: string; quantity: number; price: number; image: string; selectedSize?: string; selectedColor?: string }>;
