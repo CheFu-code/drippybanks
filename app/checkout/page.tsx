@@ -322,7 +322,12 @@ function CheckoutContent() {
                 promoDiscountPercent: promoApplied ? effectivePromoDiscount : undefined,
             });
 
-            const currentOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://drippybanks.chefu.co.za';
+            const currentOrigin =
+                typeof window !== 'undefined' &&
+                !window.location.hostname.includes('localhost') &&
+                !window.location.hostname.includes('127.0.0.1')
+                    ? window.location.origin
+                    : 'https://drippybanks.chefu.co.za';
             const returnUrl = `${currentOrigin}/checkout?payfast_success=true&order_id=${orderId}`;
             const cancelUrl = `${currentOrigin}/checkout?cancelled=true`;
 
@@ -330,7 +335,7 @@ function CheckoutContent() {
             const paymentData = await generatePayFastPaymentApi({
                 orderId,
                 amount: grandTotal,
-                itemName: `DrippyBanks Order #${orderId}`,
+                itemName: `DrippyBanks Order ${orderId}`,
                 customer: {
                     fullName,
                     email,
