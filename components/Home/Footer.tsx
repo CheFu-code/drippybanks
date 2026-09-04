@@ -16,11 +16,11 @@ const SHOP_LINKS = [
 ];
 
 const HELP_LINKS = [
-    { label: "Customer Service", href: "mailto:support@chefu.co.za" },
+    { label: "Customer Service", href: "mailto:drippybanks@chefu.co.za" },
     { label: "My Account", type: "account" as const },
     { label: "Find a Store", href: "/shop" },
     { label: "Legal & Privacy", href: "/privacy" },
-    { label: "Contact", href: "mailto:hello@chefu.co.za" },
+    { label: "Contact", href: "mailto:drippybanks@chefu.co.za" },
 ];
 
 type HelpLink = (typeof HELP_LINKS)[number];
